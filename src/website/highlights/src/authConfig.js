@@ -8,15 +8,15 @@ import { LogLevel } from "@azure/msal-browser";
 export const b2cPolicies = {
     names: {
         signUpSignIn: "B2C_1_SignUpSignIn",
-        // editProfile: "B2C_1_ProfileEditPolicy"
+        editProfile: "B2C_1_ProfileEditPolicy"
     },
     authorities: {
         signUpSignIn: {
             authority: "https://highlightsapp.b2clogin.com/highlightsapp.onmicrosoft.com/B2C_1_SignUpSignIn"
         },
-        // editProfile: {
-        //     authority: "https://msidlabb2c.b2clogin.com/msidlabb2c.onmicrosoft.com/B2C_1_ProfileEditPolicy"
-        // }
+        editProfile: {
+            authority: "https://highlightsapp.b2clogin.com/highlightsapp.onmicrosoft.com/B2C_1_ProfileEditing"
+        }
     },
     authorityDomain: "highlightsapp.b2clogin.com"
 }
@@ -73,4 +73,8 @@ export const msalConfig = {
  */
 export const loginRequest = {
     scopes: ["https://highlightsapp.onmicrosoft.com/api/User.Read"]
+};
+
+export const profileEditRequest = {
+    scopes: []
 };

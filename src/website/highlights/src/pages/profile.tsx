@@ -1,8 +1,9 @@
 import { AuthenticatedTemplate, useMsal } from "@azure/msal-react";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { loginRequest } from "../authConfig";
 import { Button, Space } from "@mantine/core";
 import { ProfileEditButton } from "@/components/ProfileEditButton";
+import PageLayout from "@/components/PageLayout";
 
 type Profile = {
     givenName: string,
@@ -41,3 +42,11 @@ export default function Profile() {
         </AuthenticatedTemplate>
     )
 };
+
+Profile.getLayout = function getLayout(page: ReactNode) {
+    return (
+        <PageLayout>
+            {page}
+        </PageLayout>
+    );
+}

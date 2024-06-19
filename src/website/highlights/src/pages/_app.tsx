@@ -5,16 +5,15 @@ import { createTheme, MantineProvider } from '@mantine/core';
 import { MsalProvider } from '@azure/msal-react';
 import { AuthenticationResult, EventType, PublicClientApplication } from '@azure/msal-browser';
 import { msalConfig } from '../authConfig';
-import PageLayout from '@/components/PageLayout';
+import { NextPage } from 'next';
+import { ReactElement, ReactNode } from 'react';
 
 const msalInstance = new PublicClientApplication(msalConfig);
 
 if (!msalInstance.getActiveAccount() && msalInstance.getAllAccounts().length > 0) {
-    // Account selection logic is app dependent. Adjust as needed for different use cases.
     msalInstance.setActiveAccount(msalInstance.getAllAccounts()[0]);
 }
 
-// Optional - This will update account state if a user signs in from another tab or window
 msalInstance.enableAccountStorageEvents();
 
 msalInstance.addEventCallback((event) => {
@@ -35,13 +34,21 @@ const theme = createTheme({
     /** Put your mantine theme override here */
 });
 
-export default function App({ Component, pageProps }: AppProps) {
+export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
+    getLayout?: (page: ReactElement) => ReactNode
+}
+
+type AppPropsWithLayout = AppProps & {
+    Component: NextPageWithLayout
+}
+
+export default function App({ Component, pageProps }: AppPropsWithLayout) {
+    const getLayout = Component.getLayout ?? ((page) => page)
+
     return (
         <MsalProvider instance={msalInstance}>
             <MantineProvider theme={theme}>
-                <PageLayout>
-                    <Component {...pageProps} />
-                </PageLayout>
+                {getLayout(<Component {...pageProps} />)}
             </MantineProvider>
         </MsalProvider>
     );

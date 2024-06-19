@@ -1,10 +1,10 @@
 import GetAPIResponse from "@/components/GetAPIResponse";
+import PageLayout from "@/components/PageLayout";
 import { SignInButton } from "@/components/SignInButton";
 import { SignOutButton } from "@/components/SignOutButton";
 import { AuthenticatedTemplate, UnauthenticatedTemplate } from "@azure/msal-react";
 import { Space, Title } from "@mantine/core";
-import React from "react";
-
+import { ReactNode } from "react";
 
 export default function Home() {
     return (
@@ -29,5 +29,13 @@ export default function Home() {
                 <SignInButton />
             </UnauthenticatedTemplate>
         </>
+    );
+}
+
+Home.getLayout = function getLayout(page: ReactNode) {
+    return (
+        <PageLayout>
+            {page}
+        </PageLayout>
     );
 }

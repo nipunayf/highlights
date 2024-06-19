@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@azure/msal-browser": "^3.17.0",
+    "@azure/msal-react": "^2.0.19",
     "@mantine/core": "^7.10.1",
     "@mantine/hooks": "^7.10.1",
     "next": "14.2.3",

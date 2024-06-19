@@ -31,7 +31,7 @@ export const msalConfig = {
         clientId: "7d51f88c-df18-4d23-afff-9ecde21be6a9",
         authority: b2cPolicies.authorities.signUpSignIn.authority,
         knownAuthorities: [b2cPolicies.authorityDomain],
-        redirectUri: "/",
+        redirectUri: "/auth/callback",
         postLogoutRedirectUri: "/",
     },
     cache: {

@@ -19,7 +19,6 @@
   
   .card{
     width: 35%;
-    
     height: 700px;
   }
 
@@ -28,4 +27,53 @@
     margin-top: 35%;
     width: 150px;  /* Adjust width as needed */
     height: 150px; /* Adjust height as needed */
+  }
+
+
+  .separator {
+    margin-left: 2%;
+    width: 4px;
+    /* height: ;  */
+    background-color: #d6d2d2; /* Color of the vertical line */
+  }
+
+  .highlight_card{
+    display: flex;
+  }
+/* ##F0F4F5; */
+  .task{
+    margin-left: 52%;
+    width:500%;
+    background-color:#F0F4F5;
+    border-radius: 10px;
+    height: 50px;
+    /* display: flex; */
+  }
+
+  /* .task h2{
+    padding-top: 1.5%;
+    padding-left: 15%;
+  } */
+
+  .flag_icon{
+    margin-top: -16%;
+    padding-top: 19%;
+    padding-left: 4%;
+  }
+
+  .task_name{
+    margin-top: -3%;
+    margin-left: 15%;
+
+  }
+
+  .task{
+    display: flex;
+  }
+
+  .bars_icon{
+    margin-top: -16%;
+    padding-top: 19%;
+    margin-left: 60%;
+    cursor: pointer;
   }

@@ -1,5 +1,6 @@
-import { Anchor, AppShell, Burger, Divider, Group, NavLink, Text } from '@mantine/core';
+import { Anchor, AppShell, Box, Burger, Divider, Group, NavLink, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import ColorSchemeToggle from './ColorSchemeToggle/ColorSchemeToggle';
 
 export default function PageLayout({ children }: { children: React.ReactNode }) {
     const [opened, { toggle }] = useDisclosure();
@@ -15,7 +16,7 @@ export default function PageLayout({ children }: { children: React.ReactNode }) 
             padding="md"
         >
             <AppShell.Header>
-                <Group h="100%" px="md">
+                <Group h="100%" px="xl">
                     <Burger
                         opened={opened}
                         onClick={toggle}
@@ -25,6 +26,8 @@ export default function PageLayout({ children }: { children: React.ReactNode }) 
                     <Anchor href="/" style={{ textDecoration: "none" }}>
                         <Text fw={600} c={'dark'}>Highlights</Text>
                     </Anchor>
+                    <Box ml="auto"></Box>
+                    <ColorSchemeToggle />
                 </Group>
             </AppShell.Header>
 

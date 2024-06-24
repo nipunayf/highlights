@@ -16,12 +16,24 @@
     color: #746f6f;
    
   }
-  
-  .card{
+  .card {
     width: 35%;
     height: 700px;
+    background-color: #D9D9D9;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid transparent; /* Initial border color */
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for the hover effect */
+    border-radius: 10px; /* Add border radius for rounded corners */
   }
-
+  
+  .card:hover {
+    transform: scale(1.05); /* Slightly scale up the card */
+    border-color: #aca9a9; /* Change border color on hover */
+    box-shadow: 0 8px 16px rgba(175, 172, 172, 0.2); /* Increase shadow on hover for "pop" effect */
+  }
+  
+  
+  
   .icon {
     margin-left: 35%;
     margin-top: 35%;
@@ -42,18 +54,15 @@
   }
 /* ##F0F4F5; */
   .task{
-    margin-left: 52%;
-    width:500%;
+    cursor: pointer;
+    margin-left: 5%;
+    width:500px;
     background-color:#F0F4F5;
     border-radius: 10px;
     height: 50px;
-    /* display: flex; */
   }
 
-  /* .task h2{
-    padding-top: 1.5%;
-    padding-left: 15%;
-  } */
+ 
 
   .flag_icon{
     margin-top: -16%;
@@ -74,6 +83,11 @@
   .bars_icon{
     margin-top: -16%;
     padding-top: 19%;
-    margin-left: 60%;
+    margin-left: 1%;
     cursor: pointer;
   }
+.d{
+    display: flex;
+    /* margin-left: 200px; */  
+}
+  

@@ -5,6 +5,9 @@ import classes from "./ActionsGrid.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFlag } from "@fortawesome/free-solid-svg-icons";
 import { faEllipsis } from "@fortawesome/free-solid-svg-icons";
+import Addtask_popup from "@/components/Addtask_popup";
+import React, { useState } from 'react';
+
 
 function ActionsGrid() {
   const theme = useMantineTheme();
@@ -13,11 +16,20 @@ function ActionsGrid() {
     { id: 2, title: "Task 2", description: "Description for task 2" },
     { id: 3, title: "Task 3", description: "Description for task 3" },
   ];
+  const [popupOpen, setPopupOpen] = useState(false);
+
+  const handleCardClick = () => {
+    setPopupOpen(true);
+  };
+
+  const handleClosePopup = () => {
+    setPopupOpen(false);
+  };
 
   return (
     <>
       <div className={classes.highlight_card}>
-        <Card withBorder radius="10px" className={classes.card}>
+        <Card withBorder radius="10px" className={classes.card} onClick={handleCardClick}>
           <Group>
             <img
               src="/add-plus-svgrepo-com (1).svg"
@@ -50,7 +62,10 @@ function ActionsGrid() {
             </div>
           ))}
         </div>
+        
       </div>
+
+      <Addtask_popup open={popupOpen} onClose={handleClosePopup} />
     </>
   );
 }

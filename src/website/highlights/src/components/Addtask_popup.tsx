@@ -39,8 +39,7 @@ export default function Addtask_popup({ open, onClose }: AddTaskPopupProps) {
       <DialogTitle>{"Use Google's location service?"}</DialogTitle>
       <DialogContent>
         <DialogContentText id="alert-dialog-slide-description">
-          Let Google help apps determine location. This means sending anonymous
-          location data to Google, even when no apps are running.
+         
           <LocalizationProvider dateAdapter={AdapterDayjs}>
       <DateCalendar />
     </LocalizationProvider>

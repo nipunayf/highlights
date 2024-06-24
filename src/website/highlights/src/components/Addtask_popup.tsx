@@ -8,6 +8,9 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Slide from '@mui/material/Slide';
 import { TransitionProps } from '@mui/material/transitions';
 
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 
 
 const Transition = React.forwardRef(function Transition(
@@ -38,7 +41,9 @@ export default function Addtask_popup({ open, onClose }: AddTaskPopupProps) {
         <DialogContentText id="alert-dialog-slide-description">
           Let Google help apps determine location. This means sending anonymous
           location data to Google, even when no apps are running.
-
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <DateCalendar />
+    </LocalizationProvider>
           
         </DialogContentText>
       </DialogContent>

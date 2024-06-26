@@ -8,7 +8,7 @@ import { msalConfig } from '../authConfig';
 import { NextPage } from 'next';
 import { ReactElement, ReactNode } from 'react';
 
-const msalInstance = new PublicClientApplication(msalConfig);
+export const msalInstance = new PublicClientApplication(msalConfig);
 
 if (!msalInstance.getActiveAccount() && msalInstance.getAllAccounts().length > 0) {
     msalInstance.setActiveAccount(msalInstance.getAllAccounts()[0]);

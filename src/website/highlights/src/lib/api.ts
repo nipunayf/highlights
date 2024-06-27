@@ -1,7 +1,7 @@
 import { apiEndpoint } from "@/apiConfig";
 import qs from "qs"
 import { loginRequest } from "@/authConfig";
-import { PublicClientApplication } from "@azure/msal-browser";
+import { InteractionRequiredAuthError, PublicClientApplication } from "@azure/msal-browser";
 import { msalInstance } from "@/pages/_app";
 
 const aquireAccessToken = async (msalInstance: PublicClientApplication) => {
@@ -10,12 +10,20 @@ const aquireAccessToken = async (msalInstance: PublicClientApplication) => {
         throw Error("No active account! Verify a user has been signed in and setActiveAccount has been called.");
     }
 
-    const response = await msalInstance.acquireTokenSilent({
+    const accessTokenRequest = {
         ...loginRequest,
         account: account
-    });
+    };
 
-    return response.accessToken;
+    try {
+        const response = await msalInstance.acquireTokenSilent(accessTokenRequest);
+        return response.accessToken;
+    } catch (error) {
+        console.error(error);
+        if (error instanceof InteractionRequiredAuthError) {
+            msalInstance.acquireTokenRedirect(accessTokenRequest);
+        }
+    }
 }
 
 export function getURL(path: string = ""): string {

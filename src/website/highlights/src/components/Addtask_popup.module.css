@@ -1,0 +1,58 @@
+.custom-dialog {
+   padding: 20px;
+   /* width: 800px; */
+ }
+ 
+ .custom-input {
+   background-color: #D9D9D9;
+   height: 40px;
+   border-radius: 10px;
+   margin-top: 10px;
+ }
+ 
+ .custom-input input {
+   padding-left: 8px;
+ }
+ 
+ .custom-time-picker {
+   background-color: #D9D9D9;
+   width: 150px;
+   height: 40px;
+   border-radius: 10px;
+   margin-top: 10px;
+ }
+ 
+ .custom-textarea {
+   background-color: #D9D9D9;
+   border-radius: 10px;
+   margin-top: 10px;
+ }
+ 
+ .custom-textarea textarea {
+   padding-left: 8px;
+ }
+ 
+ .custom-label {
+   color: #333;
+   font-weight: bold;
+   margin-bottom: 5px;
+   /* margin-left: 20%; */
+ }
+ 
+ .custom-button1 {
+   /* margin-left: 20px; */
+   background-color: #f90101;
+   color: white;
+   &:hover {
+     background-color: darkblue;
+   }
+ }
+
+ .custom-button2 {
+   background-color: #42A3FC;
+   color: white;
+   &:hover {
+     background-color: darkblue;
+   }
+ }
+ 

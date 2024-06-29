@@ -13,7 +13,13 @@
     "@azure/msal-react": "^2.0.19",
     "@mantine/core": "^7.10.1",
     "@mantine/hooks": "^7.10.1",
+<<<<<<< HEAD
     "next": "^14.2.4",
+=======
+    "@tabler/icons-react": "^3.6.0",
+    "clsx": "^2.1.1",
+    "next": "14.2.3",
+>>>>>>> 8824e96aaa9b4477f91f8ce4a931b6459bded2c9
     "react": "^18",
     "react-dom": "^18"
   },

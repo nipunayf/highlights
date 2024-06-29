@@ -1,4 +1,4 @@
-import { AppShell } from '@mantine/core';
+import { AppShell, Box } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import Navbar from './Navbar/Navbar';
 import Header from './Header/Header';
@@ -25,7 +25,9 @@ export default function PageLayout({ children }: { children: React.ReactNode }) 
             </AppShell.Navbar>
 
             <AppShell.Main>
-                {children}
+                <Box m={'xs'}>
+                    {children}
+                </Box>
             </AppShell.Main>
         </AppShell>
     );

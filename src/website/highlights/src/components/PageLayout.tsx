@@ -1,5 +1,6 @@
-import { Anchor, AppShell, Box, Burger, Divider, Group, NavLink, Text } from '@mantine/core';
+import { AppShell } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import Navbar from './Navbar/Navbar';
 import Header from './Header/Header';
 
 export default function PageLayout({ children }: { children: React.ReactNode }) {
@@ -19,39 +20,8 @@ export default function PageLayout({ children }: { children: React.ReactNode }) 
                 <Header opened={opened} toggle={toggle} />
             </AppShell.Header>
 
-            <AppShell.Navbar p="md">
-                <NavLink
-                    href="/highlights"
-                    label="Highlights"
-                />
-                <NavLink
-                    href="/calendar"
-                    label="Calendar"
-                />
-                <NavLink
-                    href="/tasks"
-                    label="Tasks"
-                />
-                <NavLink
-                    href="/analytics"
-                    label="Analytics"
-                />
-                <NavLink
-                    href="/profile"
-                    label="My Profile"
-                />
-                <AppShell.Section>
-                    <Divider my="md" />
-                    <Text pb="xs">Task lists</Text>
-                    <NavLink
-                        href="/tasks"
-                        label="Important"
-                    />
-                    <NavLink
-                        href="/tasks"
-                        label="Work"
-                    />
-                </AppShell.Section>
+            <AppShell.Navbar>
+                <Navbar />
             </AppShell.Navbar>
 
             <AppShell.Main>

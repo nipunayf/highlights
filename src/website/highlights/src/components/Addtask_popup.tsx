@@ -11,7 +11,7 @@ import { TransitionProps } from '@mui/material/transitions';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
-import { TimePicker } from '@mui/x-date-pickers/TimePicker';
+import { MultiInputTimeRangeField } from '@mui/x-date-pickers-pro';
 import dayjs, { Dayjs } from 'dayjs';
 import classes from './Addtask_popup.module.css';
 
@@ -32,8 +32,7 @@ interface AddTaskPopupProps {
 export default function AddTaskPopup({ open, onClose }: AddTaskPopupProps) {
   const [title, setTitle] = React.useState('');
   const [date, setDate] = React.useState<Dayjs | null>(dayjs());
-  const [startTime, setStartTime] = React.useState<Dayjs | null>(dayjs());
-  const [endTime, setEndTime] = React.useState<Dayjs | null>(dayjs());
+  const [timeRange, setTimeRange] = React.useState<[Dayjs | null, Dayjs | null]>([dayjs(), dayjs()]);
   const [reminder, setReminder] = React.useState('');
   const [priority, setPriority] = React.useState('');
   const [description, setDescription] = React.useState('');
@@ -46,12 +45,8 @@ export default function AddTaskPopup({ open, onClose }: AddTaskPopupProps) {
     setDate(newDate);
   };
 
-  const handleStartTimeChange = (newTime: Dayjs | null) => {
-    setStartTime(newTime);
-  };
-
-  const handleEndTimeChange = (newTime: Dayjs | null) => {
-    setEndTime(newTime);
+  const handleTimeRangeChange = (newTimeRange: [Dayjs | null, Dayjs | null]) => {
+    setTimeRange(newTimeRange);
   };
 
   const handleReminderChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -67,7 +62,7 @@ export default function AddTaskPopup({ open, onClose }: AddTaskPopupProps) {
   };
 
   const handleAgree = () => {
-    console.log(`Title: ${title}, Date: ${date}, Start Time: ${startTime}, End Time: ${endTime}, Reminder: ${reminder}, Priority: ${priority}, Description: ${description}`);
+    console.log(`Title: ${title}, Date: ${date}, Time Range: ${timeRange}, Reminder: ${reminder}, Priority: ${priority}, Description: ${description}`);
     onClose();
   };
 
@@ -79,8 +74,9 @@ export default function AddTaskPopup({ open, onClose }: AddTaskPopupProps) {
       onClose={onClose}
       aria-describedby="alert-dialog-slide-description"
       className={classes['custom-dialog']}
+      classes={{ paper: classes['dialog-paper'] }}
     >
-     
+      
       <DialogContent>
         <TextField
           margin="dense"
@@ -101,21 +97,18 @@ export default function AddTaskPopup({ open, onClose }: AddTaskPopupProps) {
             value={date}
             onChange={handleDateChange}
           />
-          <TimePicker
-            label="Start Time"
-            value={startTime}
-            onChange={handleStartTimeChange}
-            renderInput={(params) => (
-              <TextField {...params} fullWidth variant="standard" className={classes['custom-time-picker']} InputLabelProps={{ className: classes['custom-label'] }} />
-            )}
-          />
-          <TimePicker
-            label="End Time"
-            value={endTime}
-            onChange={handleEndTimeChange}
-            renderInput={(params) => (
-              <TextField {...params} fullWidth variant="standard" className={classes['custom-time-picker']} InputLabelProps={{ className: classes['custom-label'] }} />
-            )}
+          <MultiInputTimeRangeField
+            value={timeRange}
+            onChange={handleTimeRangeChange}
+            slotProps={{
+              textField: ({ position }) => ({
+                label: position === 'start' ? 'Start Time' : 'End Time',
+                fullWidth: true,
+                variant: 'standard',
+                className: classes['custom-time-picker'],
+                InputLabelProps: { className: classes['custom-label'] }
+              }),
+            }}
           />
         </LocalizationProvider>
         <TextField
@@ -147,6 +140,7 @@ export default function AddTaskPopup({ open, onClose }: AddTaskPopupProps) {
           className={classes['custom-input']}
           InputLabelProps={{ className: classes['custom-label'] }}
         >
+          <MenuItem value="none">None</MenuItem>
           <MenuItem value="low">Low</MenuItem>
           <MenuItem value="medium">Medium</MenuItem>
           <MenuItem value="high">High</MenuItem>

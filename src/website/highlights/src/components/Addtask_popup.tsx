@@ -13,6 +13,8 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import { MultiInputTimeRangeField } from '@mui/x-date-pickers-pro';
 import dayjs, { Dayjs } from 'dayjs';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFlag } from '@fortawesome/free-solid-svg-icons';
 import classes from './Addtask_popup.module.css';
 
 const Transition = React.forwardRef(function Transition(
@@ -76,7 +78,7 @@ export default function AddTaskPopup({ open, onClose }: AddTaskPopupProps) {
       className={classes['custom-dialog']}
       classes={{ paper: classes['dialog-paper'] }}
     >
-      
+      <DialogTitle>{"Add New Task"}</DialogTitle>
       <DialogContent>
         <TextField
           margin="dense"
@@ -140,10 +142,22 @@ export default function AddTaskPopup({ open, onClose }: AddTaskPopupProps) {
           className={classes['custom-input']}
           InputLabelProps={{ className: classes['custom-label'] }}
         >
-          <MenuItem value="none">None</MenuItem>
-          <MenuItem value="low">Low</MenuItem>
-          <MenuItem value="medium">Medium</MenuItem>
-          <MenuItem value="high">High</MenuItem>
+          <MenuItem value="none">
+            <FontAwesomeIcon icon={faFlag} style={{color: "transparent", marginRight: "8px"}} />
+            None
+          </MenuItem>
+          <MenuItem value="low">
+            <FontAwesomeIcon icon={faFlag} style={{color: "green", marginRight: "8px"}} />
+            Low
+          </MenuItem>
+          <MenuItem value="medium">
+            <FontAwesomeIcon icon={faFlag} style={{color: "yellow", marginRight: "8px"}} />
+            Medium
+          </MenuItem>
+          <MenuItem value="high">
+            <FontAwesomeIcon icon={faFlag} style={{color: "red", marginRight: "8px"}} />
+            High
+          </MenuItem>
         </TextField>
         <TextField
           margin="dense"

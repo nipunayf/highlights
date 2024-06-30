@@ -4,10 +4,9 @@ import { ReactNode } from "react";
 import classes from "./ActionsGrid.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFlag } from "@fortawesome/free-solid-svg-icons";
-import { faEllipsis } from "@fortawesome/free-solid-svg-icons";
 import Addtask_popup from "@/components/Addtask_popup";
 import React, { useState } from 'react';
-
+import OptionsMenu from "@/components/Option_popup";
 
 function ActionsGrid() {
   const theme = useMantineTheme();
@@ -44,25 +43,23 @@ function ActionsGrid() {
         <div className={classes.list_task}>
           {tasks.map((task) => (
             <div key={task.id}>
-                <div className={classes.d}>
-              <div className={classes.task}>
-                <div className={classes.flag_icon}>
-                  <FontAwesomeIcon icon={faFlag} />
+              <div className={classes.d}>
+                <div className={classes.task}>
+                  <div className={classes.flag_icon}>
+                    <FontAwesomeIcon icon={faFlag} />
+                  </div>
+                  <div className={classes.task_name}>
+                    <h2>{task.title}</h2>
+                  </div>
                 </div>
-                <div className={classes.task_name}>
-                  <h2>{task.title}</h2>
+                <div className={classes.bars_icon}>
+                  <OptionsMenu onOpenPopup={handleCardClick} />
                 </div>
-                
               </div>
-              <div className={classes.bars_icon}>
-                  <FontAwesomeIcon icon={faEllipsis} />
-                </div>
-                </div>
-              <br></br>
+              <br />
             </div>
           ))}
         </div>
-        
       </div>
 
       <Addtask_popup open={popupOpen} onClose={handleClosePopup} />
@@ -73,7 +70,6 @@ function ActionsGrid() {
 export default function Highlights() {
   return (
     <>
-      {/* <Title order={1}>Highlights</Title> */}
       <ActionsGrid />
     </>
   );

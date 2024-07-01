@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef,forwardRef } from 'react';
-import { Button, Modal, Group, TextInput, List, ThemeIcon, Text,Menu ,UnstyledButton, Tabs } from '@mantine/core';
-import { IconCircleCheck,IconInfoCircle, IconChevronRight } from '@tabler/icons-react';
+import React, { useState, useEffect, useRef, forwardRef } from 'react';
+import { Button, Modal, Group, TextInput, List, ThemeIcon, Text, Menu, UnstyledButton, Tabs, Avatar } from '@mantine/core';
+import { IconCircleCheck, IconInfoCircle, IconChevronRight ,IconCalendarDue} from '@tabler/icons-react';
 import { showNotification } from '@mantine/notifications';
 import styles from './Stopwatch.module.css';
 
@@ -11,9 +11,15 @@ const tasks = [
   // Add more tasks as needed
 ];
 
-const UserButton = forwardRef((props, ref) => {
-  const { image, label, icon, ...others } = props;
-  return (
+interface UserButtonProps {
+  image?: string;
+  label: string;
+  icon?: React.ReactNode;
+  [key: string]: any;
+}
+
+const UserButton = forwardRef<HTMLButtonElement, UserButtonProps>(
+  ({ image, label, icon, ...others }, ref) => (
     <UnstyledButton
       ref={ref}
       style={{
@@ -25,23 +31,16 @@ const UserButton = forwardRef((props, ref) => {
     >
       <Group>
         {image && <Avatar src={image} radius="xl" />}
-
         <div style={{ flex: 1 }}>
           <Text size="sm" fw={500}>
             {label}
           </Text>
         </div>
-
         {icon || <IconChevronRight size="1rem" />}
       </Group>
     </UnstyledButton>
-  );
-});
-
-
-
-
-
+  )
+);
 
 const Stopwatch: React.FC = () => {
   const [time, setTime] = useState(0);
@@ -118,14 +117,12 @@ const Stopwatch: React.FC = () => {
   const minutes = Math.floor(time / 60);
   const seconds = time % 60;
   const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-  
- 
 
   return (
     <div className={styles.stopwatch}>
       <div>
         <div className={styles.focusLink}>
-        <Menu withArrow>
+          <Menu withArrow>
             <Menu.Target>
               <UserButton
                 label="Focus"
@@ -142,7 +139,6 @@ const Stopwatch: React.FC = () => {
                   <Tabs.Tab value="Task">Task</Tabs.Tab>
                   <Tabs.Tab value="Timer">Timer</Tabs.Tab>
                 </Tabs.List>
-
                 <Tabs.Panel value="Task">
                   <div className={styles.taskContainer}>
                     <TextInput
@@ -150,58 +146,32 @@ const Stopwatch: React.FC = () => {
                       className={styles.searchInput}
                     />
                     <div className={styles.taskHeader}>
-                      <IconInfoCircle />
-                      <Text>Today ></Text>
+                    <IconCalendarDue />
+                    <Text>Today &gt;</Text>
                     </div>
                     <Menu.Label>Select doing Task</Menu.Label>
                     {tasks.map((task, index) => (
-                        <Menu.Item
-                          // key={index}
-                          // onClick={() => handleTaskClick(index)}
-                          // style={{
-                          //   backgroundColor: selectedTask === index ? 'var(--mantine-color-blue-lightest)' : 'transparent',
-                          //   color: selectedTask === index ? 'var(--mantine-color-blue-dark)' : 'inherit',
-                          // }}
-                        >
-                          {task.title}
-                        </Menu.Item>
-                      ))}
-                    
-                    
+                      <Menu.Item key={index}>
+                        {task.title}
+                      </Menu.Item>
+                    ))}
                   </div>
                 </Tabs.Panel>
-
                 <Tabs.Panel value="Timer">
-                <div className={styles.taskContainer}>
+                  <div className={styles.taskContainer}>
                     <TextInput
                       placeholder="search"
                       className={styles.searchInput}
                     />
                     <Menu.Label>Select a Timer</Menu.Label>
-                                {tasks.map((task, index) => (
-                        <Menu.Item>
-                          {task.title}
-                        </Menu.Item>
-                      ))}
-    
-          
-                    
-                    
+                    {tasks.map((task, index) => (
+                      <Menu.Item key={index}>
+                        {task.title}
+                      </Menu.Item>
+                    ))}
                   </div>
                 </Tabs.Panel>
               </Tabs>
-              
-      
-
-         
-
-
-
-
-
-
-
-
             </Menu.Dropdown>
           </Menu>
         </div>
@@ -245,11 +215,11 @@ const Stopwatch: React.FC = () => {
         onClose={() => setOpened(false)}
         title="Focus"
         centered
-        overlayOpacity={0} // No overlay
+        overlayProps={{ opacity: 0 }} // No overlay
       >
         <div className={styles.popupContent}>
           <TextInput placeholder="Search" mb="sm" />
-          <Text size="lg" weight={500}>Today</Text>
+          <Text size="lg" fw={500}>Today</Text>
           <List
             spacing="xs"
             size="sm"

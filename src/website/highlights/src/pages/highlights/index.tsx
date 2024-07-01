@@ -7,6 +7,7 @@ import { faFlag } from "@fortawesome/free-solid-svg-icons";
 import Addtask_popup from "@/components/Addtask_popup";
 import React, { useState } from 'react';
 import OptionsMenu from "@/components/Option_popup";
+import { faSquare as faRegularSquare } from "@fortawesome/free-regular-svg-icons"; // Import the regular square icon
 
 function ActionsGrid() {
   const theme = useMantineTheme();
@@ -46,7 +47,7 @@ function ActionsGrid() {
               <div className={classes.d}>
                 <div className={classes.task}>
                   <div className={classes.flag_icon}>
-                    <FontAwesomeIcon icon={faFlag} />
+                    <FontAwesomeIcon icon={faRegularSquare} /> {/* Use the regular square icon */}
                   </div>
                   <div className={classes.task_name}>
                     <h2>{task.title}</h2>

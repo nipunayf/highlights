@@ -7,7 +7,7 @@ import 'react-resizable/css/styles.css'; // Import styles for the resizable comp
 import styles from './index.module.css';
 import Timer from '../../components/Timer/Timer';
 import Stop_watch from '../../components/Stopwatch/Stopwatch';
-import FocusSummary from '../../components/FocusSummary';
+import FocusSummary from '../../components/FocusSummary/FocusSummary';
 
 export default function Focus() {
   const [activeTab, setActiveTab] = useState<'Pomo' | 'Stopwatch'>('Pomo');

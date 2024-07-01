@@ -6,7 +6,7 @@ import {
   IconGitCommit,
   IconMessageDots,
 } from "@tabler/icons-react";
-import styles from "../pages/focus/FocusSummary.module.css";
+import styles from "./FocusSummary.module.css";
 
 const FocusSummary = () => {
   return (

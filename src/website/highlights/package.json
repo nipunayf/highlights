@@ -13,6 +13,7 @@
     "@azure/msal-react": "^2.0.19",
     "@mantine/core": "^7.11.0",
     "@mantine/hooks": "^7.11.0",
+    "@mantine/notifications": "^7.11.0",
     "@tabler/icons-react": "^3.6.0",
     "clsx": "^2.1.1",
     "next": "14.2.3",
@@ -20,6 +21,7 @@
     "react": "^18",
     "react-circular-progressbar": "^2.1.0",
     "react-dom": "^18",
+    "react-resizable": "^3.0.5",
     "sweetalert": "^2.1.2"
   },
   "devDependencies": {

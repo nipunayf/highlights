@@ -55,8 +55,29 @@ const StyledMenu = styled((props) => (
   },
 }));
 
+const SubMenu = ({ anchorEl, handleClose }) => (
+  <StyledMenu
+    id="focus-submenu"
+    anchorEl={anchorEl}
+    open={Boolean(anchorEl)}
+    onClose={handleClose}
+    MenuListProps={{
+      onMouseEnter: (e) => e.stopPropagation(),
+      onMouseLeave: handleClose,
+    }}
+  >
+    <MenuItem onClick={handleClose}>
+      <ListItemText primary="Start Pomodoro" />
+    </MenuItem>
+    <MenuItem onClick={handleClose}>
+      <ListItemText primary="Start Stopwatch" />
+    </MenuItem>
+  </StyledMenu>
+);
+
 export default function OptionsMenu({ onOpenPopup }) {
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const [submenuAnchorEl, setSubmenuAnchorEl] = React.useState(null);
 
   const open = Boolean(anchorEl);
 
@@ -66,6 +87,7 @@ export default function OptionsMenu({ onOpenPopup }) {
 
   const handleClose = (action) => {
     setAnchorEl(null);
+    setSubmenuAnchorEl(null);
     if (action === 'delete') {
       Swal.fire({
         title: "Are you sure?",
@@ -85,6 +107,14 @@ export default function OptionsMenu({ onOpenPopup }) {
         }
       });
     }
+  };
+
+  const handleFocusMouseEnter = (event) => {
+    setSubmenuAnchorEl(event.currentTarget);
+  };
+
+  const handleFocusMouseLeave = () => {
+    setSubmenuAnchorEl(null);
   };
 
   return (
@@ -131,11 +161,17 @@ export default function OptionsMenu({ onOpenPopup }) {
           </ListItemIcon>
           <ListItemText primary="Delete" />
         </MenuItem>
-        <MenuItem onClick={() => handleClose()}>
+        <MenuItem
+          onMouseEnter={handleFocusMouseEnter}
+          onMouseLeave={handleFocusMouseLeave}
+        >
           <ListItemIcon>
             <ArchiveIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText primary="Focus" />
+          {submenuAnchorEl && (
+            <SubMenu anchorEl={submenuAnchorEl} handleClose={handleFocusMouseLeave} />
+          )}
         </MenuItem>
       </StyledMenu>
     </div>

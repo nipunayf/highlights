@@ -1,38 +1,16 @@
-import { loginRequest } from "@/authConfig";
-import { useMsal } from "@azure/msal-react";
+import { fetchAPI } from "@/lib/api";
 import { Button } from "@mantine/core";
 import { useState } from "react";
 
-function fetchData(accessToken: string) {
-    const headers = new Headers();
-    const bearer = `Bearer ${accessToken}`;
-
-    headers.append("Authorization", bearer);
-
-    const options = {
-        method: "GET",
-        headers: headers
-    };
-
-    return fetch("http://localhost:9090/greeting", options)
-        .then(response => response.text())
-        .catch(error => console.log(error));
+type Greeting = {
+    greeting: string;
 }
 
 export default function GetAPIResponse() {
+    const [response, setResponse] = useState<Greeting>();
 
-    const { instance, accounts } = useMsal();
-    const [response, setResponse] = useState<string>();
-
-    function getData() {
-        instance
-            .acquireTokenSilent({
-                ...loginRequest,
-                account: accounts[0],
-            })
-            .then((response) => {
-                fetchData(response.accessToken).then((response) => setResponse(response ?? "No response"));
-            });
+    async function getData() {
+        setResponse(await fetchAPI("greeting", {}, { method: "GET" }) ?? "No response");
     }
 
     return (
@@ -40,7 +18,7 @@ export default function GetAPIResponse() {
             <Button onClick={getData}>Call API
             </Button>
             <div>
-                {response ? <p>{response}</p> : null}
+                {response ? <p>{response.greeting}</p> : null}
             </div>
         </>
     );

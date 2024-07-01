@@ -4,7 +4,7 @@ import 'react-circular-progressbar/dist/styles.css';
 import { showNotification } from '@mantine/notifications';
 import { IconInfoCircle, IconChevronRight, IconCalendarDue } from '@tabler/icons-react';
 import { Group, Avatar, Text, Menu, UnstyledButton, ScrollArea, TextInput, Tabs } from '@mantine/core';
-import styles from '../pages/focus/Timer.module.css';
+import styles from './Timer.module.css';
 
 const tasks = [
   { title: 'Learning Ballerina', time: '9:00am-1:00pm' },

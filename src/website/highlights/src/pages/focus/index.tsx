@@ -6,7 +6,7 @@ import { ResizableBox } from 'react-resizable';
 import 'react-resizable/css/styles.css'; // Import styles for the resizable component
 import styles from './index.module.css';
 import Timer from '../../components/Timer/Timer';
-import Stop_watch from '../../components/Stopwatch';
+import Stop_watch from '../../components/Stopwatch/Stopwatch';
 import FocusSummary from '../../components/FocusSummary';
 
 export default function Focus() {

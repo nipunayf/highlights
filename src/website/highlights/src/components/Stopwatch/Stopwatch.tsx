@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef,forwardRef } from 'react';
 import { Button, Modal, Group, TextInput, List, ThemeIcon, Text,Menu ,UnstyledButton, Tabs } from '@mantine/core';
 import { IconCircleCheck,IconInfoCircle, IconChevronRight } from '@tabler/icons-react';
 import { showNotification } from '@mantine/notifications';
-import styles from '../pages/focus/Stopwatch.module.css';
+import styles from './Stopwatch.module.css';
 
 const tasks = [
   { title: 'Learning Ballerina ', time: '9:00am-1:00pm' },

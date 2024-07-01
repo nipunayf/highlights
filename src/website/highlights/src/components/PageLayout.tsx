@@ -45,6 +45,10 @@ export default function PageLayout({ children }: { children: React.ReactNode }) 
                     href="/profile"
                     label="My Profile"
                 />
+                 <NavLink
+                    href="/dailytips"
+                    label="Daily Tips"
+                />
             </AppShell.Section>
         </AppShell.Navbar>
 

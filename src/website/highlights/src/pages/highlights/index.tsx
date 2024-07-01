@@ -1,13 +1,14 @@
+// ActionsGrid.tsx
+
 import PageLayout from "@/components/PageLayout";
 import { Card, Text, Group, useMantineTheme } from "@mantine/core";
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import classes from "./ActionsGrid.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFlag } from "@fortawesome/free-solid-svg-icons";
+import { faSquare as faRegularSquare } from "@fortawesome/free-regular-svg-icons";
 import Addtask_popup from "@/components/Addtask_popup";
-import React, { useState } from 'react';
 import OptionsMenu from "@/components/Option_popup";
-import { faSquare as faRegularSquare } from "@fortawesome/free-regular-svg-icons"; // Import the regular square icon
+import Confetti from "react-confetti";
 
 function ActionsGrid() {
   const theme = useMantineTheme();
@@ -17,6 +18,10 @@ function ActionsGrid() {
     { id: 3, title: "Task 3", description: "Description for task 3" },
   ];
   const [popupOpen, setPopupOpen] = useState(false);
+  const [confettiActive, setConfettiActive] = useState(false);
+
+  // State to track which task has been completed
+  const [completedTask, setCompletedTask] = useState<{ id: number, title: string } | null>(null);
 
   const handleCardClick = () => {
     setPopupOpen(true);
@@ -24,6 +29,15 @@ function ActionsGrid() {
 
   const handleClosePopup = () => {
     setPopupOpen(false);
+  };
+
+  const handleComplete = (task: { id: number, title: string }) => {
+    setCompletedTask(task);
+    setConfettiActive(true);
+    setTimeout(() => {
+      setCompletedTask(null); // Reset completed task
+      setConfettiActive(false);
+    }, 3000);
   };
 
   return (
@@ -46,8 +60,8 @@ function ActionsGrid() {
             <div key={task.id}>
               <div className={classes.d}>
                 <div className={classes.task}>
-                  <div className={classes.flag_icon}>
-                    <FontAwesomeIcon icon={faRegularSquare} /> {/* Use the regular square icon */}
+                  <div className={classes.flag_icon} onClick={() => handleComplete(task)}>
+                    <FontAwesomeIcon icon={faRegularSquare} />
                   </div>
                   <div className={classes.task_name}>
                     <h2>{task.title}</h2>
@@ -64,6 +78,21 @@ function ActionsGrid() {
       </div>
 
       <Addtask_popup open={popupOpen} onClose={handleClosePopup} />
+
+      {confettiActive && (
+        <Confetti
+          width={window.innerWidth}
+          height={window.innerHeight}
+          recycle={false}
+        />
+      )}
+
+      {/* Display completed message in the middle */}
+      {completedTask && (
+        <div className={classes.completedMessage}>
+          <p>{`Completed: ${completedTask.title}`}</p>
+        </div>
+      )}
     </>
   );
 }

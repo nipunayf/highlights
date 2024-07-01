@@ -99,3 +99,29 @@
 
 
 
+.completedMessage {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: rgb(0, 0, 0); /* Text color */
+  font-size: 24px; /* Adjust font size */
+  z-index: 9999;
+  animation: popUp 0.5s forwards ease-out; /* Animation duration */
+}
+
+@keyframes popUp {
+  0% {
+    opacity: 0;
+    transform: translateY(10px); /* Start animation from below */
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(0); /* Move to final position */
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-10px); /* End animation above */
+  }
+}
+

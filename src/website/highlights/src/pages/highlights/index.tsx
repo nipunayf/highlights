@@ -1,4 +1,3 @@
-// ActionsGrid.tsx
 
 import PageLayout from "@/components/PageLayout";
 import { Card, Text, Group, useMantineTheme } from "@mantine/core";

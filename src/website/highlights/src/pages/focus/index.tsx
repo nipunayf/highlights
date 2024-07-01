@@ -12,10 +12,10 @@ import FocusSummary from '../../components/FocusSummary';
 export default function Focus() {
   const [activeTab, setActiveTab] = useState<'Pomo' | 'Stopwatch'>('Pomo');
   const [settingsOpened, setSettingsOpened] = useState(false);
-  const [pomoDuration, setPomoDuration] = useState(25);
-  const [shortBreakDuration, setShortBreakDuration] = useState(5);
-  const [longBreakDuration, setLongBreakDuration] = useState(15);
-  const [pomosPerLongBreak, setPomosPerLongBreak] = useState(4);
+  const [pomoDuration, setPomoDuration] = useState<number>(25);
+  const [shortBreakDuration, setShortBreakDuration] = useState<number>(5);
+  const [longBreakDuration, setLongBreakDuration] = useState<number>(15);
+  const [pomosPerLongBreak, setPomosPerLongBreak] = useState<number>(4);
 
   const handleSaveSettings = () => {
     setSettingsOpened(false);
@@ -87,7 +87,6 @@ export default function Focus() {
         onClose={() => setSettingsOpened(false)}
         title="Focus Settings"
         centered
-        overlayColor="rgba(0, 0, 0, 0.5)"
         size="md"
         radius="md"
         classNames={{
@@ -102,7 +101,7 @@ export default function Focus() {
               <div className={styles.inputTimerOption}>
                 <NumberInput
                   value={pomoDuration}
-                  onChange={(val) => setPomoDuration(val ?? 0)}
+                  onChange={(val) => setPomoDuration(Number(val))}
                   min={1}
                   max={60}
                   step={1}
@@ -114,7 +113,7 @@ export default function Focus() {
               <span>Short break duration</span>
               <NumberInput
                 value={shortBreakDuration}
-                onChange={(val) => setShortBreakDuration(val ?? 0)}
+                onChange={(val) => setShortBreakDuration(Number(val))}
                 min={1}
                 max={30}
                 step={1}
@@ -125,7 +124,7 @@ export default function Focus() {
               <span>Long break duration</span>
               <NumberInput
                 value={longBreakDuration}
-                onChange={(val) => setLongBreakDuration(val ?? 0)}
+                onChange={(val) => setLongBreakDuration(Number(val))}
                 min={5}
                 max={60}
                 step={1}
@@ -136,7 +135,7 @@ export default function Focus() {
               <span>Pomodoros per long break</span>
               <NumberInput
                 value={pomosPerLongBreak}
-                onChange={(val) => setPomosPerLongBreak(val ?? 0)}
+                onChange={(val) => setPomosPerLongBreak(Number(val))}
                 min={1}
                 max={10}
                 step={1}

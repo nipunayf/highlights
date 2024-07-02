@@ -9,7 +9,7 @@ export default function Calendar() {
     return (
         <div className={styles.calendarContainer}>
             <div className={styles.leftPlane}>
-                <Title order={1}>Calendar</Title>
+                {/* <Title order={1}>Calendar</Title> */}
                 <DaySchedule />
             </div>
             <div className={styles.middleBorder}></div> {/* Middle border element */}

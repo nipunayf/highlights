@@ -20,7 +20,17 @@
           margin-bottom: 20px;
           font-family: 'Times New Roman', Times, serif;
           color: #37474f;
+          display: -webkit-box;
+
         }
+        .titleCaption{
+          font-size: 24px;
+          font-weight: bold;
+          color: #333;
+          display: flex;
+    justify-content: center;
+        }
+
         
         .tasks {
           display: flex;

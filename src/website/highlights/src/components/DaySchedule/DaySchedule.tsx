@@ -97,6 +97,8 @@ const DaySchedule: React.FC = () => {
 
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
+      <h1 className={styles.titleCaption}>Calendar view</h1>
+
       <div className={styles.container}>
         <div className={styles.header}>
           <div>2024. 06.19</div>

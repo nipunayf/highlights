@@ -4,6 +4,10 @@ import ballerina/sql;
 import ballerinax/mysql;
 import ballerinax/mysql.driver as _;
 
+type Greeting record {|
+    string greeting;
+|};
+
 type CreateUser record {|
     string sub;
 |};
@@ -40,12 +44,10 @@ configurable string azureAdAudience = ?;
 }
 service / on new http:Listener(9090) {
 
-    # A resource for generating greetings
-    # + name - name as a string or nil
-    # + return - string name with hello message
-    resource function get greeting(string? name) returns string {
-        // Send a response back to the caller.
-        return string `Hello, ${name == () ? "visitor" : name}!`;
+    resource function get greeting(string? name) returns Greeting {
+        string greetingStr = string `Hello, ${name == () ? "visitor" : name}!`;
+        Greeting greeting = {greeting: greetingStr};
+        return greeting;
     }
 
     private final mysql:Client db;

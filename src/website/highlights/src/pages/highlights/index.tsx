@@ -1,13 +1,14 @@
-
+import React, { useState } from 'react';
 import PageLayout from "@/components/PageLayout";
 import { Card, Text, Group, useMantineTheme } from "@mantine/core";
-import { ReactNode, useState } from "react";
-import classes from "./ActionsGrid.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSquare as faRegularSquare } from "@fortawesome/free-regular-svg-icons";
+import { faCheckSquare as faSolidSquare } from "@fortawesome/free-solid-svg-icons";
 import Addtask_popup from "@/components/Addtask_popup";
 import OptionsMenu from "@/components/Option_popup";
 import Confetti from "react-confetti";
+import AlertDialogSlide from "@/components/AlertDialogSlide"; // Import the dialog component
+import classes from "./ActionsGrid.module.css";
 
 function ActionsGrid() {
   const theme = useMantineTheme();
@@ -18,6 +19,8 @@ function ActionsGrid() {
   ];
   const [popupOpen, setPopupOpen] = useState(false);
   const [confettiActive, setConfettiActive] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false); // State for dialog
+  const [currentTask, setCurrentTask] = useState<{ id: number, title: string } | null>(null); // Current task being completed
 
   // State to track which task has been completed
   const [completedTask, setCompletedTask] = useState<{ id: number, title: string } | null>(null);
@@ -37,6 +40,19 @@ function ActionsGrid() {
       setCompletedTask(null); // Reset completed task
       setConfettiActive(false);
     }, 3000);
+  };
+
+  const handleDialogOpen = (task: { id: number, title: string }) => {
+    setCurrentTask(task);
+    setDialogOpen(true);
+  };
+
+  const handleDialogClose = (agree: boolean) => {
+    setDialogOpen(false);
+    if (agree && currentTask) {
+      handleComplete(currentTask);
+    }
+    setCurrentTask(null);
   };
 
   return (
@@ -59,8 +75,11 @@ function ActionsGrid() {
             <div key={task.id}>
               <div className={classes.d}>
                 <div className={classes.task}>
-                  <div className={classes.flag_icon} onClick={() => handleComplete(task)}>
-                    <FontAwesomeIcon icon={faRegularSquare} />
+                  <div
+                    className={`${classes.flag_icon} ${completedTask && completedTask.id === task.id ? classes.completed : ''}`}
+                    onClick={() => handleDialogOpen(task)}
+                  >
+                    <FontAwesomeIcon icon={completedTask && completedTask.id === task.id ? faSolidSquare : faRegularSquare} />
                   </div>
                   <div className={classes.task_name}>
                     <h2>{task.title}</h2>
@@ -92,6 +111,9 @@ function ActionsGrid() {
           <p>{`Completed: ${completedTask.title}`}</p>
         </div>
       )}
+
+      {/* Include the dialog component */}
+      <AlertDialogSlide open={dialogOpen} handleClose={handleDialogClose} />
     </>
   );
 }

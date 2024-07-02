@@ -6,9 +6,9 @@ import { MsalProvider } from '@azure/msal-react';
 import { AuthenticationResult, EventType, PublicClientApplication } from '@azure/msal-browser';
 import { msalConfig } from '../authConfig';
 import { NextPage } from 'next';
-import { ReactElement, ReactNode } from 'react';
+import { ReactElement, ReactNode, StrictMode } from 'react';
 
-const msalInstance = new PublicClientApplication(msalConfig);
+export const msalInstance = new PublicClientApplication(msalConfig);
 
 if (!msalInstance.getActiveAccount() && msalInstance.getAllAccounts().length > 0) {
     msalInstance.setActiveAccount(msalInstance.getAllAccounts()[0]);
@@ -46,10 +46,12 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
     const getLayout = Component.getLayout ?? ((page) => page)
 
     return (
-        <MsalProvider instance={msalInstance}>
-            <MantineProvider theme={theme}>
-                {getLayout(<Component {...pageProps} />)}
-            </MantineProvider>
-        </MsalProvider>
+        <StrictMode>
+            <MsalProvider instance={msalInstance}>
+                <MantineProvider theme={theme}>
+                    {getLayout(<Component {...pageProps} />)}
+                </MantineProvider>
+            </MsalProvider>
+        </StrictMode>
     );
 }

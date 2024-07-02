@@ -10,9 +10,8 @@ const DaySchedule: React.FC = () => {
       title: 'Learning Ballerina',
       time: '8.00 am - 10.00 am',
       subtasks: [
-        { id: '1', title: 'Learning Ballerina' },
-        { id: '2', title: 'Learning Ballerina' },
-        { id: '3', title: 'Learning Ballerina' }
+        { id: '1', title: 'Setup environment', time: '8.00 am' },
+        { id: '2', title: 'Build components', time: '9.00 am' }
       ]
     },
     {
@@ -20,8 +19,8 @@ const DaySchedule: React.FC = () => {
       title: 'Learning React',
       time: '10.00 am - 12.00 pm',
       subtasks: [
-        { id: '1', title: 'Setup environment' },
-        { id: '2', title: 'Build components' }
+        { id: '1', title: 'Setup environment', time: '10.00 am' },
+        { id: '2', title: 'Build components', time: '11.00 am' }
       ]
     },
     {
@@ -44,15 +43,24 @@ const DaySchedule: React.FC = () => {
 
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedTask, setSelectedTask] = useState(null);
+  const [selectedSubtask, setSelectedSubtask] = useState(null);
 
-  const handleMenuOpen = (event, task) => {
+  const handleTaskMenuOpen = (event, task) => {
     setAnchorEl(event.currentTarget);
     setSelectedTask(task);
+    setSelectedSubtask(null); // Reset selected subtask
+  };
+
+  const handleSubtaskMenuOpen = (event, task, subtask) => {
+    setAnchorEl(event.currentTarget);
+    setSelectedTask(task);
+    setSelectedSubtask(subtask);
   };
 
   const handleMenuClose = () => {
     setAnchorEl(null);
     setSelectedTask(null);
+    setSelectedSubtask(null);
   };
 
   const handleEditTask = () => {
@@ -63,6 +71,26 @@ const DaySchedule: React.FC = () => {
   const handleDeleteTask = () => {
     // Implement delete task functionality
     const updatedTasks = tasks.filter((task) => task.id !== selectedTask.id);
+    setTasks(updatedTasks);
+    handleMenuClose();
+  };
+
+  const handleEditSubtask = () => {
+    // Implement edit subtask functionality
+    handleMenuClose();
+  };
+
+  const handleDeleteSubtask = () => {
+    // Implement delete subtask functionality
+    const updatedSubtasks = selectedTask.subtasks.filter(
+      (subtask) => subtask.id !== selectedSubtask.id
+    );
+    const updatedTasks = tasks.map((task) => {
+      if (task.id === selectedTask.id) {
+        return { ...task, subtasks: updatedSubtasks };
+      }
+      return task;
+    });
     setTasks(updatedTasks);
     handleMenuClose();
   };
@@ -84,7 +112,7 @@ const DaySchedule: React.FC = () => {
                   <span className={styles.time}>{task.time}</span>
                 </div>
                 <button
-                  onClick={(event) => handleMenuOpen(event, task)}
+                  onClick={(event) => handleTaskMenuOpen(event, task)}
                   className={styles.menuButton}
                 >
                   ...
@@ -114,8 +142,16 @@ const DaySchedule: React.FC = () => {
                               type="checkbox"
                               className={styles.checkbox}
                             />
-                            <span className={styles.title}>{subtask.title}</span>
-                            <button className={styles.menuButton}>...</button>
+                            <div className={styles.taskDetails}>
+                              <span className={styles.title}>{subtask.title}</span>
+                              <span className={styles.time}>{subtask.time}</span>
+                            </div>
+                            <button
+                              onClick={(event) => handleSubtaskMenuOpen(event, task, subtask)}
+                              className={styles.menuButton}
+                            >
+                              ...
+                            </button>
                           </div>
                         )}
                       </Draggable>
@@ -133,8 +169,17 @@ const DaySchedule: React.FC = () => {
         open={Boolean(anchorEl)}
         onClose={handleMenuClose}
       >
-        <MenuItem onClick={handleEditTask}>Edit Task</MenuItem>
-        <MenuItem onClick={handleDeleteTask}>Delete Task</MenuItem>
+        {selectedSubtask ? (
+          <MenuItem onClick={handleEditSubtask}>Edit Subtask</MenuItem>
+        ) : (
+          <>
+            <MenuItem onClick={handleEditTask}>Edit Task</MenuItem>
+            <MenuItem onClick={handleDeleteTask}>Delete Task</MenuItem>
+          </>
+        )}
+        {selectedSubtask && (
+          <MenuItem onClick={handleDeleteSubtask}>Delete Subtask</MenuItem>
+        )}
       </Menu>
     </DragDropContext>
   );

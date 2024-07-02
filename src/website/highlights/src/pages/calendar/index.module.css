@@ -44,4 +44,48 @@
               margin: 0; /* Remove any margin */
           }
       }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      
+.calendarContainer {
+          display: flex;
+          flex-direction: row;
+          justify-content: center;
+          align-items: stretch;
+          height: 100vh;
+          width: 100%;
+          background-color: #f0f4f8; /* Background color for the entire page */
+          padding: 20px; /* Add some padding around the content */
+          box-sizing: border-box;
+      }
+      
+      .leftPlane, .rightPlane {
+          flex: 1;
+          padding: 20px;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+          background-color: white;
+          border-radius: 10px;
+      }
+      
+      .leftPlane {
+          margin-right: 10px; /* Add some space between the planes */
+      }
+      
+      .middleBorder {
+          width: 2px;
+          background-color: #e0e0e0; /* Light grey color for the border */
+          margin: 0 10px; /* Add some margin around the border */
+      }
       

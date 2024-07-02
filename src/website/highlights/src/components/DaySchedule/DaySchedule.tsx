@@ -97,7 +97,8 @@ const DaySchedule: React.FC = () => {
 
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
-      <h1 className={styles.titleCaption}>Calendar view</h1>
+          <div className={styles.calendarContainer}>
+      <h1 className={styles.titleCaption}>Today Schedule</h1>
 
       <div className={styles.container}>
         <div className={styles.header}>
@@ -165,7 +166,7 @@ const DaySchedule: React.FC = () => {
             </div>
           ))}
         </div>
-      </div>
+      </div></div>
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}

@@ -1,0 +1,43 @@
+.calendarContainer {
+          padding: 20px;
+          display: flex;
+          justify-content: center;
+        }
+        
+        .customDay {
+          position: relative;
+        }
+        
+        .customDayContent {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          background: white;
+          border-radius: 5px;
+          padding: 2px;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .event {
+          margin: 2px 0;
+          padding: 2px 4px;
+          border-radius: 3px;
+          font-size: 12px;
+          text-align: center;
+        }
+        
+        .event:nth-child(1) {
+          background-color: red;
+          color: white;
+        }
+        
+        .event:nth-child(2) {
+          background-color: blue;
+          color: white;
+        }
+        
+        .event:nth-child(3) {
+          background-color: yellow;
+          color: black;
+        }
+        

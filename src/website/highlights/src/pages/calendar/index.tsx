@@ -2,6 +2,7 @@ import PageLayout from "@/components/PageLayout";
 import { Title } from "@mantine/core";
 import { ReactNode } from "react";
 import DaySchedule from "@/components/DaySchedule/DaySchedule";
+import MyCalendar from "@/components/Calendar/Calendar";
 import styles from "./index.module.css"; // Import CSS module styles
 
 export default function Calendar() {
@@ -13,7 +14,7 @@ export default function Calendar() {
             </div>
             <div className={styles.middleBorder}></div> {/* Middle border element */}
             <div className={styles.rightPlane}>
-                {/* Content for the right plane */}
+                <MyCalendar />
             </div>
         </div>
     )

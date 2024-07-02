@@ -1,6 +1,5 @@
 .app {
   font-family: Arial, sans-serif;
-  /* text-align: center; */
   background: white;
   padding: 20px;
   border-radius: 10px;
@@ -8,8 +7,7 @@
   max-width: none;
   min-width: fit-content;
   display: flex;
-  /* justify-content: space-between; Ensures left and right panes take equal space */
-  /* height: 100vh; Ensure it takes full height */
+  flex-direction: row; /* Horizontal layout by default */
 }
 
 .header {
@@ -27,6 +25,7 @@
 .tabs {
   display: flex;
   margin: auto;
+  justify-content: center; /* Center tabs on larger screens */
   margin-bottom: 10px;
 }
 
@@ -35,7 +34,7 @@
   border: none;
   padding: 10px 20px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 1rem; /* Use relative units */
   color: #007bff;
   border-radius: 20px;
   transition: background-color 0.3s, color 0.3s;
@@ -55,19 +54,20 @@
 .icons {
   display: flex;
   align-items: center;
+  justify-content: center; /* Center icons on smaller screens */
 }
 
 .iconButton {
   background: none;
   border: none;
-  font-size: 20px;
+  font-size: 1.5rem; /* Increase size for touch targets */
   cursor: pointer;
   margin-right: 1%;
 }
 
 .content {
   margin-top: 20px;
-  font-size: 18px;
+  font-size: 1.125rem; /* Use relative units */
   padding-bottom: 10%;
 }
 
@@ -84,12 +84,9 @@
 }
 
 .timerOption span {
-  font-size: 14px;
+  font-size: 1rem; /* Use relative units */
   flex-basis: 50%;
   text-align: left;
-}
-
-.inputTimerOption span {
 }
 
 .timerOption .mantine-NumberInput-root {
@@ -144,9 +141,8 @@
 .leftPane {
   padding: 20px;
   background-color: #ffffff;
-  /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); */
   border-right: 1px solid #e0e0e0;
-  flex: 1
+  flex: 1;
 }
 
 .rightPane {
@@ -161,7 +157,7 @@
   .app {
     padding: 15px;
     margin: 20px auto;
-    flex-direction: column;
+    flex-direction: column; /* Stack vertically on smaller screens */
   }
 
   .header {
@@ -182,5 +178,10 @@
   .icons {
     justify-content: center;
     margin-top: 10px;
+  }
+
+  .leftPane, .rightPane {
+    flex: none; /* Prevent shrinking */
+    width: 100%; /* Take full width */
   }
 }

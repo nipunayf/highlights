@@ -80,7 +80,7 @@ export default function Focus() {
       </ResizableBox>
       <div className={styles.rightPane}>
         {/* Right pane content goes here */}
-        <FocusSummary/>
+        <FocusSummary />
       </div>
       <Modal
         opened={settingsOpened}

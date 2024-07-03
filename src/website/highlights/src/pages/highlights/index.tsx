@@ -7,22 +7,69 @@ import { faCheckSquare as faSolidSquare } from "@fortawesome/free-solid-svg-icon
 import Addtask_popup from "@/components/Addtask/Addtask_popup";
 import OptionsMenu from "@/components/Optionmenu/Option_popup";
 import Confetti from "react-confetti";
-import AlertDialogSlide from "@/components/Feedback/AlertDialogSlide"; // Import the dialog component
+import AlertDialogSlide from "@/components/Feedback/AlertDialogSlide";
 import classes from "./ActionsGrid.module.css";
 
 function ActionsGrid() {
   const theme = useMantineTheme();
+
   const tasks = [
-    { id: 1, title: "Task 1", description: "Description for task 1" },
-    { id: 2, title: "Task 2", description: "Description for task 2" },
-    { id: 3, title: "Task 3", description: "Description for task 3" },
+    { 
+      id: 1, 
+      title: "Tasak 1", 
+      description: "Description for task 1", 
+      date: "2024-07-03", // Main task date
+      subTasks: [
+        { id: 1, title: "Sub-task 1.1", date: "2024-07-03" },
+        { id: 2, title: "Sub-task 1.2", date: "2024-07-03" }
+      ]
+    },
+    { 
+      id: 1, 
+      title: "Tasak 1", 
+      description: "Description for task 1", 
+      date: "2024-07-03", // Main task date
+      subTasks: [
+        { id: 1, title: "Sub-task 1.1", date: "2024-07-03" },
+        { id: 2, title: "Sub-task 1.2", date: "2024-07-03" }
+      ]
+    },
+    { 
+      id: 1, 
+      title: "Tasak 1", 
+      description: "Description for task 1", 
+      date: "2024-07-03", // Main task date
+      subTasks: [
+        { id: 1, title: "Sub-task 1.1", date: "2024-07-03" },
+        { id: 2, title: "Sub-task 1.2", date: "2024-07-03" }
+      ]
+    },
+    { 
+      id: 2, 
+      title: "Task 2", 
+      description: "Description for task 2", 
+      date: "2024-07-03", // Main task date
+      subTasks: [
+        { id: 3, title: "Sub-task 2.1", date: "2024-07-03" },
+        { id: 4, title: "Sub-task 2.2", date: "2024-07-03" }
+      ]
+    },
+    { 
+      id: 3, 
+      title: "Task 3", 
+      description: "Description for task 3", 
+      date: "2024-07-03", // Main task date
+      subTasks: [
+        { id: 5, title: "Sub-task 3.1", date: "2024-07-03" },
+        { id: 6, title: "Sub-task 3.2", date: "2024-07-03" }
+      ]
+    }
   ];
+
   const [popupOpen, setPopupOpen] = useState(false);
   const [confettiActive, setConfettiActive] = useState(false);
-  const [dialogOpen, setDialogOpen] = useState(false); // State for dialog
-  const [currentTask, setCurrentTask] = useState<{ id: number, title: string } | null>(null); // Current task being completed
-
-  // State to track which task has been completed
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [currentTask, setCurrentTask] = useState<{ id: number, title: string } | null>(null);
   const [completedTask, setCompletedTask] = useState<{ id: number, title: string } | null>(null);
 
   const handleCardClick = () => {
@@ -37,7 +84,7 @@ function ActionsGrid() {
     setCompletedTask(task);
     setConfettiActive(true);
     setTimeout(() => {
-      setCompletedTask(null); // Reset completed task
+      setCompletedTask(null);
       setConfettiActive(false);
     }, 3000);
   };
@@ -82,13 +129,38 @@ function ActionsGrid() {
                     <FontAwesomeIcon icon={completedTask && completedTask.id === task.id ? faSolidSquare : faRegularSquare} />
                   </div>
                   <div className={classes.task_name}>
-                    <h2>{task.title}</h2>
+                    <h3>{task.title}</h3>
+                    <div className={classes.task_date}>
+
+                    <p>{task.date}</p>
+                    </div>
                   </div>
                 </div>
                 <div className={classes.bars_icon}>
                   <OptionsMenu onOpenPopup={handleCardClick} />
                 </div>
               </div>
+              {task.subTasks.map((subTask) => (
+                <div key={subTask.id} className={`${classes.d} ${classes.subTask}`}>
+                  <div className={classes.task}>
+                    <div
+                      className={`${classes.flag_icon} ${completedTask && completedTask.id === subTask.id ? classes.completed : ''}`}
+                      onClick={() => handleDialogOpen(subTask)}
+                    >
+                      <FontAwesomeIcon icon={completedTask && completedTask.id === subTask.id ? faSolidSquare : faRegularSquare} />
+                    </div>
+                    <div className={classes.task_name}>
+                      <h3>{subTask.title}</h3>
+                      <div className={classes.task_date}>
+                         <p>{subTask.date}</p>
+                      </div> 
+                    </div>
+                  </div>
+                  <div className={classes.bars_icon}>
+                    <OptionsMenu onOpenPopup={handleCardClick} />
+                  </div>
+                </div>
+              ))}
               <br />
             </div>
           ))}
@@ -105,14 +177,12 @@ function ActionsGrid() {
         />
       )}
 
-      {/* Display completed message in the middle */}
       {completedTask && (
         <div className={classes.completedMessage}>
           <p>{`Completed: ${completedTask.title}`}</p>
         </div>
       )}
 
-      {/* Include the dialog component */}
       <AlertDialogSlide open={dialogOpen} handleClose={handleDialogClose} />
     </>
   );

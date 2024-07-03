@@ -16,6 +16,11 @@ import dayjs, { Dayjs } from 'dayjs';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFlag } from '@fortawesome/free-solid-svg-icons';
 import classes from './Addtask_popup.module.css';
+import { fetchAPI } from '@/lib/api';
+
+interface Task {
+  name:string;
+}
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
@@ -68,6 +73,17 @@ export default function AddTaskPopup({ open, onClose }: AddTaskPopupProps) {
     onClose();
   };
 
+  async function createTask(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    // setResponse(await fetchAPI("greeting", {}, { method: "POST" }) ?? "No response");
+   
+
+
+    console.log("Create task");
+    // await fetchAPI( Task task,"greeting", {}, { method: "POST" });
+    
+  }
+
   return (
     <Dialog
       open={open}
@@ -79,105 +95,107 @@ export default function AddTaskPopup({ open, onClose }: AddTaskPopupProps) {
       classes={{ paper: classes['dialog-paper'] }}
     >
       <DialogTitle>{"Add New Task"}</DialogTitle>
-      <DialogContent>
-        <TextField
-          margin="dense"
-          id="title"
-          label="Add Title"
-          type="text"
-          fullWidth
-          variant="standard"
-          value={title}
-          onChange={handleTitleChange}
-          InputLabelProps={{
-            className: classes['custom-label'], 
-          }}
-          className={classes['custom-input']}
-        />
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DateCalendar
-            value={date}
-            onChange={handleDateChange}
-          />
-          <MultiInputTimeRangeField
-            value={timeRange}
-            onChange={handleTimeRangeChange}
-            slotProps={{
-              textField: ({ position }) => ({
-                label: position === 'start' ? 'Start Time' : 'End Time',
-                fullWidth: true,
-                variant: 'standard',
-                className: classes['custom-time-picker'],
-                InputLabelProps: { className: classes['custom-label'] }
-              }),
+      <form onSubmit={createTask}>
+        <DialogContent>
+          <TextField
+            margin="dense"
+            id="title"
+            label="Add Title"
+            type="text"
+            fullWidth
+            variant="standard"
+            value={title}
+            onChange={handleTitleChange}
+            InputLabelProps={{
+              className: classes['custom-label'], 
             }}
+            className={classes['custom-input']}
           />
-        </LocalizationProvider>
-        <TextField
-          select
-          margin="dense"
-          id="reminder"
-          label="Reminder"
-          value={reminder}
-          onChange={handleReminderChange}
-          fullWidth
-          variant="standard"
-          className={classes['custom-input']}
-          InputLabelProps={{ className: classes['custom-label'] }}
-        >
-          <MenuItem value="10">Before 10 minutes</MenuItem>
-          <MenuItem value="15">Before 15 minutes</MenuItem>
-          <MenuItem value="30">Before 30 minutes</MenuItem>
-          <MenuItem value="60">Before 1 hour</MenuItem>
-        </TextField>
-        <TextField
-          select
-          margin="dense"
-          id="priority"
-          label="Priority"
-          value={priority}
-          onChange={handlePriorityChange}
-          fullWidth
-          variant="standard"
-          className={classes['custom-input']}
-          InputLabelProps={{ className: classes['custom-label'] }}
-        >
-          <MenuItem value="none">
-            <FontAwesomeIcon icon={faFlag} style={{color: "transparent", marginRight: "8px"}} />
-            None
-          </MenuItem>
-          <MenuItem value="low">
-            <FontAwesomeIcon icon={faFlag} style={{color: "green", marginRight: "8px"}} />
-            Low
-          </MenuItem>
-          <MenuItem value="medium">
-            <FontAwesomeIcon icon={faFlag} style={{color: "yellow", marginRight: "8px"}} />
-            Medium
-          </MenuItem>
-          <MenuItem value="high">
-            <FontAwesomeIcon icon={faFlag} style={{color: "red", marginRight: "8px"}} />
-            High
-          </MenuItem>
-        </TextField>
-        <TextField
-          margin="dense"
-          id="description"
-          label="Description"
-          type="text"
-          fullWidth
-          multiline
-          rows={4}
-          variant="standard"
-          value={description}
-          onChange={handleDescriptionChange}
-          className={classes['custom-textarea']}
-          InputLabelProps={{ className: classes['custom-label'] }}
-        />
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} className={classes['custom-button1']}>Cancel</Button>
-        <Button onClick={handleAgree} className={classes['custom-button2']}>OK</Button>
-      </DialogActions>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DateCalendar
+              value={date}
+              onChange={handleDateChange}
+            />
+            <MultiInputTimeRangeField
+              value={timeRange}
+              onChange={handleTimeRangeChange}
+              slotProps={{
+                textField: ({ position }) => ({
+                  label: position === 'start' ? 'Start Time' : 'End Time',
+                  fullWidth: true,
+                  variant: 'standard',
+                  className: classes['custom-time-picker'],
+                  InputLabelProps: { className: classes['custom-label'] }
+                }),
+              }}
+            />
+          </LocalizationProvider>
+          <TextField
+            select
+            margin="dense"
+            id="reminder"
+            label="Reminder"
+            value={reminder}
+            onChange={handleReminderChange}
+            fullWidth
+            variant="standard"
+            className={classes['custom-input']}
+            InputLabelProps={{ className: classes['custom-label'] }}
+          >
+            <MenuItem value="10">Before 10 minutes</MenuItem>
+            <MenuItem value="15">Before 15 minutes</MenuItem>
+            <MenuItem value="30">Before 30 minutes</MenuItem>
+            <MenuItem value="60">Before 1 hour</MenuItem>
+          </TextField>
+          <TextField
+            select
+            margin="dense"
+            id="priority"
+            label="Priority"
+            value={priority}
+            onChange={handlePriorityChange}
+            fullWidth
+            variant="standard"
+            className={classes['custom-input']}
+            InputLabelProps={{ className: classes['custom-label'] }}
+          >
+            <MenuItem value="none">
+              <FontAwesomeIcon icon={faFlag} style={{color: "transparent", marginRight: "8px"}} />
+              None
+            </MenuItem>
+            <MenuItem value="low">
+              <FontAwesomeIcon icon={faFlag} style={{color: "green", marginRight: "8px"}} />
+              Low
+            </MenuItem>
+            <MenuItem value="medium">
+              <FontAwesomeIcon icon={faFlag} style={{color: "yellow", marginRight: "8px"}} />
+              Medium
+            </MenuItem>
+            <MenuItem value="high">
+              <FontAwesomeIcon icon={faFlag} style={{color: "red", marginRight: "8px"}} />
+              High
+            </MenuItem>
+          </TextField>
+          <TextField
+            margin="dense"
+            id="description"
+            label="Description"
+            type="text"
+            fullWidth
+            multiline
+            rows={4}
+            variant="standard"
+            value={description}
+            onChange={handleDescriptionChange}
+            className={classes['custom-textarea']}
+            InputLabelProps={{ className: classes['custom-label'] }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={onClose} className={classes['custom-button1']}>Cancel</Button>
+          <Button type="submit" className={classes['custom-button2']}>OK</Button>
+        </DialogActions>
+      </form >
     </Dialog>
   );
 }

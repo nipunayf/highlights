@@ -58,9 +58,18 @@
     margin-left: 5%;
     width:500px;
     background-color:#F0F4F5;
+    
     border-radius: 10px;
     height: 50px;
   }
+
+  .subTask {
+  
+  margin-left: 5%;
+  margin-top: 2%;
+    
+  }
+ 
 
  
 
@@ -71,24 +80,38 @@
   }
 
   .task_name{
-    margin-top: -3%;
-    margin-left: 15%;
+    margin-top: -2%;
+    padding-bottom: 2000px;
+
+    margin-left: 10%;
+    display: flex;
+    
 
   }
+
+.task_date p{
+  /* background-color: aqua; */
+  margin-left: 100px;
+  /* padding-left: 800%; */
+  /* margin-right: -50px; */
+  /* padding-right: -2000px; */
+  padding-top: 4%;
+}
+
 
   .task{
     display: flex;
   }
 
   .bars_icon{
-    margin-top: -16%;
+    margin-top: -17.5%;
     padding-top: 19%;
     margin-left: 1%;
     cursor: pointer;
   }
 .d{
     display: flex;
-    /* margin-left: 200px; */  
+   
 }
   
 
@@ -124,4 +147,5 @@
     transform: translateY(-10px); /* End animation above */
   }
 }
+
 

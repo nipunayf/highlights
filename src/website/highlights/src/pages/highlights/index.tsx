@@ -4,10 +4,10 @@ import { Card, Text, Group, useMantineTheme } from "@mantine/core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSquare as faRegularSquare } from "@fortawesome/free-regular-svg-icons";
 import { faCheckSquare as faSolidSquare } from "@fortawesome/free-solid-svg-icons";
-import Addtask_popup from "@/components/Addtask_popup";
-import OptionsMenu from "@/components/Option_popup";
+import Addtask_popup from "@/components/Addtask/Addtask_popup";
+import OptionsMenu from "@/components/Optionmenu/Option_popup";
 import Confetti from "react-confetti";
-import AlertDialogSlide from "@/components/AlertDialogSlide"; // Import the dialog component
+import AlertDialogSlide from "@/components/Feedback/AlertDialogSlide"; // Import the dialog component
 import classes from "./ActionsGrid.module.css";
 
 function ActionsGrid() {

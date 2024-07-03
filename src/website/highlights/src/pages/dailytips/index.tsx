@@ -1,6 +1,6 @@
 import React from 'react';
 import PageLayout from "@/components/PageLayout";
-import Card from "@/components/Card"; // Assuming this is where your Card component is defined
+import Card from "@/components/Dailytipscard/Card"; // Assuming this is where your Card component is defined
 import { Title } from "@mantine/core";
 import { ReactNode } from "react";
 import classes from "./daily_tips.module.css"; // Update import to use CSS modules

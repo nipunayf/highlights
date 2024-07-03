@@ -5,9 +5,9 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Slide from '@mui/material/Slide';
-import { TransitionProps } from '@mui/material/transitions';
 import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Grid';
+import { TransitionProps } from '@mui/material/transitions';
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & { children?: React.ReactElement<any, any> },
@@ -16,13 +16,12 @@ const Transition = React.forwardRef(function Transition(
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-export default function AlertDialogSlide({
-  open,
-  handleClose,
-}: {
+interface AlertDialogSlideProps {
   open: boolean;
-  handleClose: () => void;
-}) {
+  handleClose: (agree: boolean) => void;
+}
+
+export default function AlertDialogSlide({ open, handleClose }: AlertDialogSlideProps) {
   const [formData, setFormData] = React.useState({
     q1: '',
     q2: '',
@@ -40,7 +39,7 @@ export default function AlertDialogSlide({
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     console.log(formData); // Replace with your submission logic
-    handleClose();
+    handleClose(true);
   };
 
   return (
@@ -48,15 +47,30 @@ export default function AlertDialogSlide({
       open={open}
       TransitionComponent={Transition}
       keepMounted
-      onClose={handleClose}
+      onClose={() => handleClose(false)}
       aria-labelledby="alert-dialog-slide-title"
       aria-describedby="alert-dialog-slide-description"
     >
-      <DialogTitle sx={{ backgroundColor: '#2196f3', color: '#fff', textAlign: 'center' }} id="alert-dialog-slide-title">
+      <DialogTitle 
+        sx={{ 
+          backgroundColor: '#2196f3', 
+          color: '#fff', 
+          textAlign: 'center',
+          padding: '16px 24px',
+          fontSize: '24px',
+          fontWeight: 'bold',
+        }} 
+        id="alert-dialog-slide-title"
+      >
         Task Completion Form
       </DialogTitle>
       <form onSubmit={handleSubmit}>
-        <DialogContent sx={{ padding: '20px' }}>
+        <DialogContent 
+          sx={{ 
+            padding: '20px 24px', 
+            backgroundColor: '#f5f5f5',
+          }}
+        >
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <TextField
@@ -69,6 +83,19 @@ export default function AlertDialogSlide({
                 variant="outlined"
                 value={formData.q1}
                 onChange={handleInputChange}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': {
+                      borderColor: '#2196f3',
+                    },
+                    '&:hover fieldset': {
+                      borderColor: '#1976d2',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#1976d2',
+                    },
+                  },
+                }}
               />
             </Grid>
             <Grid item xs={12}>
@@ -81,6 +108,19 @@ export default function AlertDialogSlide({
                 variant="outlined"
                 value={formData.q2}
                 onChange={handleInputChange}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': {
+                      borderColor: '#2196f3',
+                    },
+                    '&:hover fieldset': {
+                      borderColor: '#1976d2',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#1976d2',
+                    },
+                  },
+                }}
               />
             </Grid>
             <Grid item xs={12}>
@@ -93,6 +133,19 @@ export default function AlertDialogSlide({
                 variant="outlined"
                 value={formData.q3}
                 onChange={handleInputChange}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': {
+                      borderColor: '#2196f3',
+                    },
+                    '&:hover fieldset': {
+                      borderColor: '#1976d2',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#1976d2',
+                    },
+                  },
+                }}
               />
             </Grid>
             <Grid item xs={12}>
@@ -105,6 +158,19 @@ export default function AlertDialogSlide({
                 variant="outlined"
                 value={formData.q4}
                 onChange={handleInputChange}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': {
+                      borderColor: '#2196f3',
+                    },
+                    '&:hover fieldset': {
+                      borderColor: '#1976d2',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#1976d2',
+                    },
+                  },
+                }}
               />
             </Grid>
             <Grid item xs={12}>
@@ -117,6 +183,19 @@ export default function AlertDialogSlide({
                 variant="outlined"
                 value={formData.q5}
                 onChange={handleInputChange}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': {
+                      borderColor: '#2196f3',
+                    },
+                    '&:hover fieldset': {
+                      borderColor: '#1976d2',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#1976d2',
+                    },
+                  },
+                }}
               />
             </Grid>
             <Grid item xs={12}>
@@ -129,13 +208,51 @@ export default function AlertDialogSlide({
                 variant="outlined"
                 value={formData.q6}
                 onChange={handleInputChange}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': {
+                      borderColor: '#2196f3',
+                    },
+                    '&:hover fieldset': {
+                      borderColor: '#1976d2',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#1976d2',
+                    },
+                  },
+                }}
               />
             </Grid>
           </Grid>
         </DialogContent>
-        <DialogActions sx={{ justifyContent: 'space-between' }}>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button type="submit" sx={{ backgroundColor: '#2196f3', color: '#fff', '&:hover': { backgroundColor: '#1976d2' } }}>
+        <DialogActions 
+          sx={{ 
+            justifyContent: 'space-between', 
+            padding: '8px 24px', 
+            backgroundColor: '#f5f5f5',
+          }}
+        >
+          <Button 
+            onClick={() => handleClose(false)} 
+            sx={{ 
+              color: '#2196f3', 
+              '&:hover': { 
+                backgroundColor: 'rgba(33, 150, 243, 0.1)', 
+              } 
+            }}
+          >
+            Cancel
+          </Button>
+          <Button 
+            type="submit" 
+            sx={{ 
+              backgroundColor: '#2196f3', 
+              color: '#fff', 
+              '&:hover': { 
+                backgroundColor: '#1976d2', 
+              },
+            }}
+          >
             Submit
           </Button>
         </DialogActions>

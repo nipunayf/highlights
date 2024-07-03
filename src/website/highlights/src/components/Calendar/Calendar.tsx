@@ -2,21 +2,21 @@ import React, { useState } from 'react';
 import styles from './Calendar.module.css';
 import { IconChevronDown } from '@tabler/icons-react';
 
-const Calendar = () => {
+const Calendar: React.FC = () => {
   const today = new Date();
-  const [currentMonth, setCurrentMonth] = useState(today.getMonth());
-  const [currentYear, setCurrentYear] = useState(today.getFullYear());
-  const [selectedDate, setSelectedDate] = useState(today);
-  const [view, setView] = useState('month');
+  const [currentMonth, setCurrentMonth] = useState<number>(today.getMonth());
+  const [currentYear, setCurrentYear] = useState<number>(today.getFullYear());
+  const [selectedDate, setSelectedDate] = useState<Date>(today);
+  const [view, setView] = useState<'month' | 'year'>('month');
 
-  const daysInMonth = (month, year) => new Date(year, month + 1, 0).getDate();
-  const firstDayOfMonth = (month, year) => new Date(year, month, 1).getDay();
+  const daysInMonth = (month: number, year: number): number => new Date(year, month + 1, 0).getDate();
+  const firstDayOfMonth = (month: number, year: number): number => new Date(year, month, 1).getDay();
 
-  const handleDateClick = (day, month, year) => {
+  const handleDateClick = (day: number, month: number, year: number): void => {
     setSelectedDate(new Date(year, month, day));
   };
 
-  const handlePreviousMonth = () => {
+  const handlePreviousMonth = (): void => {
     if (currentMonth === 0) {
       setCurrentMonth(11);
       setCurrentYear(currentYear - 1);
@@ -25,7 +25,7 @@ const Calendar = () => {
     }
   };
 
-  const handleNextMonth = () => {
+  const handleNextMonth = (): void => {
     if (currentMonth === 11) {
       setCurrentMonth(0);
       setCurrentYear(currentYear + 1);
@@ -34,15 +34,15 @@ const Calendar = () => {
     }
   };
 
-  const handlePreviousYear = () => {
+  const handlePreviousYear = (): void => {
     setCurrentYear(currentYear - 1);
   };
 
-  const handleNextYear = () => {
+  const handleNextYear = (): void => {
     setCurrentYear(currentYear + 1);
   };
 
-  const renderDays = (month, year, isYearView = false) => {
+  const renderDays = (month: number, year: number, isYearView: boolean = false): JSX.Element[] => {
     const totalDays = daysInMonth(month, year);
     const firstDay = firstDayOfMonth(month, year);
     const days = Array.from({ length: totalDays }, (_, i) => i + 1);
@@ -52,10 +52,10 @@ const Calendar = () => {
       { day: 4, month: 0, year: 2024, patterns: [styles.redPattern, styles.yellowPattern, styles.bluePattern] }, // January
       { day: 12, month: 0, year: 2024, patterns: [styles.redPattern, styles.yellowPattern] },
       { day: 19, month: 0, year: 2024, patterns: [styles.bluePattern, styles.redPattern] },
-      { day: 1, month: 1, year: 2024, patterns: [styles.redPattern, styles.yellowPattern, styles.bluePattern] }, // February
-      { day: 10, month: 1, year: 2024, patterns: [styles.redPattern, styles.yellowPattern] },
-      { day: 25, month: 1, year: 2024, patterns: [styles.bluePattern, styles.redPattern] },
-      { day: 8, month: 2, year: 2024, patterns: [styles.redPattern, styles.yellowPattern, styles.bluePattern] }, // March
+      { day: 4, month: 1, year: 2024, patterns: [styles.redPattern, styles.yellowPattern, styles.bluePattern] }, // February
+      { day: 12, month: 1, year: 2024, patterns: [styles.redPattern, styles.yellowPattern] },
+      { day: 19, month: 1, year: 2024, patterns: [styles.bluePattern, styles.redPattern] },
+      { day: 4, month: 2, year: 2024, patterns: [styles.redPattern, styles.yellowPattern, styles.bluePattern] }, // March
       { day: 12, month: 2, year: 2024, patterns: [styles.redPattern, styles.yellowPattern] },
       { day: 19, month: 2, year: 2024, patterns: [styles.bluePattern, styles.redPattern] },
       { day: 4, month: 3, year: 2024, patterns: [styles.redPattern, styles.yellowPattern, styles.bluePattern] }, // April
@@ -111,7 +111,7 @@ const Calendar = () => {
     ];
   };
 
-  const renderMonth = (month, year, isYearView = false) => (
+  const renderMonth = (month: number, year: number, isYearView: boolean = false): JSX.Element => (
     <div className={styles.month} key={`${month}-${year}`}>
       <div className={styles.monthTitle}>{`${new Date(year, month).toLocaleString('default', { month: 'long' })}`}</div>
       <div className={styles.daysOfWeek}>
@@ -123,7 +123,7 @@ const Calendar = () => {
     </div>
   );
 
-  const renderYearView = () => {
+  const renderYearView = (): JSX.Element => {
     const months = Array.from({ length: 12 }, (_, i) => i);
     return (
       <div className={styles.year}>
@@ -132,7 +132,7 @@ const Calendar = () => {
     );
   };
 
-  const handleViewChange = (newView) => {
+  const handleViewChange = (newView: 'month' | 'year'): void => {
     setView(newView);
   };
 

@@ -4,16 +4,21 @@
 .calendarContainer {
           margin-top: 50px;
           width: 100%;
-          max-width: 600px;
+          /* max-width: 600px; */
           margin: 0 auto;
           font-family: 'Roboto', sans-serif;
-          padding: 10%;
+          /* padding: 10%; */
           background:linear-gradient(135deg, #f5f7fa, #c3cfe200);
-          
+          padding-bottom: 10%;
+          padding-left: 1%;
+          padding-right: 1%;
+          padding-top: 50px;
+          min-height: 100%;
+              
           
           border-radius: 15px;
           box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-          
+  
         }
 
 
@@ -45,7 +50,9 @@
           font-weight: bold;
           color: #333;
           display: flex;
-    justify-content: center;
+          justify-content: space-between;
+          padding-left: 30px;
+          margin-bottom: 100px;
         }
 
         
@@ -107,6 +114,13 @@
         .title {
           font-size: 1.1rem;
           color: #37474f;
+        }
+        .titleCaption{
+          font-size: 24px;
+          font-weight: bold;
+          color: #333;
+          display: flex;
+          align-items: ;
         }
         
         .time {

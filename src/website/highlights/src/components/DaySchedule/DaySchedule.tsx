@@ -101,10 +101,10 @@ const DaySchedule: React.FC = () => {
       <h1 className={styles.titleCaption}>Today Schedule</h1>
 
       <div className={styles.container}>
-        <div className={styles.header}>
+        {/* <div className={styles.header}>
           <div>2024. 06.19</div>
           <div>Wednesday</div>
-        </div>
+        </div> */}
         <div className={styles.tasks}>
           {tasks.map((task, index) => (
             <div key={task.id} className={styles.taskContainer}>

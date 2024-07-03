@@ -1,91 +1,51 @@
 .calendarContainer {
-          display: flex;
-          flex-direction: column; /* Stack planes vertically on mobile */
-          height: 100%; /* Ensure full height */
-          max-width: 1200px; /* Fixed max width for desktop */
-          width: 100%; /* Ensure container takes full width by default */
-          margin: 0 auto; /* Center the container */
-          padding: 20px; /* Add some padding */
-          box-sizing: border-box; /* Ensure padding and border are included in the element's total width and height */
-          min-height: 100vh; /* Set minimum height to fit the viewport height */
-      }
-      
-      .leftPlane, .rightPlane {
-          padding: 20px;
-          min-width: fit-content; /* Set minimum width to fit content */
-          width: 100%; /* Ensure full width by default */
-          border: 1px solid #ccc; /* Border color */
-          border-radius: 10px; /* Curve the border */
-          background-color: #fff; /* Background color */
-          box-sizing: border-box; /* Ensure padding and border are included in the element's total width and height */
-          margin-bottom: 10px; /* Space between the planes when stacked vertically */
-      }
-      
-      .middleBorder {
-          display: none; /* Hide middle border on smaller screens */
-      }
-      
-      @media (min-width: 768px) {
-          .calendarContainer {
-              flex-direction: row; /* Display planes side-by-side on larger screens */
-              justify-content: space-between; /* Ensure planes are spaced correctly */
-          }
-      
-          .leftPlane, .rightPlane {
-              width: calc(50% - 7.5px); /* Each plane takes half the width minus half the middle border width */
-              margin-bottom: 0; /* Remove bottom margin when planes are side-by-side */
-          }
-      
-          .middleBorder {
-              display: block; /* Show middle border on larger screens */
-              width: 4px; /* Set width for the middle border */
-              background-color: #ccc; /* Middle border color */
-              height: auto; /* Adjust height to match content */
-              margin: 0; /* Remove any margin */
-          }
-      }
+    display: flex;
+    flex-direction: column; /* Stack planes vertically on mobile */
+    height: 100%; /* Ensure full height */
+    /* max-width: 1200px; Fixed max width for desktop */
+    width: 100%; /* Ensure container takes full width by default */
+    margin: 0 auto; /* Center the container */
+    padding: 20px; /* Add some padding */
+    box-sizing: border-box; /* Ensure padding and border are included in the element's total width and height */
+    min-height: 100vh; /* Set minimum height to fit the viewport height */
+    /* background-color: #f0f4f8; Background color for the entire page */
+}
 
+.leftPlane, .rightPlane {
+    flex: 1;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #fff; /* Background color */
+    border-radius: 10px; /* Curve the border */
+    box-sizing: border-box; /* Ensure padding and border are included in the element's total width and height */
+    margin-bottom: 10px; /* Space between the planes when stacked vertically */
+}
 
+.middleBorder {
+    display: none; /* Hide middle border on smaller screens */
+}
 
+@media (min-width: 768px) {
+    .calendarContainer {
+        flex-direction: row; /* Display planes side-by-side on larger screens */
+        justify-content: space-between; /* Ensure planes are spaced correctly */
+        align-items: stretch; /* Stretch planes to match height */
+    }
 
+    .leftPlane {
+        flex: 0 0 40%; /* Fixed width of 30% */
+        margin-right: 10px; /* Add space between planes */
+    }
 
+    .rightPlane {
+        flex: 0 0 60%; /* Fixed width of 70% */
+    }
 
-
-
-
-
-
-
-
-
-      
-.calendarContainer {
-          display: flex;
-          flex-direction: row;
-          justify-content: center;
-          align-items: stretch;
-          height: 100vh;
-          width: 100%;
-          background-color: #f0f4f8; /* Background color for the entire page */
-          padding: 20px; /* Add some padding around the content */
-          box-sizing: border-box;
-      }
-      
-      .leftPlane, .rightPlane {
-          flex: 1;
-          padding: 20px;
-          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-          background-color: white;
-          border-radius: 10px;
-      }
-      
-      .leftPlane {
-          margin-right: 10px; /* Add some space between the planes */
-      }
-      
-      .middleBorder {
-          width: 2px;
-          background-color: #e0e0e0; /* Light grey color for the border */
-          margin: 0 10px; /* Add some margin around the border */
-      }
-      
+    .middleBorder {
+        display: block; /* Show middle border on larger screens */
+        width: 4px; /* Set width for the middle border */
+        background-color: #e0e0e0; /* Middle border color */
+        height: auto; /* Adjust height to match content */
+        margin: 0; /* Remove any margin */
+    }
+}

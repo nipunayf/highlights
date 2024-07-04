@@ -1,5 +1,4 @@
 import '@mantine/core/styles.css';
-import '@mantine/dates/styles.css';
 
 import type { AppProps } from 'next/app';
 import { createTheme, MantineProvider } from '@mantine/core';

@@ -45,6 +45,10 @@ export default function PageLayout({ children }: { children: React.ReactNode }) 
                     label="Tasks"
                 />
                 <NavLink
+                    href="/projects"
+                    label="Projects"
+                />
+                <NavLink
                     href="/analytics"
                     label="Analytics"
                 />

@@ -3,6 +3,7 @@ import ballerina/log;
 import ballerina/sql;
 import ballerinax/mysql;
 import ballerinax/mysql.driver as _;
+import ballerina/io;
 
 type Greeting record {|
     string greeting;
@@ -17,11 +18,15 @@ type User record {|
     string sub;
 |};
 
+
+
 // listener http:Listener securedEP = new (9090);
 
 // Define the configuration variables
 configurable string azureAdIssuer = ?;
 configurable string azureAdAudience = ?;
+
+
 
 @http:ServiceConfig {
     auth: [
@@ -81,4 +86,6 @@ service / on new http:Listener(9090) {
 
         return http:INTERNAL_SERVER_ERROR;
     }
+
+   
 }

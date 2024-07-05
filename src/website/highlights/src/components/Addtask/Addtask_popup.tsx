@@ -18,10 +18,6 @@ import { faFlag } from '@fortawesome/free-solid-svg-icons';
 import classes from './Addtask_popup.module.css';
 import { fetchAPI } from '@/lib/api';
 
-interface Task {
-  name:string;
-}
-
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
     children: React.ReactElement<any, any>;
@@ -43,6 +39,7 @@ export default function AddTaskPopup({ open, onClose }: AddTaskPopupProps) {
   const [reminder, setReminder] = React.useState('');
   const [priority, setPriority] = React.useState('');
   const [description, setDescription] = React.useState('');
+  const [error, setError] = React.useState<string>('');
 
   const handleTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(event.target.value);
@@ -68,34 +65,47 @@ export default function AddTaskPopup({ open, onClose }: AddTaskPopupProps) {
     setDescription(event.target.value);
   };
 
-  const handleAgree = () => {
-    console.log(`Title: ${title}, Date: ${date}, Time Range: ${timeRange}, Reminder: ${reminder}, Priority: ${priority}, Description: ${description}`);
-    onClose();
+  const createTask = async () => {
+    try {
+      const taskData = {
+        title,
+        date: date?.toISOString(),
+        startTime: timeRange[0]?.toISOString(),
+        endTime: timeRange[1]?.toISOString(),
+        reminder,
+        priority,
+        description
+      };
+
+      const data = await fetchAPI('addtask', taskData, { method: 'POST' });
+
+      console.log('Task created successfully:', data);
+
+      // Close the dialog after successfully creating the task
+      onClose();
+    } catch (error) {
+      console.error('Error creating task:', error);
+      setError('Failed to create task. Please try again.');
+    }
   };
 
-  async function createTask(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    // setResponse(await fetchAPI("greeting", {}, { method: "POST" }) ?? "No response");
-   
-
-
-    console.log("Create task");
-    // await fetchAPI( Task task,"greeting", {}, { method: "POST" });
-    
-  }
+  const handleClose = () => {
+    setError(''); // Clear any previous errors when closing the dialog
+    onClose();
+  };
 
   return (
     <Dialog
       open={open}
       TransitionComponent={Transition}
       keepMounted
-      onClose={onClose}
+      onClose={handleClose}
       aria-describedby="alert-dialog-slide-description"
       className={classes['custom-dialog']}
       classes={{ paper: classes['dialog-paper'] }}
     >
       <DialogTitle>{"Add New Task"}</DialogTitle>
-      <form onSubmit={createTask}>
+      <form onSubmit={(e) => { e.preventDefault(); createTask(); }}>
         <DialogContent>
           <TextField
             margin="dense"
@@ -107,7 +117,7 @@ export default function AddTaskPopup({ open, onClose }: AddTaskPopupProps) {
             value={title}
             onChange={handleTitleChange}
             InputLabelProps={{
-              className: classes['custom-label'], 
+              className: classes['custom-label'],
             }}
             className={classes['custom-input']}
           />
@@ -160,19 +170,19 @@ export default function AddTaskPopup({ open, onClose }: AddTaskPopupProps) {
             InputLabelProps={{ className: classes['custom-label'] }}
           >
             <MenuItem value="none">
-              <FontAwesomeIcon icon={faFlag} style={{color: "transparent", marginRight: "8px"}} />
+              <FontAwesomeIcon icon={faFlag} style={{ color: "transparent", marginRight: "8px" }} />
               None
             </MenuItem>
             <MenuItem value="low">
-              <FontAwesomeIcon icon={faFlag} style={{color: "green", marginRight: "8px"}} />
+              <FontAwesomeIcon icon={faFlag} style={{ color: "green", marginRight: "8px" }} />
               Low
             </MenuItem>
             <MenuItem value="medium">
-              <FontAwesomeIcon icon={faFlag} style={{color: "yellow", marginRight: "8px"}} />
+              <FontAwesomeIcon icon={faFlag} style={{ color: "yellow", marginRight: "8px" }} />
               Medium
             </MenuItem>
             <MenuItem value="high">
-              <FontAwesomeIcon icon={faFlag} style={{color: "red", marginRight: "8px"}} />
+              <FontAwesomeIcon icon={faFlag} style={{ color: "red", marginRight: "8px" }} />
               High
             </MenuItem>
           </TextField>
@@ -190,12 +200,13 @@ export default function AddTaskPopup({ open, onClose }: AddTaskPopupProps) {
             className={classes['custom-textarea']}
             InputLabelProps={{ className: classes['custom-label'] }}
           />
+          {error && <p className={classes['error-message']}>{error}</p>}
         </DialogContent>
         <DialogActions>
-          <Button onClick={onClose} className={classes['custom-button1']}>Cancel</Button>
+          <Button onClick={handleClose} className={classes['custom-button1']}>Cancel</Button>
           <Button type="submit" className={classes['custom-button2']}>OK</Button>
         </DialogActions>
-      </form >
+      </form>
     </Dialog>
   );
 }

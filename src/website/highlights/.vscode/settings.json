@@ -10,4 +10,6 @@
     "git.autofetch": true,
     "git.suggestSmartCommit": false,
     "git.confirmSync": false,
+    "editor.indentSize": "tabSize",
+    "editor.tabSize": 4
 }

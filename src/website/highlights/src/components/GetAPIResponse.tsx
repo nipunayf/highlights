@@ -14,7 +14,7 @@ export default function GetAPIResponse() {
     }
 
     return (
-        <>
+        <> 
             <Button onClick={getData}>Call API
             </Button>
             <div>

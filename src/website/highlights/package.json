@@ -1,37 +1,51 @@
 {
-    "name": "highlights",
-    "version": "0.1.0",
-    "private": true,
-    "scripts": {
-        "dev": "next dev",
-        "build": "next build",
-        "start": "next start",
-        "lint": "next lint"
-    },
-    "dependencies": {
-        "@azure/msal-browser": "^3.17.0",
-        "@azure/msal-react": "^2.0.19",
-        "@mantine/core": "^7.11.1",
-        "@mantine/dates": "^7.11.1",
-        "@mantine/hooks": "^7.11.1",
-        "@tabler/icons-react": "^3.7.0",
-        "clsx": "^2.1.1",
-        "dayjs": "^1.11.11",
-        "next": "14.2.3",
-        "qs": "^6.12.1",
-        "react": "^18",
-        "react-dom": "^18"
-    },
-    "devDependencies": {
-        "@types/node": "^20",
-        "@types/qs": "^6.9.15",
-        "@types/react": "^18",
-        "@types/react-dom": "^18",
-        "eslint": "^8",
-        "eslint-config-next": "14.2.3",
-        "postcss": "^8.4.38",
-        "postcss-preset-mantine": "^1.15.0",
-        "postcss-simple-vars": "^7.0.1",
-        "typescript": "^5"
-    }
+  "name": "highlights",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@azure/msal-browser": "^3.17.0",
+    "@azure/msal-react": "^2.0.19",
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
+    "@fortawesome/fontawesome-svg-core": "^6.5.2",
+    "@fortawesome/free-regular-svg-icons": "^6.5.2",
+    "@fortawesome/free-solid-svg-icons": "^6.5.2",
+    "@fortawesome/react-fontawesome": "^0.2.2",
+    "@mantine/core": "^7.11.1",
+    "@mantine/dates": "^7.11.1",
+    "@mantine/form": "^7.11.1",
+    "@mantine/hooks": "^7.11.1",
+    "@mui/icons-material": "^5.15.21",
+    "@mui/material": "^5.15.20",
+    "@mui/x-date-pickers": "^7.7.1",
+    "@mui/x-date-pickers-pro": "^7.8.0",
+    "@tabler/icons-react": "^3.6.0",
+    "dayjs": "^1.11.11",
+    "inquirer": "^9.2.23",
+    "next": "14.2.3",
+    "qs": "^6.12.2",
+    "react": "^18",
+    "react-confetti": "^6.1.0",
+    "react-dom": "^18",
+    "react-snowfall": "^2.1.0",
+    "sweetalert2": "^11.12.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/qs": "^6.9.15",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.3",
+    "postcss": "^8.4.38",
+    "postcss-preset-mantine": "^1.15.0",
+    "postcss-simple-vars": "^7.0.1",
+    "typescript": "^5"
+  }
 }

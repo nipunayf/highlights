@@ -149,3 +149,42 @@
 }
 
 
+/* Responsive styles */
+@media (max-width: 1265px) {
+  .title {
+    font-size: 1.5rem; /* Adjust font size for mobile */
+  }
+
+  .icon {
+    width: 50px; /* Adjust size for mobile */
+    height: 50px; /* Adjust size for mobile */
+    margin-top: 2%;
+    margin-left: 5%;
+  }
+
+  .task {
+    width: 100%; /* Full width for mobile */
+  }
+
+  .highlight_card {
+    /* background-color: #921212; */
+    /* height: 10%; */
+    width: 100%; 
+    padding: 10px; /* Add padding for better spacing */
+    flex-direction: column; /* Stack items vertically */
+  }
+  .card{
+    /* background-color: rgb(255, 255, 255); */
+    height: 20%;
+    width: 80%;
+  }
+
+  .separator {
+    display: none; /* Hide separator on mobile */
+  }
+
+  .task {
+    margin: 2% auto; /* Adjust margin for mobile */
+  }
+}
+

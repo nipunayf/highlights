@@ -16,7 +16,6 @@ import dayjs, { Dayjs } from 'dayjs';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFlag } from '@fortawesome/free-solid-svg-icons';
 import classes from './Addtask_popup.module.css';
-import { fetchAPI } from '@/lib/api';
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
@@ -77,9 +76,7 @@ export default function AddTaskPopup({ open, onClose }: AddTaskPopupProps) {
         description
       };
 
-      const data = await fetchAPI('addtask', taskData, { method: 'POST' });
-
-      console.log('Task created successfully:', data);
+      console.log('Task created successfully:', taskData);
 
       // Close the dialog after successfully creating the task
       onClose();

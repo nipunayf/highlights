@@ -6,8 +6,8 @@ import { faCheckSquare as faSolidSquare } from '@fortawesome/free-solid-svg-icon
 
 import Confetti from 'react-confetti';
 import PageLayout from "@/components/PageLayout";
-import Addtask_popup from "@/components/Addtask/Addtask_popup";
-import OptionsMenu from "@/components/Optionmenu/Option_popup";
+import Addtask_popup from "@/components/Addtask/AddtaskPopup";
+import OptionsMenu from "@/components/Optionmenu/OptionPopup";
 import AlertDialogSlide from "@/components/Feedback/AlertDialogSlide";
 import classes from "./ActionsGrid.module.css";
 

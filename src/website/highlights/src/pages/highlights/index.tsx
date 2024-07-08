@@ -2,7 +2,7 @@ import React, { ReactNode, useState } from 'react';
 import { Card, Group, Text, useMantineTheme } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSquare as faRegularSquare } from '@fortawesome/free-regular-svg-icons';
-// import { faCheckSquare as faSolidSquare } from '@fortawesome/free-solid-svg-icons';
+import { faCheckSquare as faSolidSquare } from '@fortawesome/free-solid-svg-icons';
 
 import Confetti from 'react-confetti';
 import PageLayout from "@/components/PageLayout";

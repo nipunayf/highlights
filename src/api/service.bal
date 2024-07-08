@@ -1,6 +1,7 @@
 import ballerina/http;
 import ballerina/log;
 import ballerina/sql;
+import ballerina/time;
 import ballerinax/mysql;
 import ballerinax/mysql.driver as _;
 
@@ -16,6 +17,18 @@ type User record {|
     int id;
     string sub;
 |};
+
+type Task record {|
+    string? id = null;
+    string title;
+    time:Utc? dueDate = null;
+|};
+
+Task[] tasks = [
+    {id: "1", title: "Task 1"},
+    {id: "2", title: "Task 2"},
+    {id: "3", title: "Task 3"}
+];
 
 // listener http:Listener securedEP = new (9090);
 
@@ -65,8 +78,8 @@ service / on new http:Listener(9090) {
         if result is sql:NoRowsError {
             do {
                 _ = check self.db->execute(`
-	                    INSERT INTO users (sub)
-	                    VALUES (${createUser.sub});`);
+                        INSERT INTO users (sub)
+                        VALUES (${createUser.sub});`);
             } on fail var e {
                 log:printError("Error occurred while inserting data: ", e);
                 return http:INTERNAL_SERVER_ERROR;
@@ -80,5 +93,15 @@ service / on new http:Listener(9090) {
         }
 
         return http:INTERNAL_SERVER_ERROR;
+    }
+
+    resource function get tasks() returns Task[] {
+        return tasks;
+    }
+
+    resource function post tasks(Task task) returns Task {
+        tasks.push({id: (tasks.length() + 1).toString(), title: task.title});
+        log:printInfo("Task added");
+        return task;
     }
 }

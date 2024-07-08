@@ -2,8 +2,8 @@ import '@mantine/core/styles.css';
 
 import type { AppProps } from 'next/app';
 import { createTheme, MantineProvider } from '@mantine/core';
-import { MsalProvider } from '@azure/msal-react';
-import { AuthenticationResult, EventType, PublicClientApplication } from '@azure/msal-browser';
+import { MsalAuthenticationTemplate, MsalProvider } from '@azure/msal-react';
+import { AuthenticationResult, EventType, InteractionType, PublicClientApplication } from '@azure/msal-browser';
 import { msalConfig } from '../authConfig';
 import { NextPage } from 'next';
 import { ReactElement, ReactNode, StrictMode } from 'react';
@@ -48,9 +48,11 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
     return (
         <StrictMode>
             <MsalProvider instance={msalInstance}>
-                <MantineProvider theme={theme}>
-                    {getLayout(<Component {...pageProps} />)}
-                </MantineProvider>
+                <MsalAuthenticationTemplate interactionType={InteractionType.Redirect}>
+                    <MantineProvider theme={theme}>
+                        {getLayout(<Component {...pageProps} />)}
+                    </MantineProvider>
+                </MsalAuthenticationTemplate>
             </MsalProvider>
         </StrictMode>
     );

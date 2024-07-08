@@ -7,11 +7,7 @@ import {
     rem,
     Space,
 } from '@mantine/core';
-<<<<<<< HEAD
-import { IconBulb, IconUser, IconCheckbox, IconPlus, IconChartDots2, IconCalendarMonth, IconAlarm } from '@tabler/icons-react';
-=======
-import { IconBulb, IconUser, IconCheckbox, IconPlus, IconChartDots2, IconCalendarMonth , IconBellRinging,IconTie} from '@tabler/icons-react';
->>>>>>> be437227660d5c363fb75a5fb6bae22f18c40a3e
+import { IconBulb, IconUser, IconCheckbox, IconPlus, IconChartDots2, IconCalendarMonth , IconBellRinging,IconTie,IconAlarm} from '@tabler/icons-react';
 import classes from './Navbar.module.css';
 import Link from 'next/link';
 import { useState } from 'react';

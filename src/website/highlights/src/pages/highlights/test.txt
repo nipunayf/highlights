@@ -1,9 +1,7 @@
-import React, { ReactNode, useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Card, Group, Text, useMantineTheme } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSquare as faRegularSquare } from '@fortawesome/free-regular-svg-icons';
-// import { faCheckSquare as faSolidSquare } from '@fortawesome/free-solid-svg-icons';
-
+import { faSquare as faRegularSquare, faCheckSquare as faSolidSquare } from '@fortawesome/free-solid-svg-icons';
 import Confetti from 'react-confetti';
 import PageLayout from "@/components/PageLayout";
 import Addtask_popup from "@/components/Addtask/Addtask_popup";
@@ -14,38 +12,58 @@ import classes from "./ActionsGrid.module.css";
 function ActionsGrid() {
   const theme = useMantineTheme();
 
-  const [tasks, setTasks] = useState([
-    {
-      id: 1,
-      title: "Task 1",
-      description: "Description for task 1",
-      date: "2024-07-03",
+   const tasks = [
+    { 
+      id: 1, 
+      title: "Tasak 1", 
+      description: "Description for task 1", 
+      date: "2024-07-03", // Main task date
       subTasks: [
         { id: 1, title: "Sub-task 1.1", date: "2024-07-03" },
         { id: 2, title: "Sub-task 1.2", date: "2024-07-03" }
       ]
     },
-    {
-      id: 2,
-      title: "Task 2",
-      description: "Description for task 2",
-      date: "2024-07-03",
+    { 
+      id: 1, 
+      title: "Tasak 1", 
+      description: "Description for task 1", 
+      date: "2024-07-03", // Main task date
+      subTasks: [
+        { id: 1, title: "Sub-task 1.1", date: "2024-07-03" },
+        { id: 2, title: "Sub-task 1.2", date: "2024-07-03" }
+      ]
+    },
+    { 
+      id: 1, 
+      title: "Tasak 1", 
+      description: "Description for task 1", 
+      date: "2024-07-03", // Main task date
+      subTasks: [
+        { id: 1, title: "Sub-task 1.1", date: "2024-07-03" },
+        { id: 2, title: "Sub-task 1.2", date: "2024-07-03" }
+      ]
+    },
+    { 
+      id: 2, 
+      title: "Task 2", 
+      description: "Description for task 2", 
+      date: "2024-07-03", // Main task date
       subTasks: [
         { id: 3, title: "Sub-task 2.1", date: "2024-07-03" },
         { id: 4, title: "Sub-task 2.2", date: "2024-07-03" }
       ]
     },
-    {
-      id: 3,
-      title: "Task 3",
-      description: "Description for task 3",
-      date: "2024-07-03",
+    { 
+      id: 3, 
+      title: "Task 3", 
+      description: "Description for task 3", 
+      date: "2024-07-03", // Main task date
       subTasks: [
         { id: 5, title: "Sub-task 3.1", date: "2024-07-03" },
         { id: 6, title: "Sub-task 3.2", date: "2024-07-03" }
       ]
     }
-  ]);
+  ];
 
   const [popupOpen, setPopupOpen] = useState(false);
   const [confettiActive, setConfettiActive] = useState(false);
@@ -81,12 +99,6 @@ function ActionsGrid() {
       handleComplete(currentTask);
     }
     setCurrentTask(null);
-  };
-
-  const addTask = (newTask: any) => {
-    // Add the new task to the tasks array
-    setTasks([...tasks, newTask]);
-    setPopupOpen(false); // Close the popup after adding the task
   };
 
   return (
@@ -153,7 +165,7 @@ function ActionsGrid() {
         </div>
       </div>
 
-      <Addtask_popup open={popupOpen} onClose={handleClosePopup} addTask={addTask} />
+      <Addtask_popup open={popupOpen} onClose={handleClosePopup} />
 
       {confettiActive && (
         <Confetti

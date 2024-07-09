@@ -1,38 +1,40 @@
-import * as React from 'react';
-import { Menu, Button, Text, rem } from '@mantine/core';
-import {
-  IconEdit,
-  IconArchive,
-  IconCopy,
-  IconTrash,
-  IconClock,
-  IconCheck,
-} from '@tabler/icons-react';
+import React, { useState, useRef } from 'react';
+import { Menu, Button, rem } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEllipsis } from '@fortawesome/free-solid-svg-icons';
 import Swal from 'sweetalert2';
 
-const SubMenu = ({ opened, onClose }) => (
+interface SubMenuProps {
+  opened: boolean;
+  onClose: () => void;
+}
+
+const SubMenu: React.FC<SubMenuProps> = ({ opened, onClose }) => (
   <Menu opened={opened} onClose={onClose}>
     <Menu.Target>
       <div />
     </Menu.Target>
     <Menu.Dropdown>
-      <Menu.Item icon={<IconClock style={{ width: rem(14), height: rem(14) }} />} onClick={onClose}>
+      <Menu.Item onClick={onClose}>
         Start Pomodoro
       </Menu.Item>
-      <Menu.Item icon={<IconCheck style={{ width: rem(14), height: rem(14) }} />} onClick={onClose}>
+      <Menu.Item onClick={onClose}>
         Start Stopwatch
       </Menu.Item>
     </Menu.Dropdown>
   </Menu>
 );
 
-export default function OptionsMenu({ onOpenPopup }) {
-  const [opened, setOpened] = React.useState(false);
-  const [submenuOpened, setSubmenuOpened] = React.useState(false);
+interface OptionsMenuProps {
+  onOpenPopup: () => void;
+}
 
-  const handleClose = (action) => {
+const OptionsMenu: React.FC<OptionsMenuProps> = ({ onOpenPopup }) => {
+  const [opened, setOpened] = useState(false);
+  const [submenuOpened, setSubmenuOpened] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement>(null); // Define ref type explicitly
+
+  const handleClose = (action?: string) => {
     setOpened(false);
     setSubmenuOpened(false);
     if (action === 'delete') {
@@ -64,14 +66,17 @@ export default function OptionsMenu({ onOpenPopup }) {
       onClose={() => handleClose()}
     >
       <Menu.Target>
-        <Button color="#F0F4F5" onClick={() => setOpened((o) => !o)} ref={React.createRef()}>
+        <Button
+          color="#F0F4F5"
+          onClick={() => setOpened((o) => !o)}
+          ref={buttonRef} // Assign the ref here
+        >
           <FontAwesomeIcon icon={faEllipsis} style={{ color: 'black' }} /> {/* Set icon color to black */}
         </Button>
       </Menu.Target>
 
       <Menu.Dropdown>
         <Menu.Item
-          icon={<IconEdit style={{ width: rem(14), height: rem(14) }} />}
           onClick={() => {
             handleClose();
             onOpenPopup();
@@ -80,7 +85,6 @@ export default function OptionsMenu({ onOpenPopup }) {
           Update
         </Menu.Item>
         <Menu.Item
-          icon={<IconCopy style={{ width: rem(14), height: rem(14) }} />}
           onClick={() => {
             handleClose();
             onOpenPopup();
@@ -89,14 +93,12 @@ export default function OptionsMenu({ onOpenPopup }) {
           Add Subtask
         </Menu.Item>
         <Menu.Item
-          icon={<IconTrash style={{ width: rem(14), height: rem(14) }} />}
           color="red"
           onClick={() => handleClose('delete')}
         >
           Delete
         </Menu.Item>
         <Menu.Item
-          icon={<IconArchive style={{ width: rem(14), height: rem(14) }} />}
           onMouseEnter={() => setSubmenuOpened(true)}
           onMouseLeave={() => setSubmenuOpened(false)}
         >
@@ -108,4 +110,6 @@ export default function OptionsMenu({ onOpenPopup }) {
       </Menu.Dropdown>
     </Menu>
   );
-}
+};
+
+export default OptionsMenu;

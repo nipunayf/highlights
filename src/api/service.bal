@@ -37,16 +37,16 @@ configurable string azureAdIssuer = ?;
 configurable string azureAdAudience = ?;
 
 @http:ServiceConfig {
-    auth: [
-        {
-            jwtValidatorConfig: {
-                issuer: azureAdIssuer,
-                audience: azureAdAudience,
-                scopeKey: "scp"
-            },
-            scopes: ["User.Read"]
-        }
-    ],
+    // auth: [
+    //     {
+    //         jwtValidatorConfig: {
+    //             issuer: azureAdIssuer,
+    //             audience: azureAdAudience,
+    //             scopeKey: "scp"
+    //         },
+    //         scopes: ["User.Read"]
+    //     }
+    // ],
     cors: {
         allowOrigins: ["http://localhost:3000"],
         allowCredentials: false,

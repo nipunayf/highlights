@@ -21,6 +21,7 @@
     "@mantine/dates": "^7.11.1",
     "@mantine/form": "^7.11.1",
     "@mantine/hooks": "^7.11.1",
+    "@mantine/notifications": "^7.11.1",
     "@mui/icons-material": "^5.15.21",
     "@mui/material": "^5.15.20",
     "@mui/x-date-pickers": "^7.7.1",
@@ -32,8 +33,11 @@
     "inquirer": "^9.2.23",
     "next": "14.2.3",
     "react": "^18",
+    "react-beautiful-dnd": "^13.1.1",
+    "react-circular-progressbar": "^2.1.0",
     "react-confetti": "^6.1.0",
     "react-dom": "^18",
+    "react-resizable": "^3.0.5",
     "react-snowfall": "^2.1.0",
     "sweetalert2": "^11.12.1",
     "swr": "^2.2.5"
@@ -42,6 +46,7 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/react-resizable": "^3.0.8",
     "eslint": "^8",
     "eslint-config-next": "14.2.3",
     "postcss": "^8.4.38",
@@ -50,3 +55,4 @@
     "typescript": "^5"
   }
 }
+

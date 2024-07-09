@@ -7,7 +7,7 @@ import {
     rem,
     Space,
 } from '@mantine/core';
-import { IconBulb, IconUser, IconCheckbox, IconPlus, IconChartDots2, IconCalendarMonth , IconBellRinging,IconTie} from '@tabler/icons-react';
+import { IconBulb, IconUser, IconCheckbox, IconPlus, IconChartDots2, IconCalendarMonth , IconBellRinging,IconTie,IconAlarm} from '@tabler/icons-react';
 import classes from './Navbar.module.css';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -16,6 +16,7 @@ const links = [
     { icon: IconBulb, label: 'Highlights', path: '/highlights' },
     { icon: IconCheckbox, label: 'Tasks', path: '/tasks' },
     { icon: IconCalendarMonth, label: 'Calendar', path: '/calendar' },
+    { icon: IconAlarm, label: 'Focus', path: '/focus' },
     { icon: IconChartDots2, label: 'Analytics', path: '/analytics' },
     { icon: IconUser, label: 'Profile', path: '/profile' },
     { icon: IconTie, label: 'Dailytips', path: '/dailytips' },

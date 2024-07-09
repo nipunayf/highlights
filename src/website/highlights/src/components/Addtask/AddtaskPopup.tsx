@@ -39,11 +39,10 @@ export default function Addtask_popup({ open, onClose, addTask }: AddtaskPopupPr
     </ActionIcon>
   );
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
+  const handleSelectChange = (value: string | null, option: { label: string, value: string }) => {
     setFormState(prevState => ({
       ...prevState,
-      [name]: value,
+      reminder: value || '', // Update state with selected value or empty string if null
     }));
   };
 
@@ -63,7 +62,10 @@ export default function Addtask_popup({ open, onClose, addTask }: AddtaskPopupPr
           label="Title"
           name="title"
           value={formState.title}
-          onChange={handleChange}
+          onChange={(e) => setFormState(prevState => ({
+            ...prevState,
+            title: e.target.value,
+          }))}
         />
 
         <div style={{ display: 'flex', justifyContent: 'center', margin: '16px 0' }}>
@@ -90,8 +92,8 @@ export default function Addtask_popup({ open, onClose, addTask }: AddtaskPopupPr
           placeholder="Pick value"
           name="reminder"
           value={formState.reminder}
-          onChange={handleChange}
-          data={['Before 10 minutes', 'Before 15 minutes', 'Before 20 minutes', 'Before 30 minutes']}
+          onChange={handleSelectChange} // Use the adapted onChange handler
+          data={['Before 10 minutes', 'Before 15 minutes', 'Before 20 minutes', 'Before 30 minutes'].map(value => ({ value, label: value }))}
           mb="md"
         />
 
@@ -100,7 +102,10 @@ export default function Addtask_popup({ open, onClose, addTask }: AddtaskPopupPr
           placeholder="Pick value"
           name="priority"
           value={formState.priority}
-          onChange={handleChange}
+          onChange={(value) => setFormState(prevState => ({
+            ...prevState,
+            priority: value || '',
+          }))}
           data={[
             { value: 'none', label: 'None' },
             { value: 'low', label: 'Low' },
@@ -115,7 +120,10 @@ export default function Addtask_popup({ open, onClose, addTask }: AddtaskPopupPr
           label="Description"
           name="description"
           value={formState.description}
-          onChange={handleChange}
+          onChange={(e) => setFormState(prevState => ({
+            ...prevState,
+            description: e.target.value,
+          }))}
           mb="md"
         />
 

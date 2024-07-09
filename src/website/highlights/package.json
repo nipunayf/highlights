@@ -26,8 +26,8 @@
     "@mui/material": "^5.15.20",
     "@mui/x-date-pickers": "^7.7.1",
     "@mui/x-date-pickers-pro": "^7.8.0",
-    "@tabler/icons-react": "^3.9.0",
-    "@types/react-beautiful-dnd": "^13.1.8",
+    "@tabler/icons": "^3.9.0",
+    "@tabler/icons-react": "^3.6.0",
     "axios": "^1.7.2",
     "dayjs": "^1.11.11",
     "inquirer": "^9.2.23",
@@ -55,3 +55,4 @@
     "typescript": "^5"
   }
 }
+

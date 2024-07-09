@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, forwardRef } from 'react';
 import { Button, Modal, Group, TextInput, List, ThemeIcon, Text, Menu, UnstyledButton, Tabs, Avatar } from '@mantine/core';
 import { IconCircleCheck, IconInfoCircle, IconChevronRight ,IconCalendarDue} from '@tabler/icons-react';
-import { showNotification } from '@mantine/notifications';
+// import { showNotification } from '@mantine/notifications';
 import styles from './Stopwatch.module.css';
 
 const tasks = [

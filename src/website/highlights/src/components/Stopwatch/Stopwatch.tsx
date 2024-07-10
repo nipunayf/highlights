@@ -1,15 +1,16 @@
 import React, { useState, useEffect, useRef, forwardRef } from 'react';
 import { Button, Modal, Group, TextInput, List, ThemeIcon, Text, Menu, UnstyledButton, Tabs, Avatar } from '@mantine/core';
-import { IconCircleCheck, IconInfoCircle, IconChevronRight ,IconCalendarDue} from '@tabler/icons-react';
-// import { showNotification } from '@mantine/notifications';
+import { IconCircleCheck, IconInfoCircle, IconChevronRight, IconCalendarDue } from '@tabler/icons-react';
+import { showNotification } from '@mantine/notifications';
 import styles from './Stopwatch.module.css';
 
-const tasks = [
-  { title: 'Learning Ballerina ', time: '9:00am-1:00pm' },
-  { title: 'React Project', time: '2:00pm-5:00pm' },
-  { title: 'Exercise', time: '6:00pm-7:00pm' },
-  // Add more tasks as needed
-];
+import { useTasks } from "@/hooks/useTasks";
+import { Task } from "@/models/Task";
+
+import { useHighlights } from "@/hooks/useHighlights";
+import { HighlightTask } from "@/models/HighlightTask";
+
+
 
 interface UserButtonProps {
   image?: string;
@@ -42,12 +43,46 @@ const UserButton = forwardRef<HTMLButtonElement, UserButtonProps>(
   )
 );
 
+
+
+
+const HighlightMenu = ({ highlights }: { highlights: HighlightTask[] }) => (
+  <Tabs.Panel value="Task">
+    <div className={styles.taskContainer}>
+      <TextInput placeholder="search" className={styles.searchInput} />
+      <div className={styles.taskHeader}>
+        
+        <Text> <IconCalendarDue />Today &gt;</Text>
+      </div>
+      <Menu>
+        {/* <Menu.Label>Select doing Task</Menu.Label> */}
+        {highlights.map((highlight) => (
+          <Menu.Item key={highlight.id}>{highlight.title}</Menu.Item>
+        ))}
+      </Menu>
+    </div>
+  </Tabs.Panel>
+);
+
+
+
+
+
+
+
+
+
+
 const Stopwatch: React.FC = () => {
   const [time, setTime] = useState(0);
   const [isActive, setIsActive] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [opened, setOpened] = useState(false);
   const intervalRef = useRef<number | null>(null);
+
+  const { tasks, isLoading, isError } = useTasks();
+  const { highlights, isHighlightsLoading, isHighlightsError } = useHighlights();
+
 
   useEffect(() => {
     if (isActive && !isPaused) {
@@ -139,24 +174,7 @@ const Stopwatch: React.FC = () => {
                   <Tabs.Tab value="Task">Task</Tabs.Tab>
                   <Tabs.Tab value="Timer">Timer</Tabs.Tab>
                 </Tabs.List>
-                <Tabs.Panel value="Task">
-                  <div className={styles.taskContainer}>
-                    <TextInput
-                      placeholder="search"
-                      className={styles.searchInput}
-                    />
-                    <div className={styles.taskHeader}>
-                    <IconCalendarDue />
-                    <Text>Today &gt;</Text>
-                    </div>
-                    <Menu.Label>Select doing Task</Menu.Label>
-                    {tasks.map((task, index) => (
-                      <Menu.Item key={index}>
-                        {task.title}
-                      </Menu.Item>
-                    ))}
-                  </div>
-                </Tabs.Panel>
+                {highlights ? <HighlightMenu highlights={highlights} /> : null}
                 <Tabs.Panel value="Timer">
                   <div className={styles.taskContainer}>
                     <TextInput
@@ -164,11 +182,11 @@ const Stopwatch: React.FC = () => {
                       className={styles.searchInput}
                     />
                     <Menu.Label>Select a Timer</Menu.Label>
-                    {tasks.map((task, index) => (
+                    {/* {tasks.map((task, index) => (
                       <Menu.Item key={index}>
                         {task.title}
                       </Menu.Item>
-                    ))}
+                    ))} */}
                   </div>
                 </Tabs.Panel>
               </Tabs>

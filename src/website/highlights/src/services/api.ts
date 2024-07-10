@@ -1,6 +1,7 @@
 import { apiEndpoint } from "@/apiConfig";
 import { aquireAccessToken } from "@/util/auth";
 import { Task } from "@/models/Task";
+import { HighlightTask } from "@/models/HighlightTask";
 import axios, { AxiosInstance } from "axios";
 
 function getAxiosClient(route: string): AxiosInstance {
@@ -32,6 +33,17 @@ export async function createTask(task: Task): Promise<Task> {
     const response = await getAxiosClient('tasks').request<Task>({
         method: 'POST',
         data: task
+    });
+
+    return response.data;
+}
+
+
+
+
+export async function getHighlights(): Promise<HighlightTask[]> {
+    const response = await getAxiosClient('highlights').request<HighlightTask[]>({
+        method: 'GET'
     });
 
     return response.data;

@@ -24,10 +24,23 @@ type Task record {|
     time:Utc? dueDate = null;
 |};
 
+type Highlight record {|
+    string? id = null;
+    string title;
+    time:Utc? dueDate = null;
+|};
+
 Task[] tasks = [
     {id: "1", title: "Task 1"},
     {id: "2", title: "Task 2"},
     {id: "3", title: "Task 3"}
+];
+
+
+Highlight[] highlights = [
+    {id: "1", title: "Learning Ballerina"},
+    {id: "2", title: "React Project"},
+    {id: "3", title: "Exercise"}
 ];
 
 // listener http:Listener securedEP = new (9090);
@@ -104,4 +117,16 @@ service / on new http:Listener(9090) {
         log:printInfo("Task added");
         return task;
     }
+
+    
+    resource function get highlights() returns Highlight[] {
+        return highlights;
+    }
+
+        resource function post highlights(Highlight highlight) returns Highlight {
+        highlights.push({id: (highlights.length() + 1).toString(), title: highlight.title});
+        log:printInfo("Highlight added");
+        return highlight;
+    }
 }
+

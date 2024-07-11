@@ -2,35 +2,85 @@ import React, { useState, useRef } from 'react';
 import { Modal, TextInput, Button, Textarea, Select, ActionIcon, rem } from '@mantine/core';
 import { DatePicker, TimeInput } from '@mantine/dates';
 import { IconClock, IconX } from '@tabler/icons-react';
+import { createTask as createApiTask } from '@/services/api';
 
 interface AddtaskPopupProps {
   open: boolean;
   onClose: () => void;
-  addTask: (newTask: any) => void;
+  addTask: (newTask: Task) => void;
 }
 
-export default function Addtask_popup({ open, onClose, addTask }: AddtaskPopupProps) {
+interface Task {
+  title: string;
+  description: string;
+  dueDate: Date | null;
+  startTime: string;
+  endTime: string;
+  reminder: string;
+  priority: string;
+  subTasks: Task[];
+}
+
+interface ApiTask {
+  title: string;
+  description: string;
+  dueDate: string | null;
+  startTime: string;
+  endTime: string;
+  reminder: string;
+  priority: string;
+  subTasks: ApiTask[];
+}
+
+export default function AddtaskPopup({ open, onClose, addTask }: AddtaskPopupProps) {
   const [formState, setFormState] = useState({
     title: '',
     description: '',
     reminder: '',
     priority: '',
   });
-  const [value, setValue] = useState<Date | null>(null);
+  const [dueDate, setDueDate] = useState<Date | null>(null);
+  const [startTime, setStartTime] = useState<string>('');
+  const [endTime, setEndTime] = useState<string>('');
+
   const startRef = useRef<HTMLInputElement>(null);
   const endRef = useRef<HTMLInputElement>(null);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const newTask = {
-      id: Date.now(), // Example: Use a unique identifier like timestamp
+
+    // Adjust dueDate to UTC
+    const adjustedDueDate = dueDate ? new Date(Date.UTC(dueDate.getFullYear(), dueDate.getMonth(), dueDate.getDate())) : null;
+
+    const newTask: Task = {
       title: formState.title,
       description: formState.description,
-      date: value?.toISOString().split('T')[0], // Example: Convert date to string format
-      subTasks: [], // Example: Initialize subTasks array
+      dueDate: adjustedDueDate,
+      startTime: startTime,
+      endTime: endTime,
+      reminder: formState.reminder,
+      priority: formState.priority,
+      subTasks: [],
     };
-    addTask(newTask); // Call parent function to add the new task
-    onClose(); // Close modal after submission
+
+    const apiTask: ApiTask = {
+      ...newTask,
+      dueDate: newTask.dueDate ? newTask.dueDate.toISOString() : null,
+      startTime: newTask.startTime,
+      endTime: newTask.endTime,
+      subTasks: [],
+    };
+
+    console.log("New Task:", newTask);
+    console.log("API Task:", apiTask);
+
+    try {
+      await createApiTask(apiTask as any); // Casting to 'any' to bypass type error
+      addTask(newTask);
+      onClose();
+    } catch (error) {
+      console.error('Error submitting task:', error);
+    }
   };
 
   const pickerControl = (ref: React.RefObject<HTMLInputElement>) => (
@@ -39,10 +89,10 @@ export default function Addtask_popup({ open, onClose, addTask }: AddtaskPopupPr
     </ActionIcon>
   );
 
-  const handleSelectChange = (value: string | null, option: { label: string, value: string }) => {
+  const handleSelectChange = (value: string | null) => {
     setFormState(prevState => ({
       ...prevState,
-      reminder: value || '', // Update state with selected value or empty string if null
+      reminder: value || '',
     }));
   };
 
@@ -69,18 +119,22 @@ export default function Addtask_popup({ open, onClose, addTask }: AddtaskPopupPr
         />
 
         <div style={{ display: 'flex', justifyContent: 'center', margin: '16px 0' }}>
-          <DatePicker value={value} onChange={setValue} />
+          <DatePicker value={dueDate} onChange={setDueDate} />
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: rem(10) }}>
           <TimeInput
             label="Start Time"
+            value={startTime}
+            onChange={(e) => setStartTime(e.currentTarget.value)}
             ref={startRef}
             rightSection={pickerControl(startRef)}
             style={{ width: '180px' }}
           />
           <TimeInput
             label="End Time"
+            value={endTime}
+            onChange={(e) => setEndTime(e.currentTarget.value)}
             ref={endRef}
             rightSection={pickerControl(endRef)}
             style={{ width: '180px' }}
@@ -92,7 +146,7 @@ export default function Addtask_popup({ open, onClose, addTask }: AddtaskPopupPr
           placeholder="Pick value"
           name="reminder"
           value={formState.reminder}
-          onChange={handleSelectChange} // Use the adapted onChange handler
+          onChange={handleSelectChange}
           data={['Before 10 minutes', 'Before 15 minutes', 'Before 20 minutes', 'Before 30 minutes'].map(value => ({ value, label: value }))}
           mb="md"
         />

@@ -11,10 +11,13 @@ import OptionsMenu from "@/components/Optionmenu/OptionPopup";
 import AlertDialogSlide from "@/components/Feedback/AlertDialogSlide";
 import classes from "./ActionsGrid.module.css";
 
+import { useTasks } from "@/hooks/useTasks";
+import { Task } from "@/models/Task";
+
 function ActionsGrid() {
   const theme = useMantineTheme();
 
-  const [tasks, setTasks] = useState([
+  const [tasksz, setTasks] = useState([
     {
       id: 1,
       title: "Task 1",
@@ -83,14 +86,24 @@ function ActionsGrid() {
     setCurrentTask(null);
   };
 
+  const { tasks, isLoading, isError } = useTasks();
+
+    if (isLoading) return <div>Loading...</div>;
+    if (isError) return <div>Error loading tasks.</div>;
+
   const addTask = (newTask: any) => {
     // Add the new task to the tasks array
-    setTasks([...tasks, newTask]);
+    setTasks([...tasksz, newTask]);
     setPopupOpen(false); // Close the popup after adding the task
   };
 
   return (
     <>
+     <ul>
+                {tasks?.map((task: Task) => (
+                    <li key={task.id}>{task.title}</li>
+                ))}
+            </ul>
       <div className={classes.highlight_card}>
         <Card withBorder radius="10px" className={classes.card} onClick={handleCardClick}>
           <Group>
@@ -105,7 +118,7 @@ function ActionsGrid() {
         <div className={classes.separator}></div>
 
         <div className={classes.list_task}>
-          {tasks.map((task) => (
+          {tasksz.map((task) => (
             <div key={task.id}>
               <div className={classes.d}>
                 <div className={classes.task}>

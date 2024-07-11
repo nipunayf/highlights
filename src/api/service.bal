@@ -1,9 +1,10 @@
 import ballerina/http;
 import ballerina/log;
 import ballerina/sql;
-import ballerina/time;
+// import ballerina/time;
 import ballerinax/mysql;
 import ballerinax/mysql.driver as _;
+import ballerina/io;
 
 type Greeting record {|
     string greeting;
@@ -18,16 +19,36 @@ type User record {|
     string sub;
 |};
 
-type Task record {|
-    string? id = null;
+// type Task record {|
+//     string? id = null;
+//     string title;
+//     time:Utc? dueDate = null;
+// |};
+
+
+
+type Task record {
     string title;
-    time:Utc? dueDate = null;
-|};
+    string description;
+    string? dueDate;
+    string? startTime;
+    string? endTime;
+    string? reminder;
+    string priority;
+    Task[] subTasks;
+};
+
+
+// Task[] tasks = [
+//     {id: "1", title: "Task 1"},
+//     {id: "2", title: "Task 2"},
+//     {id: "3", title: "Task 3"}
+// ];
 
 Task[] tasks = [
-    {id: "1", title: "Task 1"},
-    {id: "2", title: "Task 2"},
-    {id: "3", title: "Task 3"}
+    { title: "Task 1", description: "", dueDate: (),startTime:"", endTime:"",reminder: "", priority: "", subTasks: []},
+    { title: "Task 2", description: "", dueDate: (),startTime:"", endTime:"", reminder: "", priority: "", subTasks: []},
+    { title: "Task 3", description: "", dueDate: (),startTime:"", endTime:"", reminder: "", priority: "", subTasks: []}
 ];
 
 // listener http:Listener securedEP = new (9090);
@@ -96,12 +117,39 @@ service / on new http:Listener(9090) {
     }
 
     resource function get tasks() returns Task[] {
+         io:print(tasks);
         return tasks;
     }
 
-    resource function post tasks(Task task) returns Task {
-        tasks.push({id: (tasks.length() + 1).toString(), title: task.title});
-        log:printInfo("Task added");
+    // resource function post tasks(Task task) returns Task {
+    //     tasks.push({id: (tasks.length() + 1).toString(), title: task.title});
+    //     log:printInfo("Task added");
+    //     return task;
+    // }
+
+   resource function post tasks(Task task) returns Task|error {
+        // if task.dueDate is string {
+        //     var result = parseIso8601String(task.dueDate);
+        //     if result is Utc { // Updated to check against Utc type
+        //         task.dueDate = result;
+        //     } else {
+        //         return error("Invalid date format");
+        //     }
+        // }
+        io:print("nbbnnn");
+        tasks.push({
+            title: task.title,
+            description: task.description,
+            dueDate: task.dueDate,
+            startTime: task.startTime,
+        endTime: task.endTime,
+            reminder: task.reminder,
+            priority: task.priority,
+            subTasks: task.subTasks
+        });
+        
         return task;
     }
+
+    
 }

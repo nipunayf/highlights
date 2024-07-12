@@ -43,11 +43,17 @@ CREATE TABLE `calendars` (
   `name` varchar(255) NOT NULL
 );
 
-CREATE TABLE `t` (
-  `id` integer PRIMARY KEY AUTO_INCREMENT,
-  `user_id` integer NOT NULL,
-  `name` varchar(255) NOT NULL
+
+CREATE TABLE `timer_details` (
+  `timer_id` integer PRIMARY KEY AUTO_INCREMENT,
+    `timer_name` VARCHAR(255) NOT NULL,
+  `pomo_durration` TIME,
+  `short_break_duration` TIME,
+  `long_break_duration` TIME,
+  `pomos_per_long_break` INT NOT NULL,
+  `user_id` INTEGER NOT NULL
 );
+  
 
 ALTER TABLE `highlights` ADD FOREIGN KEY (`event_id`) REFERENCES `events` (`id`);
 
@@ -62,3 +68,5 @@ ALTER TABLE `task_lists` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 ALTER TABLE `events` ADD FOREIGN KEY (`calendar_id`) REFERENCES `calendars` (`id`);
 
 ALTER TABLE `calendars` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+
+ALTER TABLE `timer_details` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);

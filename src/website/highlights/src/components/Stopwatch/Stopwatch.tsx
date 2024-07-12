@@ -3,10 +3,6 @@ import { Button, Modal, Group, TextInput, List, ThemeIcon, Text, Menu, UnstyledB
 import { IconCircleCheck, IconInfoCircle, IconChevronRight, IconCalendarDue } from '@tabler/icons-react';
 import { showNotification } from '@mantine/notifications';
 import styles from './Stopwatch.module.css';
-
-import { useTasks } from "@/hooks/useTasks";
-import { Task } from "@/models/Task";
-
 import { useHighlights } from "@/hooks/useHighlights";
 import { HighlightTask } from "@/models/HighlightTask";
 
@@ -65,7 +61,23 @@ const HighlightMenu = ({ highlights }: { highlights: HighlightTask[] }) => (
 );
 
 
-
+const TimerMenu = ({ highlights }: { highlights: HighlightTask[] }) => (
+  <Tabs.Panel value="Task">
+    <div className={styles.taskContainer}>
+      <TextInput placeholder="search" className={styles.searchInput} />
+      <div className={styles.taskHeader}>
+        
+        <Text> <IconCalendarDue />Today &gt;</Text>
+      </div>
+      <Menu>
+        {/* <Menu.Label>Select doing Task</Menu.Label> */}
+        {highlights.map((highlight) => (
+          <Menu.Item key={highlight.id}>{highlight.title}</Menu.Item>
+        ))}
+      </Menu>
+    </div>
+  </Tabs.Panel>
+);
 
 
 
@@ -79,8 +91,6 @@ const Stopwatch: React.FC = () => {
   const [isPaused, setIsPaused] = useState(false);
   const [opened, setOpened] = useState(false);
   const intervalRef = useRef<number | null>(null);
-
-  const { tasks, isLoading, isError } = useTasks();
   const { highlights, isHighlightsLoading, isHighlightsError } = useHighlights();
 
 

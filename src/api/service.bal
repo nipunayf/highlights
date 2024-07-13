@@ -35,7 +35,7 @@ type Task record {
     string? endTime;
     string? reminder;
     string priority;
-    Task[] subTasks;
+    // Task[] subTasks;
 };
 
 
@@ -46,9 +46,9 @@ type Task record {
 // ];
 
 Task[] tasks = [
-    { title: "Task 1", description: "", dueDate: (),startTime:"", endTime:"",reminder: "", priority: "", subTasks: []},
-    { title: "Task 2", description: "", dueDate: (),startTime:"", endTime:"", reminder: "", priority: "", subTasks: []},
-    { title: "Task 3", description: "", dueDate: (),startTime:"", endTime:"", reminder: "", priority: "", subTasks: []}
+    { title: "Task 1", description: "", dueDate: (),startTime:"", endTime:"",reminder: "", priority: ""},
+    { title: "Task 2", description: "", dueDate: (),startTime:"", endTime:"", reminder: "", priority: ""},
+    { title: "Task 3", description: "", dueDate: (),startTime:"", endTime:"", reminder: "", priority: ""}
 ];
 
 // listener http:Listener securedEP = new (9090);
@@ -176,7 +176,7 @@ function formatTime(string isoTime) returns string {
     }
     
     // Convert UTC time to civil time to get hours, minutes, and seconds
-    time:Civil dt = time:utcToCivil(check <time:Utc> utc);
+    time:Civil dt = time:utcToCivil(<time:Utc> utc);
     
     // Format the time components into HH:MM:SS format
     return string `${dt.hour}:${dt.minute}:${dt.second ?: 0}`;

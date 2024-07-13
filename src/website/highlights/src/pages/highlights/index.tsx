@@ -138,7 +138,7 @@ function ActionsGrid() {
                   <OptionsMenu onOpenPopup={handleCardClick} />
                 </div>
               </div>
-              {task.subTasks.map((subTask) => (
+              {/* {task.subTasks.map((subTask) => (
                 <div key={subTask.id} className={`${classes.d} ${classes.subTask}`}>
                   <div className={classes.task}>
                     <div
@@ -158,14 +158,14 @@ function ActionsGrid() {
                     <OptionsMenu onOpenPopup={handleCardClick} />
                   </div>
                 </div>
-              ))}
+              ))} */}
               <br />
             </div>
           ))}
         </div>
       </div>
 
-      <AddtaskPopup open={popupOpen} onClose={handleClosePopup} addTask={addTask} />
+      <AddtaskPopup open={popupOpen} onClose={handleClosePopup}/>
 
       {confettiActive && (
         <Confetti

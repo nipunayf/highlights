@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Modal, TextInput, Button, Textarea, Select, ActionIcon, rem } from '@mantine/core';
+import { Modal, TextInput, Button, Textarea, Select, ActionIcon, rem, Text } from '@mantine/core';
 import { DatePicker, TimeInput } from '@mantine/dates';
 import { IconClock, IconX } from '@tabler/icons-react';
 import { createTask as createApiTask } from '@/services/api';
@@ -7,7 +7,7 @@ import { createTask as createApiTask } from '@/services/api';
 interface AddtaskPopupProps {
   open: boolean;
   onClose: () => void;
-  addTask: (newTask: Task) => void;
+  // addTask: (newTask: Task) => void;
 }
 
 interface Task {
@@ -18,7 +18,7 @@ interface Task {
   endTime: string;
   reminder: string;
   priority: string;
-  subTasks: Task[];
+  // subTasks: Task[];
 }
 
 interface ApiTask {
@@ -29,10 +29,10 @@ interface ApiTask {
   endTime: string;
   reminder: string;
   priority: string;
-  subTasks: ApiTask[];
+  // subTasks: ApiTask[];
 }
 
-export default function AddtaskPopup({ open, onClose, addTask }: AddtaskPopupProps) {
+export default function AddtaskPopup({ open, onClose }: AddtaskPopupProps) {
   // State hooks to manage form input values and other state
   const [formState, setFormState] = useState({
     title: '',
@@ -43,6 +43,7 @@ export default function AddtaskPopup({ open, onClose, addTask }: AddtaskPopupPro
   const [dueDate, setDueDate] = useState<Date | null>(null);
   const [startTime, setStartTime] = useState<string>('');
   const [endTime, setEndTime] = useState<string>('');
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   // Refs for accessing the TimeInput components' methods
   const startRef = useRef<HTMLInputElement>(null);
@@ -51,6 +52,24 @@ export default function AddtaskPopup({ open, onClose, addTask }: AddtaskPopupPro
   // Function to handle form submission
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    // Validation
+    const newErrors: { [key: string]: string } = {};
+
+    if (!formState.title) newErrors.title = 'Title is required';
+    if (!formState.description) newErrors.description = 'Description is required';
+    if (!dueDate) newErrors.dueDate = 'Due date is required';
+    if (!startTime) newErrors.startTime = 'Start time is required';
+    if (!endTime) newErrors.endTime = 'End time is required';
+    if (startTime && endTime && new Date(`1970-01-01T${startTime}Z`).getTime() >= new Date(`1970-01-01T${endTime}Z`).getTime()) {
+      newErrors.time = 'Start time should be less than end time';
+    }
+    if (dueDate && dueDate.getTime() < new Date().setHours(0, 0, 0, 0)) newErrors.dueDate = 'Due date should be today or a future date';
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
 
     // Adjust dueDate to UTC
     const adjustedDueDate = dueDate ? new Date(Date.UTC(dueDate.getFullYear(), dueDate.getMonth(), dueDate.getDate())) : null;
@@ -64,7 +83,7 @@ export default function AddtaskPopup({ open, onClose, addTask }: AddtaskPopupPro
       endTime: endTime,
       reminder: formState.reminder,
       priority: formState.priority,
-      subTasks: [],
+      // subTasks: [],
     };
 
     // Constructing apiTask object with data adjusted for API consumption
@@ -73,7 +92,7 @@ export default function AddtaskPopup({ open, onClose, addTask }: AddtaskPopupPro
       dueDate: newTask.dueDate ? newTask.dueDate.toISOString() : null,
       startTime: newTask.startTime,
       endTime: newTask.endTime,
-      subTasks: [],
+      // subTasks: [],
     };
 
     // Logging newTask and apiTask for debugging purposes
@@ -84,7 +103,20 @@ export default function AddtaskPopup({ open, onClose, addTask }: AddtaskPopupPro
       // Calling API function to create task
       await createApiTask(apiTask as any); // Casting to 'any' to bypass type error
       // Adding new task locally after successful API call
-      addTask(newTask);
+      // addTask(newTask);
+      
+      // Resetting form state after successful submission
+      setFormState({
+        title: '',
+        description: '',
+        reminder: '',
+        priority: '',
+      });
+      setDueDate(null);
+      setStartTime('');
+      setEndTime('');
+      setErrors({});
+      
       // Closing the modal after successful submission
       onClose();
     } catch (error) {
@@ -129,11 +161,17 @@ export default function AddtaskPopup({ open, onClose, addTask }: AddtaskPopupPro
             ...prevState,
             title: e.target.value,
           }))}
+          error={errors.title}
         />
 
         {/* DatePicker component for Due Date */}
         <div style={{ display: 'flex', justifyContent: 'center', margin: '16px 0' }}>
-          <DatePicker value={dueDate} onChange={setDueDate} />
+          <DatePicker 
+            value={dueDate} 
+            onChange={setDueDate} 
+            minDate={new Date()} // Prevent selection of past dates
+          />
+          {errors.dueDate && <Text color="red">{errors.dueDate}</Text>}
         </div>
 
         {/* TimeInput components for Start Time and End Time */}
@@ -145,6 +183,7 @@ export default function AddtaskPopup({ open, onClose, addTask }: AddtaskPopupPro
             ref={startRef}
             rightSection={pickerControl(startRef)}
             style={{ width: '180px' }}
+            error={errors.startTime}
           />
           <TimeInput
             label="End Time"
@@ -153,7 +192,9 @@ export default function AddtaskPopup({ open, onClose, addTask }: AddtaskPopupPro
             ref={endRef}
             rightSection={pickerControl(endRef)}
             style={{ width: '180px' }}
+            error={errors.endTime || errors.time}
           />
+          {/* {errors.time && <Text color="red">{errors.time}</Text>} */}
         </div>
 
         {/* Select component for Reminder */}
@@ -165,6 +206,7 @@ export default function AddtaskPopup({ open, onClose, addTask }: AddtaskPopupPro
           onChange={handleSelectChange}
           data={['Before 10 minutes', 'Before 15 minutes', 'Before 20 minutes', 'Before 30 minutes'].map(value => ({ value, label: value }))}
           mb="md"
+          error={errors.reminder}
         />
 
         {/* Select component for Priority */}
@@ -184,6 +226,7 @@ export default function AddtaskPopup({ open, onClose, addTask }: AddtaskPopupPro
             { value: 'high', label: 'High' },
           ]}
           mb="md"
+          error={errors.priority}
         />
 
         {/* Textarea component for Description */}
@@ -197,6 +240,7 @@ export default function AddtaskPopup({ open, onClose, addTask }: AddtaskPopupPro
             description: e.target.value,
           }))}
           mb="md"
+          error={errors.description}
         />
 
         {/* Submit button */}

@@ -37,8 +37,6 @@ export async function getTasks(): Promise<Task[]> {
     return response.data;
 }
 
-
-
 export async function createTask(task: Task): Promise<Task> {
     console.log(task)
     const response = await getAxiosClient('tasks').request<Task>({

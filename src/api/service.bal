@@ -1,10 +1,10 @@
 import ballerina/http;
 import ballerina/log;
 import ballerina/sql;
-// import ballerina/time;
+import ballerina/time;
 import ballerinax/mysql;
 import ballerinax/mysql.driver as _;
-import ballerina/io;
+// import ballerina/io;
 
 type Greeting record {|
     string greeting;
@@ -117,39 +117,70 @@ service / on new http:Listener(9090) {
     }
 
     resource function get tasks() returns Task[] {
-         io:print(tasks);
+        //  io:print(tasks);
         return tasks;
     }
 
-    // resource function post tasks(Task task) returns Task {
-    //     tasks.push({id: (tasks.length() + 1).toString(), title: task.title});
-    //     log:printInfo("Task added");
-    //     return task;
-    // }
-
-   resource function post tasks(Task task) returns Task|error {
-        // if task.dueDate is string {
-        //     var result = parseIso8601String(task.dueDate);
-        //     if result is Utc { // Updated to check against Utc type
-        //         task.dueDate = result;
-        //     } else {
-        //         return error("Invalid date format");
-        //     }
-        // }
-        io:print("nbbnnn");
-        tasks.push({
-            title: task.title,
-            description: task.description,
-            dueDate: task.dueDate,
-            startTime: task.startTime,
-        endTime: task.endTime,
-            reminder: task.reminder,
-            priority: task.priority,
-            subTasks: task.subTasks
-        });
-        
-        return task;
+   
+ resource function post tasks(http:Caller caller, http:Request req) returns error? {
+    json|http:ClientError payload = req.getJsonPayload();
+    if payload is http:ClientError {
+        log:printError("Error while parsing request payload", 'error = payload);
+        check caller->respond(http:STATUS_BAD_REQUEST);
+        return;
     }
 
+    Task|error task = payload.cloneWithType(Task);
+    if task is error {
+        log:printError("Error while converting JSON to Task", 'error = task);
+        check caller->respond(http:STATUS_BAD_REQUEST);
+        return;
+    }
+
+    // Convert ISO 8601 date to MySQL compatible date format
+    string dueDate = task.dueDate != () ? formatDateTime(task.dueDate.toString()) : "";
+    string startTime = task.startTime != () ? formatTime(task.startTime.toString()) : "";
+    string endTime = task.endTime != () ? formatTime(task.endTime.toString()) : "";
+
+    sql:ExecutionResult|sql:Error result = self.db->execute(`
+        INSERT INTO hi (title, Date, start_time, end_time, reminder, priority, description) 
+        VALUES (${task.title}, ${dueDate}, ${startTime}, ${endTime}, ${task.reminder}, ${task.priority}, ${task.description});
+    `);
+
+    if result is sql:Error {
+        log:printError("Error occurred while inserting task", 'error = result);
+        check caller->respond(http:STATUS_INTERNAL_SERVER_ERROR);
+    } else {
+        check caller->respond(http:STATUS_CREATED);
+    }
+}
+
+
+   
     
 }
+function formatDateTime(string isoDateTime) returns string {
+    time:Utc utc = checkpanic time:utcFromString(isoDateTime);
+    time:Civil dt = time:utcToCivil(utc);
+    return string `${dt.year}-${dt.month}-${dt.day}`;
+}
+function formatTime(string isoTime) returns string {
+    // Construct a full RFC 3339 formatted string with a default date and seconds
+    string fullTime = "1970-01-01T" + isoTime + ":00Z";
+    
+    // Parse the fullTime string into UTC time
+    time:Utc|time:Error utc = time:utcFromString(fullTime);
+    if (utc is error) {
+        log:printError("Error parsing time string:", utc);
+        return "";
+    }
+    
+    // Convert UTC time to civil time to get hours, minutes, and seconds
+    time:Civil dt = time:utcToCivil(check <time:Utc> utc);
+    
+    // Format the time components into HH:MM:SS format
+    return string `${dt.hour}:${dt.minute}:${dt.second ?: 0}`;
+}
+
+
+

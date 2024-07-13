@@ -33,6 +33,7 @@ interface ApiTask {
 }
 
 export default function AddtaskPopup({ open, onClose, addTask }: AddtaskPopupProps) {
+  // State hooks to manage form input values and other state
   const [formState, setFormState] = useState({
     title: '',
     description: '',
@@ -43,15 +44,18 @@ export default function AddtaskPopup({ open, onClose, addTask }: AddtaskPopupPro
   const [startTime, setStartTime] = useState<string>('');
   const [endTime, setEndTime] = useState<string>('');
 
+  // Refs for accessing the TimeInput components' methods
   const startRef = useRef<HTMLInputElement>(null);
   const endRef = useRef<HTMLInputElement>(null);
 
+  // Function to handle form submission
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     // Adjust dueDate to UTC
     const adjustedDueDate = dueDate ? new Date(Date.UTC(dueDate.getFullYear(), dueDate.getMonth(), dueDate.getDate())) : null;
 
+    // Constructing newTask object with form data
     const newTask: Task = {
       title: formState.title,
       description: formState.description,
@@ -63,6 +67,7 @@ export default function AddtaskPopup({ open, onClose, addTask }: AddtaskPopupPro
       subTasks: [],
     };
 
+    // Constructing apiTask object with data adjusted for API consumption
     const apiTask: ApiTask = {
       ...newTask,
       dueDate: newTask.dueDate ? newTask.dueDate.toISOString() : null,
@@ -71,24 +76,30 @@ export default function AddtaskPopup({ open, onClose, addTask }: AddtaskPopupPro
       subTasks: [],
     };
 
+    // Logging newTask and apiTask for debugging purposes
     console.log("New Task:", newTask);
     console.log("API Task:", apiTask);
 
     try {
+      // Calling API function to create task
       await createApiTask(apiTask as any); // Casting to 'any' to bypass type error
+      // Adding new task locally after successful API call
       addTask(newTask);
+      // Closing the modal after successful submission
       onClose();
     } catch (error) {
       console.error('Error submitting task:', error);
     }
   };
 
+  // Function to render clock icon and handle click event to show time picker
   const pickerControl = (ref: React.RefObject<HTMLInputElement>) => (
     <ActionIcon variant="subtle" color="gray" onClick={() => ref.current?.showPicker()}>
       <IconClock style={{ width: rem(16), height: rem(16) }} stroke={1.5} />
     </ActionIcon>
   );
 
+  // Function to handle change in Select component for Reminder
   const handleSelectChange = (value: string | null) => {
     setFormState(prevState => ({
       ...prevState,
@@ -96,6 +107,7 @@ export default function AddtaskPopup({ open, onClose, addTask }: AddtaskPopupPro
     }));
   };
 
+  // Rendering the modal component with form inputs
   return (
     <Modal
       opened={open}
@@ -107,6 +119,7 @@ export default function AddtaskPopup({ open, onClose, addTask }: AddtaskPopupPro
       centered
     >
       <form onSubmit={handleSubmit}>
+        {/* TextInput component for Title */}
         <TextInput
           withAsterisk
           label="Title"
@@ -118,10 +131,12 @@ export default function AddtaskPopup({ open, onClose, addTask }: AddtaskPopupPro
           }))}
         />
 
+        {/* DatePicker component for Due Date */}
         <div style={{ display: 'flex', justifyContent: 'center', margin: '16px 0' }}>
           <DatePicker value={dueDate} onChange={setDueDate} />
         </div>
 
+        {/* TimeInput components for Start Time and End Time */}
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: rem(10) }}>
           <TimeInput
             label="Start Time"
@@ -141,6 +156,7 @@ export default function AddtaskPopup({ open, onClose, addTask }: AddtaskPopupPro
           />
         </div>
 
+        {/* Select component for Reminder */}
         <Select
           label="Reminder"
           placeholder="Pick value"
@@ -151,6 +167,7 @@ export default function AddtaskPopup({ open, onClose, addTask }: AddtaskPopupPro
           mb="md"
         />
 
+        {/* Select component for Priority */}
         <Select
           label="Priority"
           placeholder="Pick value"
@@ -169,6 +186,7 @@ export default function AddtaskPopup({ open, onClose, addTask }: AddtaskPopupPro
           mb="md"
         />
 
+        {/* Textarea component for Description */}
         <Textarea
           resize="vertical"
           label="Description"
@@ -181,6 +199,7 @@ export default function AddtaskPopup({ open, onClose, addTask }: AddtaskPopupPro
           mb="md"
         />
 
+        {/* Submit button */}
         <Button type="submit">Submit</Button>
       </form>
     </Modal>

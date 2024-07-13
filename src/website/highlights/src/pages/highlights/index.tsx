@@ -6,7 +6,7 @@ import { faCheckSquare as faSolidSquare } from '@fortawesome/free-solid-svg-icon
 
 import Confetti from 'react-confetti';
 import PageLayout from "@/components/PageLayout";
-import Addtask_popup from "@/components/AddTask/AddtaskPopup";
+import AddtaskPopup from "@/components/AddTask/AddtaskPopup";
 import OptionsMenu from "@/components/Optionmenu/OptionPopup";
 import AlertDialogSlide from "@/components/Feedback/AlertDialogSlide";
 import classes from "./ActionsGrid.module.css";
@@ -88,22 +88,21 @@ function ActionsGrid() {
 
   const { tasks, isLoading, isError } = useTasks();
 
-    if (isLoading) return <div>Loading...</div>;
-    if (isError) return <div>Error loading tasks.</div>;
+  if (isLoading) return <div>Loading...</div>;
+  if (isError) return <div>Error loading tasks.</div>;
 
   const addTask = (newTask: any) => {
-    // Add the new task to the tasks array
     setTasks([...tasksz, newTask]);
-    setPopupOpen(false); // Close the popup after adding the task
+    setPopupOpen(false);
   };
 
   return (
     <>
-     <ul>
-                {tasks?.map((task: Task) => (
-                    <li key={task.id}>{task.title}</li>
-                ))}
-            </ul>
+      <ul>
+        {tasks?.map((task: Task) => (
+          <li key={task.id}>{task.title}</li>
+        ))}
+      </ul>
       <div className={classes.highlight_card}>
         <Card withBorder radius="10px" className={classes.card} onClick={handleCardClick}>
           <Group>
@@ -166,7 +165,7 @@ function ActionsGrid() {
         </div>
       </div>
 
-      <Addtask_popup open={popupOpen} onClose={handleClosePopup} addTask={addTask} />
+      <AddtaskPopup open={popupOpen} onClose={handleClosePopup} addTask={addTask} />
 
       {confettiActive && (
         <Confetti

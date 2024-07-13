@@ -49,6 +49,18 @@ CREATE TABLE `t` (
   `name` varchar(255) NOT NULL
 );
 
+
+CREATE TABLE `hi`(
+  `id` integer PRIMARY KEY AUTO_INCREMENT,
+  `title` varchar(512),
+  `Date` DATE,
+  `start_time` TIME,
+  `end_time` TIME,
+  `reminder` VARCHAR(255),
+  `priority` VARCHAR(255), 
+  `description` TEXT
+);
+
 ALTER TABLE `highlights` ADD FOREIGN KEY (`event_id`) REFERENCES `events` (`id`);
 
 ALTER TABLE `highlight_tasks` ADD FOREIGN KEY (`highlight_id`) REFERENCES `highlights` (`id`);

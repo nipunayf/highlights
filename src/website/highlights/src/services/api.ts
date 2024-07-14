@@ -2,6 +2,7 @@ import { apiEndpoint } from "@/apiConfig";
 import { aquireAccessToken } from "@/util/auth";
 import { Task } from "@/models/Task";
 import { HighlightTask } from "@/models/HighlightTask";
+import {mTimer} from "@/models/Timer";
 import axios, { AxiosInstance } from "axios";
 
 function getAxiosClient(route: string): AxiosInstance {
@@ -43,6 +44,15 @@ export async function createTask(task: Task): Promise<Task> {
 
 export async function getHighlights(): Promise<HighlightTask[]> {
     const response = await getAxiosClient('highlights').request<HighlightTask[]>({
+        method: 'GET'
+    });
+
+    return response.data;
+}
+
+
+export async function getTimerDetails(): Promise<mTimer[]> {
+    const response = await getAxiosClient('timer_details').request<mTimer[]>({
         method: 'GET'
     });
 

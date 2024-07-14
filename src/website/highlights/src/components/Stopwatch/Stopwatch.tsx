@@ -4,7 +4,9 @@ import { IconCircleCheck, IconInfoCircle, IconChevronRight, IconCalendarDue } fr
 import { showNotification } from '@mantine/notifications';
 import styles from './Stopwatch.module.css';
 import { useHighlights } from "@/hooks/useHighlights";
+import { useTimers } from '@/hooks/useTimer';
 import { HighlightTask } from "@/models/HighlightTask";
+import { mTimer } from '@/models/Timer';
 
 
 
@@ -61,8 +63,8 @@ const HighlightMenu = ({ highlights }: { highlights: HighlightTask[] }) => (
 );
 
 
-const TimerMenu = ({ highlights }: { highlights: HighlightTask[] }) => (
-  <Tabs.Panel value="Task">
+const TimerMenu = ({ timer_details }: { timer_details: mTimer[] }) => (
+  <Tabs.Panel value="Timer">
     <div className={styles.taskContainer}>
       <TextInput placeholder="search" className={styles.searchInput} />
       <div className={styles.taskHeader}>
@@ -71,8 +73,8 @@ const TimerMenu = ({ highlights }: { highlights: HighlightTask[] }) => (
       </div>
       <Menu>
         {/* <Menu.Label>Select doing Task</Menu.Label> */}
-        {highlights.map((highlight) => (
-          <Menu.Item key={highlight.id}>{highlight.title}</Menu.Item>
+        {timer_details.map((timer) => (
+          <Menu.Item key={timer.id}>{timer.title}</Menu.Item>
         ))}
       </Menu>
     </div>
@@ -92,6 +94,7 @@ const Stopwatch: React.FC = () => {
   const [opened, setOpened] = useState(false);
   const intervalRef = useRef<number | null>(null);
   const { highlights, isHighlightsLoading, isHighlightsError } = useHighlights();
+  const { timer_details, istimer_detailsLoading, istimer_detailsError } = useTimers();
 
 
   useEffect(() => {
@@ -185,20 +188,9 @@ const Stopwatch: React.FC = () => {
                   <Tabs.Tab value="Timer">Timer</Tabs.Tab>
                 </Tabs.List>
                 {highlights ? <HighlightMenu highlights={highlights} /> : null}
-                <Tabs.Panel value="Timer">
-                  <div className={styles.taskContainer}>
-                    <TextInput
-                      placeholder="search"
-                      className={styles.searchInput}
-                    />
-                    <Menu.Label>Select a Timer</Menu.Label>
-                    {/* {tasks.map((task, index) => (
-                      <Menu.Item key={index}>
-                        {task.title}
-                      </Menu.Item>
-                    ))} */}
-                  </div>
-                </Tabs.Panel>
+                {timer_details ? <TimerMenu timer_details={timer_details} /> : null}
+
+           
               </Tabs>
             </Menu.Dropdown>
           </Menu>
@@ -237,51 +229,6 @@ const Stopwatch: React.FC = () => {
           )}
         </div>
       </div>
-
-      <Modal
-        opened={opened}
-        onClose={() => setOpened(false)}
-        title="Focus"
-        centered
-        overlayProps={{ opacity: 0 }} // No overlay
-      >
-        <div className={styles.popupContent}>
-          <TextInput placeholder="Search" mb="sm" />
-          <Text size="lg" fw={500}>Today</Text>
-          <List
-            spacing="xs"
-            size="sm"
-            center
-            icon={
-              <ThemeIcon color="teal" size={24} radius="xl">
-                <IconCircleCheck size={16} />
-              </ThemeIcon>
-            }
-          >
-            <List.Item>
-              <Text size="md">Learning Baltics</Text>
-              <Text color="dimmed">9:00am - 1:00pm</Text>
-            </List.Item>
-            <List.Item>
-              <Text size="md">Learning Baltics</Text>
-              <Text color="dimmed">9:00am - 1:00pm</Text>
-            </List.Item>
-            <List.Item>
-              <Text size="md">Learning Baltics</Text>
-              <Text color="dimmed">9:00am - 1:00pm</Text>
-            </List.Item>
-            <List.Item>
-              <Text size="md">Learning Baltics</Text>
-              <Text color="dimmed">9:00am - 1:00pm</Text>
-            </List.Item>
-            <List.Item>
-              <Text size="md">Learning Baltics</Text>
-              <Text color="dimmed">9:00am - 1:00pm</Text>
-            </List.Item>
-            {/* Add more list items as needed */}
-          </List>
-        </div>
-      </Modal>
     </div>
   );
 };

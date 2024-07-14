@@ -30,6 +30,12 @@ type Highlight record {|
     time:Utc? dueDate = null;
 |};
 
+type TimerDetails record {|
+    string? id = null;
+    string title;
+    time:Utc? dueDate = null;
+|};
+
 Task[] tasks = [
     {id: "1", title: "Task 1"},
     {id: "2", title: "Task 2"},
@@ -41,6 +47,12 @@ Highlight[] highlights = [
     {id: "1", title: "Learning Ballerina"},
     {id: "2", title: "React Project"},
     {id: "3", title: "Exercise"}
+];
+
+TimerDetails[] timer_details = [
+    {id: "1", title: "First Timer"},
+    {id: "2", title: "Second Timer"},
+    {id: "3", title: "Third Timer"}
 ];
 
 // listener http:Listener securedEP = new (9090);
@@ -128,5 +140,14 @@ service / on new http:Listener(9090) {
         log:printInfo("Highlight added");
         return highlight;
     }
+
+
+
+    resource function get timer_details() returns TimerDetails[] {
+        return timer_details;
+    }
+
+
+
 }
 

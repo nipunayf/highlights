@@ -164,3 +164,9 @@
 .taskTime {
   flex-shrink: 0;
 }
+.taskContainer {
+  padding: 20px;
+}
+.today{
+padding: 10%;
+}

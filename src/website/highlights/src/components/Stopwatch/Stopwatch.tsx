@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, forwardRef } from 'react';
 import { Button, Modal, Group, TextInput, List, ThemeIcon, Text, Menu, UnstyledButton, Tabs, Avatar } from '@mantine/core';
-import { IconCircleCheck, IconInfoCircle, IconChevronRight, IconCalendarDue } from '@tabler/icons-react';
+import { IconCircleCheck, IconInfoCircle, IconChevronRight, IconCalendarDue,IconHourglassHigh  } from '@tabler/icons-react';
 import { showNotification } from '@mantine/notifications';
 import styles from './Stopwatch.module.css';
 import { useHighlights } from "@/hooks/useHighlights";
@@ -50,7 +50,7 @@ const HighlightMenu = ({ highlights }: { highlights: HighlightTask[] }) => (
       <TextInput placeholder="search" className={styles.searchInput} />
       <div className={styles.taskHeader}>
         
-        <Text> <IconCalendarDue />Today &gt;</Text>
+        <Text className={styles.today}> <IconCalendarDue />Today &gt;</Text>
       </div>
       <Menu>
         {/* <Menu.Label>Select doing Task</Menu.Label> */}
@@ -69,7 +69,7 @@ const TimerMenu = ({ timer_details }: { timer_details: mTimer[] }) => (
       <TextInput placeholder="search" className={styles.searchInput} />
       <div className={styles.taskHeader}>
         
-        <Text> <IconCalendarDue />Today &gt;</Text>
+        <Text  className={styles.today} > <IconHourglassHigh  /> </Text>
       </div>
       <Menu>
         {/* <Menu.Label>Select doing Task</Menu.Label> */}

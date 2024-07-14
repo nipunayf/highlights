@@ -2,9 +2,13 @@ import { useState, useEffect, forwardRef } from 'react';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import { showNotification } from '@mantine/notifications';
-import { IconInfoCircle, IconChevronRight, IconCalendarDue } from '@tabler/icons-react';
+import { IconInfoCircle, IconChevronRight, IconCalendarDue,IconHourglassHigh } from '@tabler/icons-react';
 import { Group, Avatar, Text, Menu, UnstyledButton, ScrollArea, TextInput, Tabs } from '@mantine/core';
 import styles from './Timer.module.css';
+import { useHighlights } from "@/hooks/useHighlights";
+import { useTimers } from '@/hooks/useTimer';
+import { HighlightTask } from "@/models/HighlightTask";
+import { mTimer } from '@/models/Timer';
 
 const tasks = [
   { title: 'Learning Ballerina', time: '9:00am-1:00pm' },
@@ -52,6 +56,56 @@ const UserButton = forwardRef<HTMLButtonElement, UserButtonProps>(
   }
 );
 
+
+
+const HighlightMenu = ({ highlights }: { highlights: HighlightTask[] }) => (
+  <Tabs.Panel value="Task">
+    <div className={styles.taskContainer}>
+      <TextInput placeholder="search" className={styles.searchInput} />
+      <div className={styles.taskHeader}>
+        
+        <Text className={styles.today}> <IconCalendarDue />Today &gt;</Text>
+      </div>
+      <Menu>
+        {/* <Menu.Label>Select doing Task</Menu.Label> */}
+        {highlights.map((highlight) => (
+          <Menu.Item key={highlight.id}>{highlight.title}</Menu.Item>
+        ))}
+      </Menu>
+    </div>
+  </Tabs.Panel>
+);
+
+
+const TimerMenu = ({ timer_details }: { timer_details: mTimer[] }) => (
+  <Tabs.Panel value="Timer">
+    <div className={styles.taskContainer}>
+      <TextInput placeholder="search" className={styles.searchInput} />
+      <div className={styles.taskHeader}>
+        
+        <Text  className={styles.today} > <IconHourglassHigh  /> </Text>
+      </div>
+      <Menu>
+        {/* <Menu.Label>Select doing Task</Menu.Label> */}
+        {timer_details.map((timer) => (
+          <Menu.Item key={timer.id}>{timer.title}</Menu.Item>
+        ))}
+      </Menu>
+    </div>
+  </Tabs.Panel>
+);
+
+
+
+
+
+
+
+
+
+
+
+
 const Timer = () => {
   const WORK_TIME = 25; // in minutes for work session
   const SHORT_BREAK = 5; // in minutes for short break
@@ -66,6 +120,8 @@ const Timer = () => {
   const [timerId, setTimerId] = useState<NodeJS.Timeout | null>(null); // Timer ID for setInterval
   const [cycles, setCycles] = useState(0); // Number of completed work cycles
   const [selectedTask, setSelectedTask] = useState<number | null>(null); // State to track selected task
+  const { highlights, isHighlightsLoading, isHighlightsError } = useHighlights();
+  const { timer_details, istimer_detailsLoading, istimer_detailsError } = useTimers();
 
   const formatTime = (minutes: number, seconds: number) => {
     return `${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`;
@@ -174,7 +230,7 @@ const Timer = () => {
   return (
     <div className={styles.container}>
       <div className={styles.pomodoro}>
-        <div className={styles.focusLink}>
+      <div className={styles.focusLink}>
           <Menu withArrow>
             <Menu.Target>
               <UserButton
@@ -192,44 +248,10 @@ const Timer = () => {
                   <Tabs.Tab value="Task">Task</Tabs.Tab>
                   <Tabs.Tab value="Timer">Timer</Tabs.Tab>
                 </Tabs.List>
+                {highlights ? <HighlightMenu highlights={highlights} /> : null}
+                {timer_details ? <TimerMenu timer_details={timer_details} /> : null}
 
-                <Tabs.Panel value="Task">
-                  <div className={styles.taskContainer}>
-                    <TextInput
-                      placeholder="search"
-                      className={styles.searchInput}
-                    />
-                    <div className={styles.taskHeader}>
-                      <IconCalendarDue />
-                      <Text>Today &gt;</Text>
-                    </div>
-                    <Menu.Label>Select doing Task</Menu.Label>
-                    {tasks.map((task, index) => (
-                      <Menu.Item
-                        key={index}
-                        onClick={() => handleTaskClick(index)}
-                        
-                      >
-                        {task.title}
-                      </Menu.Item>
-                    ))}
-                  </div>
-                </Tabs.Panel>
-
-                <Tabs.Panel value="Timer">
-                  <div className={styles.taskContainer}>
-                    <TextInput
-                      placeholder="search"
-                      className={styles.searchInput}
-                    />
-                    <Menu.Label>Select a Timer</Menu.Label>
-                    {tasks.map((task, index) => (
-                      <Menu.Item key={index}>
-                        {task.title}
-                      </Menu.Item>
-                    ))}
-                  </div>
-                </Tabs.Panel>
+           
               </Tabs>
             </Menu.Dropdown>
           </Menu>

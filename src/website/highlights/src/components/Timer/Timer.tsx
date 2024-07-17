@@ -56,55 +56,65 @@ const UserButton = forwardRef<HTMLButtonElement, UserButtonProps>(
   }
 );
 
+const HighlightMenu = ({ highlights }: { highlights: HighlightTask[] }) => {
+  const [searchQuery, setSearchQuery] = useState('');
 
+  const filteredHighlights = highlights.filter((highlight) =>
+    highlight.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
-const HighlightMenu = ({ highlights }: { highlights: HighlightTask[] }) => (
-  <Tabs.Panel value="Task">
-    <div className={styles.taskContainer}>
-      <TextInput placeholder="search" className={styles.searchInput} />
-      <div className={styles.taskHeader}>
-        
-        <Text className={styles.today}> <IconCalendarDue />Today &gt;</Text>
+  return (
+    <Tabs.Panel value="Task">
+      <div className={styles.taskContainer}>
+        <TextInput
+          placeholder="search"
+          className={styles.searchInput}
+          value={searchQuery}
+          onChange={(event) => setSearchQuery(event.currentTarget.value)}
+        />
+        <div className={styles.taskHeader}>
+          <Text className={styles.today}> <IconCalendarDue />Today &gt;</Text>
+        </div>
+        <Menu>
+          {/* <Menu.Label>Select doing Task</Menu.Label> */}
+          {filteredHighlights.map((highlight) => (
+            <Menu.Item key={highlight.id}>{highlight.title}</Menu.Item>
+          ))}
+        </Menu>
       </div>
-      <Menu>
-        {/* <Menu.Label>Select doing Task</Menu.Label> */}
-        {highlights.map((highlight) => (
-          <Menu.Item key={highlight.id}>{highlight.title}</Menu.Item>
-        ))}
-      </Menu>
-    </div>
-  </Tabs.Panel>
-);
+    </Tabs.Panel>
+  );
+};
 
+const TimerMenu = ({ timer_details }: { timer_details: mTimer[] }) => {
+  const [searchQuery, setSearchQuery] = useState('');
 
-const TimerMenu = ({ timer_details }: { timer_details: mTimer[] }) => (
-  <Tabs.Panel value="Timer">
-    <div className={styles.taskContainer}>
-      <TextInput placeholder="search" className={styles.searchInput} />
-      <div className={styles.taskHeader}>
-        
-        <Text  className={styles.today} > <IconHourglassHigh  /> </Text>
+  const filteredTimers = timer_details.filter((timer) =>
+    timer.timer_name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  return (
+    <Tabs.Panel value="Timer">
+      <div className={styles.taskContainer}>
+        <TextInput
+          placeholder="search"
+          className={styles.searchInput}
+          value={searchQuery}
+          onChange={(event) => setSearchQuery(event.currentTarget.value)}
+        />
+        <div className={styles.taskHeader}>
+          <Text className={styles.today}> <IconHourglassHigh /> </Text>
+        </div>
+        <Menu>
+          {/* <Menu.Label>Select doing Task</Menu.Label> */}
+          {filteredTimers.map((timer) => (
+            <Menu.Item key={timer.timer_id}>{timer.timer_name}</Menu.Item>
+          ))}
+        </Menu>
       </div>
-      <Menu>
-        {/* <Menu.Label>Select doing Task</Menu.Label> */}
-        {timer_details.map((timer) => (
-          <Menu.Item key={timer.id}>{timer.title}</Menu.Item>
-        ))}
-      </Menu>
-    </div>
-  </Tabs.Panel>
-);
-
-
-
-
-
-
-
-
-
-
-
+    </Tabs.Panel>
+  );
+};
 
 const Timer = () => {
   const WORK_TIME = 25; // in minutes for work session
@@ -230,7 +240,7 @@ const Timer = () => {
   return (
     <div className={styles.container}>
       <div className={styles.pomodoro}>
-      <div className={styles.focusLink}>
+        <div className={styles.focusLink}>
           <Menu withArrow>
             <Menu.Target>
               <UserButton
@@ -250,8 +260,6 @@ const Timer = () => {
                 </Tabs.List>
                 {highlights ? <HighlightMenu highlights={highlights} /> : null}
                 {timer_details ? <TimerMenu timer_details={timer_details} /> : null}
-
-           
               </Tabs>
             </Menu.Dropdown>
           </Menu>

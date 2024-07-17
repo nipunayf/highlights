@@ -58,7 +58,9 @@ CREATE TABLE `hi`(
   `end_time` TIME,
   `reminder` VARCHAR(255),
   `priority` VARCHAR(255), 
-  `description` TEXT
+  `description` TEXT,
+  `status` varchar(1) DEFAULT 0,
+  `type` VARCHAR(255) DEFAULT 'MAIN TASK'
 );
 
 ALTER TABLE `highlights` ADD FOREIGN KEY (`event_id`) REFERENCES `events` (`id`);

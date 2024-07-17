@@ -49,5 +49,16 @@ export async function createTask(task: Task): Promise<Task> {
 }
 
 
+export async function updateTask(task: Task): Promise<Task> {
+    console.log(task)
+    const response = await getAxiosClient('tasks').request<Task>({
+        method: 'POST',
+        data: task
+    });
+    console.log("mbbbbbm")
+
+    return response.data;
+}
+
 
   

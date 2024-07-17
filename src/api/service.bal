@@ -4,6 +4,7 @@ import ballerina/sql;
 import ballerina/time;
 import ballerinax/mysql;
 import ballerinax/mysql.driver as _;
+import ballerina/io;
 // import ballerina/io;
 
 type Greeting record {|
@@ -46,9 +47,7 @@ type Task record {
 // ];
 
 Task[] tasks = [
-    { title: "Task 1", description: "", dueDate: (),startTime:"", endTime:"",reminder: "", priority: ""},
-    { title: "Task 2", description: "", dueDate: (),startTime:"", endTime:"", reminder: "", priority: ""},
-    { title: "Task 3", description: "", dueDate: (),startTime:"", endTime:"", reminder: "", priority: ""}
+    
 ];
 
 // listener http:Listener securedEP = new (9090);
@@ -116,9 +115,22 @@ service / on new http:Listener(9090) {
         return http:INTERNAL_SERVER_ERROR;
     }
 
-    resource function get tasks() returns Task[] {
-        //  io:print(tasks);
-        return tasks;
+    resource function get tasks() returns Task[]|error {
+        sql:ParameterizedQuery query = `SELECT id,title, Date, start_time, end_time, reminder, priority, description FROM hi`;
+        stream<Task, sql:Error?> resultStream = self.db->query(query);
+
+        Task[] tasksList = [];
+        error? e = resultStream.forEach(function(Task task) {
+            tasksList.push(task);
+        });
+
+        if (e is error) {
+            log:printError("Error occurred while fetching tasks: ", 'error = e);
+            return e;
+        }
+// io:print(tasklist);
+io:println(tasksList);
+        return tasksList;
     }
 
    

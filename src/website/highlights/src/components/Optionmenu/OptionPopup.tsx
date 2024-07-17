@@ -71,7 +71,7 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({ onOpenPopup }) => {
           onClick={() => setOpened((o) => !o)}
           ref={buttonRef} // Assign the ref here
         >
-          <FontAwesomeIcon icon={faEllipsis} style={{ color: 'black' }} /> {/* Set icon color to black */}
+          <FontAwesomeIcon icon={faEllipsis} style={{ color: 'black' }} />
         </Button>
       </Menu.Target>
 

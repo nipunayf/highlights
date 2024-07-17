@@ -47,7 +47,7 @@ CREATE TABLE `calendars` (
 CREATE TABLE `timer_details` (
   `timer_id` integer PRIMARY KEY AUTO_INCREMENT,
     `timer_name` VARCHAR(255) NOT NULL,
-  `pomo_durration` TIME,
+  `pomo_duration` TIME,
   `short_break_duration` TIME,
   `long_break_duration` TIME,
   `pomos_per_long_break` INT NOT NULL,

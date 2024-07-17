@@ -1,7 +1,11 @@
 export interface mTimer {
-          id?: string;
-          created?: Date;
-          updated?: Date;
-          title: string;
-          dueDate: Date | null;
+          timer_id: string;
+          timer_name: string;
+          pomo_duration: TimeRanges;
+          short_break_duration: TimeRanges;
+          long_break_duration: TimeRanges;
+          pomos_per_long_break: number;
+
+
+          
 }

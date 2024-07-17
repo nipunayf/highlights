@@ -74,7 +74,7 @@ const TimerMenu = ({ timer_details }: { timer_details: mTimer[] }) => (
       <Menu>
         {/* <Menu.Label>Select doing Task</Menu.Label> */}
         {timer_details.map((timer) => (
-          <Menu.Item key={timer.id}>{timer.title}</Menu.Item>
+          <Menu.Item key={timer.timer_id}>{timer.timer_name}</Menu.Item>
         ))}
       </Menu>
     </div>

@@ -4,6 +4,7 @@ import ballerina/sql;
 import ballerina/time;
 import ballerinax/mysql;
 import ballerinax/mysql.driver as _;
+import ballerina/io;
 
 type Greeting record {|
     string greeting;
@@ -18,6 +19,7 @@ type User record {|
     string sub;
 |};
 
+
 type Task record {|
     string? id = null;
     string title;
@@ -31,9 +33,13 @@ type Highlight record {|
 |};
 
 type TimerDetails record {|
-    string? id = null;
-    string title;
-    time:Utc? dueDate = null;
+    int timer_id;
+    string timer_name;
+    time:TimeOfDay? pomo_duration;
+    time:TimeOfDay? short_break_duration;
+    time:TimeOfDay? long_break_duration;
+    int pomos_per_long_break;
+    int user_id;
 |};
 
 Task[] tasks = [
@@ -42,36 +48,17 @@ Task[] tasks = [
     {id: "3", title: "Task 3"}
 ];
 
-
 Highlight[] highlights = [
     {id: "1", title: "Learning Ballerina"},
     {id: "2", title: "React Project"},
     {id: "3", title: "Exercise"}
 ];
 
-TimerDetails[] timer_details = [
-    {id: "1", title: "First Timer"},
-    {id: "2", title: "Second Timer"},
-    {id: "3", title: "Third Timer"}
-];
-
-// listener http:Listener securedEP = new (9090);
-
 // Define the configuration variables
 configurable string azureAdIssuer = ?;
 configurable string azureAdAudience = ?;
 
 @http:ServiceConfig {
-    // auth: [
-    //     {
-    //         jwtValidatorConfig: {
-    //             issuer: azureAdIssuer,
-    //             audience: azureAdAudience,
-    //             scopeKey: "scp"
-    //         },
-    //         scopes: ["User.Read"]
-    //     }
-    // ],
     cors: {
         allowOrigins: ["http://localhost:3000"],
         allowCredentials: false,
@@ -130,24 +117,61 @@ service / on new http:Listener(9090) {
         return task;
     }
 
-    
     resource function get highlights() returns Highlight[] {
         return highlights;
     }
 
-        resource function post highlights(Highlight highlight) returns Highlight {
+    resource function post highlights(Highlight highlight) returns Highlight {
         highlights.push({id: (highlights.length() + 1).toString(), title: highlight.title});
         log:printInfo("Highlight added");
         return highlight;
     }
 
+    resource function get timer_details() returns TimerDetails[]|error {
+        // Define the SQL query
+        sql:ParameterizedQuery sqlQuery = `SELECT timer_id, timer_name, pomo_duration, short_break_duration, long_break_duration, pomos_per_long_break, user_id FROM timer_details`;
 
+        // Execute the query and retrieve the results
+        stream<record {| 
+            int timer_id; 
+            string timer_name; 
+            time:TimeOfDay? pomo_duration; 
+            time:TimeOfDay? short_break_duration; 
+            time:TimeOfDay? long_break_duration; 
+            int pomos_per_long_break; 
+            int user_id; 
+        |}, sql:Error?> resultStream = self.db->query(sqlQuery);
 
-    resource function get timer_details() returns TimerDetails[] {
-        return timer_details;
+        // Create an array to hold the timer details
+        TimerDetails[] timerDetailsList = [];
+
+        // Iterate over the results
+        check from var timerDetail in resultStream
+            do {
+                log:printInfo("Retrieved TimerDetail: " + timerDetail.toString());
+                timerDetailsList.push({
+                    timer_id: timerDetail.timer_id,
+                    timer_name: timerDetail.timer_name,
+                    pomo_duration: timerDetail.pomo_duration,
+                    short_break_duration: timerDetail.short_break_duration,
+                    long_break_duration: timerDetail.long_break_duration,
+                    pomos_per_long_break: timerDetail.pomos_per_long_break,
+                    user_id: timerDetail.user_id
+                });
+            };
+        
+        // Print the timer details list to the console
+        io:println(timerDetailsList);
+        // io:println("timerDetailsList");
+
+        return timerDetailsList;
     }
 
 
 
-}
 
+
+
+
+
+}

@@ -19,10 +19,11 @@ interface UserButtonProps {
       fontSize?: string;
     };
   };
+  onClick?: () => void;
 }
 
 const UserButton = forwardRef<HTMLButtonElement, UserButtonProps>(
-  ({ image, label, icon, styles: userStyles, ...others }: UserButtonProps, ref) => {
+  ({ image, label, icon, styles: userStyles, onClick, ...others }: UserButtonProps, ref) => {
     return (
       <UnstyledButton
         ref={ref}
@@ -31,6 +32,7 @@ const UserButton = forwardRef<HTMLButtonElement, UserButtonProps>(
           color: 'var(--mantine-color-text)',
           borderRadius: 'var(--mantine-radius-sm)',
         }}
+        onClick={onClick}
         {...others}
       >
         <Group>
@@ -247,7 +249,7 @@ const Timer = () => {
                 label={selectedTask !== null && highlights ? highlights[selectedTask]?.title : "Focus"}
                 styles={{
                   label: {
-                    fontSize: '14px', // Adjust font size
+                    fontSize: '14px',
                   },
                 }}
                 onClick={() => setMenuOpened((prev) => !prev)}

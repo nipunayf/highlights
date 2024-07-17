@@ -128,7 +128,7 @@ service / on new http:Listener(9090) {
     }
 
     resource function get timer_details() returns TimerDetails[]|error {
-        // Define the SQL query
+
         sql:ParameterizedQuery sqlQuery = `SELECT timer_id, timer_name, pomo_duration, short_break_duration, long_break_duration, pomos_per_long_break, user_id FROM timer_details`;
 
         // Execute the query and retrieve the results
@@ -142,7 +142,6 @@ service / on new http:Listener(9090) {
             int user_id; 
         |}, sql:Error?> resultStream = self.db->query(sqlQuery);
 
-        // Create an array to hold the timer details
         TimerDetails[] timerDetailsList = [];
 
         // Iterate over the results
@@ -160,18 +159,9 @@ service / on new http:Listener(9090) {
                 });
             };
         
-        // Print the timer details list to the console
         io:println(timerDetailsList);
-        // io:println("timerDetailsList");
 
         return timerDetailsList;
     }
-
-
-
-
-
-
-
 
 }

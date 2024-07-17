@@ -1,16 +1,14 @@
-import { useState, useEffect, forwardRef } from 'react';
+import React, { useState, useEffect, forwardRef } from 'react';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import { showNotification } from '@mantine/notifications';
-import { IconInfoCircle, IconChevronRight, IconCalendarDue,IconHourglassHigh } from '@tabler/icons-react';
-import { Group, Avatar, Text, Menu, UnstyledButton, ScrollArea, TextInput, Tabs } from '@mantine/core';
+import { IconInfoCircle, IconChevronRight, IconCalendarDue, IconHourglassHigh } from '@tabler/icons-react';
+import { Group, Avatar, Text, Menu, UnstyledButton, TextInput, Tabs } from '@mantine/core';
 import styles from './Timer.module.css';
 import { useHighlights } from "@/hooks/useHighlights";
 import { useTimers } from '@/hooks/useTimer';
 import { HighlightTask } from "@/models/HighlightTask";
 import { mTimer } from '@/models/Timer';
-
-
 
 interface UserButtonProps {
   image?: string;
@@ -51,29 +49,35 @@ const UserButton = forwardRef<HTMLButtonElement, UserButtonProps>(
   }
 );
 
-const HighlightMenu = ({ highlights }: { highlights: HighlightTask[] }) => {
+const HighlightMenu = ({ highlights, onHighlightSelect, closeMenu }: { highlights: HighlightTask[], onHighlightSelect: (index: number) => void, closeMenu: () => void }) => {
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredHighlights = highlights.filter((highlight) =>
     highlight.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const handleSelect = (index: number) => {
+    onHighlightSelect(index);
+    closeMenu();
+  };
+
   return (
     <Tabs.Panel value="Task">
       <div className={styles.taskContainer}>
         <TextInput
-          placeholder="search"
+          placeholder="Search"
           className={styles.searchInput}
           value={searchQuery}
           onChange={(event) => setSearchQuery(event.currentTarget.value)}
         />
         <div className={styles.taskHeader}>
-          <Text className={styles.today}> <IconCalendarDue />Today &gt;</Text>
+          <Text className={styles.today}><IconCalendarDue /> Today &gt;</Text>
         </div>
         <Menu>
-          {/* <Menu.Label>Select doing Task</Menu.Label> */}
-          {filteredHighlights.map((highlight) => (
-            <Menu.Item key={highlight.id}>{highlight.title}</Menu.Item>
+          {filteredHighlights.map((highlight, index) => (
+            <Menu.Item key={highlight.id} onClick={() => handleSelect(index)}>
+              {highlight.title}
+            </Menu.Item>
           ))}
         </Menu>
       </div>
@@ -92,16 +96,15 @@ const TimerMenu = ({ timer_details }: { timer_details: mTimer[] }) => {
     <Tabs.Panel value="Timer">
       <div className={styles.taskContainer}>
         <TextInput
-          placeholder="search"
+          placeholder="Search"
           className={styles.searchInput}
           value={searchQuery}
           onChange={(event) => setSearchQuery(event.currentTarget.value)}
         />
         <div className={styles.taskHeader}>
-          <Text className={styles.today}> <IconHourglassHigh /> </Text>
+          <Text className={styles.today}><IconHourglassHigh /></Text>
         </div>
         <Menu>
-          {/* <Menu.Label>Select doing Task</Menu.Label> */}
           {filteredTimers.map((timer) => (
             <Menu.Item key={timer.timer_id}>{timer.timer_name}</Menu.Item>
           ))}
@@ -127,6 +130,7 @@ const Timer = () => {
   const [selectedTask, setSelectedTask] = useState<number | null>(null); // State to track selected task
   const { highlights, isHighlightsLoading, isHighlightsError } = useHighlights();
   const { timer_details, istimer_detailsLoading, istimer_detailsError } = useTimers();
+  const [menuOpened, setMenuOpened] = useState(false);
 
   const formatTime = (minutes: number, seconds: number) => {
     return `${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`;
@@ -228,23 +232,25 @@ const Timer = () => {
     }
   }, [totalSeconds, started]);
 
-  const handleTaskClick = (index: number) => {
-    setSelectedTask(selectedTask === index ? null : index);
+  const handleHighlightSelect = (index: number) => {
+    setSelectedTask(index);
+    setMenuOpened(false);
   };
 
   return (
     <div className={styles.container}>
       <div className={styles.pomodoro}>
         <div className={styles.focusLink}>
-          <Menu withArrow>
+          <Menu withArrow opened={menuOpened} onChange={setMenuOpened}>
             <Menu.Target>
               <UserButton
-                label="Focus"
+                label={selectedTask !== null && highlights ? highlights[selectedTask]?.title : "Focus"}
                 styles={{
                   label: {
                     fontSize: '14px', // Adjust font size
                   },
                 }}
+                onClick={() => setMenuOpened((prev) => !prev)}
               />
             </Menu.Target>
             <Menu.Dropdown>
@@ -253,7 +259,7 @@ const Timer = () => {
                   <Tabs.Tab value="Task">Task</Tabs.Tab>
                   <Tabs.Tab value="Timer">Timer</Tabs.Tab>
                 </Tabs.List>
-                {highlights ? <HighlightMenu highlights={highlights} /> : null}
+                {highlights ? <HighlightMenu highlights={highlights} onHighlightSelect={handleHighlightSelect} closeMenu={() => setMenuOpened(false)} /> : null}
                 {timer_details ? <TimerMenu timer_details={timer_details} /> : null}
               </Tabs>
             </Menu.Dropdown>

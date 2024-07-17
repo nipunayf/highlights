@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, forwardRef } from 'react';
-import { Button, Modal, Group, TextInput, List, ThemeIcon, Text, Menu, UnstyledButton, Tabs, Avatar } from '@mantine/core';
-import { IconCircleCheck, IconInfoCircle, IconChevronRight, IconCalendarDue,IconHourglassHigh  } from '@tabler/icons-react';
+import {Group, TextInput, List, ThemeIcon, Text, Menu, UnstyledButton, Tabs, Avatar } from '@mantine/core';
+import { IconInfoCircle, IconChevronRight, IconCalendarDue,IconHourglassHigh  } from '@tabler/icons-react';
 import { showNotification } from '@mantine/notifications';
 import styles from './Stopwatch.module.css';
 import { useHighlights } from "@/hooks/useHighlights";
@@ -174,9 +174,7 @@ const Stopwatch: React.FC = () => {
     });
   };
 
-  const handleFocusClick = () => {
-    setOpened(true);
-  };
+
 
   const radius = 90;
   const circumference = 2 * Math.PI * radius;

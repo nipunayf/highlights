@@ -10,12 +10,7 @@ import { useTimers } from '@/hooks/useTimer';
 import { HighlightTask } from "@/models/HighlightTask";
 import { mTimer } from '@/models/Timer';
 
-const tasks = [
-  { title: 'Learning Ballerina', time: '9:00am-1:00pm' },
-  { title: 'React Project', time: '2:00pm-5:00pm' },
-  { title: 'Exercise', time: '6:00pm-7:00pm' },
-  // Add more tasks as needed
-];
+
 
 interface UserButtonProps {
   image?: string;

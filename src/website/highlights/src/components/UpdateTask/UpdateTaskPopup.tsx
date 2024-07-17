@@ -20,7 +20,6 @@ interface Task {
   endTime: string;
   reminder: string;
   priority: string;
-  // subTasks: Task[];
 }
 
 interface ApiTask {
@@ -32,10 +31,9 @@ interface ApiTask {
   endTime: string;
   reminder: string;
   priority: string;
-  // subTasks: ApiTask[];
 }
 
-export default function UpdateTaskPopup({ open, onClose, task, onUpdate }: UpdateTaskPopupProps) {
+const UpdateTaskPopup: React.FC<UpdateTaskPopupProps> = ({ open, onClose, task, onUpdate }) => {
   const [formState, setFormState] = useState({
     title: '',
     description: '',
@@ -95,7 +93,6 @@ export default function UpdateTaskPopup({ open, onClose, task, onUpdate }: Updat
       endTime: endTime,
       reminder: formState.reminder,
       priority: formState.priority,
-      // subTasks: task!.subTasks || [],
     };
 
     const apiTask: ApiTask = {
@@ -103,7 +100,6 @@ export default function UpdateTaskPopup({ open, onClose, task, onUpdate }: Updat
       dueDate: updatedTask.dueDate ? updatedTask.dueDate.toISOString() : null,
       startTime: updatedTask.startTime,
       endTime: updatedTask.endTime,
-      // subTasks: updatedTask.subTasks.map(subTask => ({ ...subTask, dueDate: subTask.dueDate ? subTask.dueDate.toISOString() : null })),
     };
 
     console.log("Updated Task:", updatedTask);
@@ -231,4 +227,6 @@ export default function UpdateTaskPopup({ open, onClose, task, onUpdate }: Updat
       </form>
     </Modal>
   );
-}
+};
+
+export default UpdateTaskPopup;

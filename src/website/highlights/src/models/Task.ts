@@ -5,7 +5,7 @@ export interface Task extends Entity {
     // Date: ReactNode;
    
     // title: string;
-    // dueDate: Date | null;
+    dueDate: Date | null;
     Date: string;
     title: string;
     description: string;

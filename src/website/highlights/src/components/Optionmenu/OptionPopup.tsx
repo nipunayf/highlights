@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Menu, Button, rem } from '@mantine/core';
+import { Menu, Button } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEllipsis } from '@fortawesome/free-solid-svg-icons';
 import Swal from 'sweetalert2';
@@ -15,21 +15,18 @@ const SubMenu: React.FC<SubMenuProps> = ({ opened, onClose }) => (
       <div />
     </Menu.Target>
     <Menu.Dropdown>
-      <Menu.Item onClick={onClose}>
-        Start Pomodoro
-      </Menu.Item>
-      <Menu.Item onClick={onClose}>
-        Start Stopwatch
-      </Menu.Item>
+      <Menu.Item onClick={onClose}>Start Pomodoro</Menu.Item>
+      <Menu.Item onClick={onClose}>Start Stopwatch</Menu.Item>
     </Menu.Dropdown>
   </Menu>
 );
 
 interface OptionsMenuProps {
   onOpenPopup: () => void;
+  onUpdateClick: () => void; // Define the prop if it's used for update functionality
 }
 
-const OptionsMenu: React.FC<OptionsMenuProps> = ({ onOpenPopup }) => {
+const OptionsMenu: React.FC<OptionsMenuProps> = ({ onOpenPopup, onUpdateClick }) => {
   const [opened, setOpened] = useState(false);
   const [submenuOpened, setSubmenuOpened] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null); // Define ref type explicitly
@@ -79,7 +76,7 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({ onOpenPopup }) => {
         <Menu.Item
           onClick={() => {
             handleClose();
-            onOpenPopup();
+            onUpdateClick(); // Call the update function passed from parent component
           }}
         >
           Update

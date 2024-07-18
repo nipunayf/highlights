@@ -42,13 +42,18 @@ const UserButton = forwardRef<HTMLButtonElement, UserButtonProps>(
 );
 
 
-
-const HighlightMenu = ({ highlights }: { highlights: HighlightTask[] }) => {
+const HighlightMenu = ({ highlights, onHighlightSelect, closeMenu }: { highlights: HighlightTask[], onHighlightSelect: (index: number) => void, closeMenu: () => void }) => {
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredHighlights = highlights.filter((highlight) =>
     highlight.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const handleSelect = (index: number) => {
+    onHighlightSelect(index);
+    closeMenu();
+  };
+
 
   return (
     <Tabs.Panel value="Task">
@@ -63,9 +68,10 @@ const HighlightMenu = ({ highlights }: { highlights: HighlightTask[] }) => {
           <Text className={styles.today}> <IconCalendarDue />Today &gt;</Text>
         </div>
         <Menu>
-          {/* <Menu.Label>Select doing Task</Menu.Label> */}
-          {filteredHighlights.map((highlight) => (
-            <Menu.Item key={highlight.id}>{highlight.title}</Menu.Item>
+          {filteredHighlights.map((highlight, index) => (
+            <Menu.Item key={highlight.id} onClick={() => handleSelect(index)}>
+              {highlight.title}
+            </Menu.Item>
           ))}
         </Menu>
       </div>
@@ -115,8 +121,11 @@ const Stopwatch: React.FC = () => {
   const [isPaused, setIsPaused] = useState(false);
   const [opened, setOpened] = useState(false);
   const intervalRef = useRef<number | null>(null);
+  const [selectedTask, setSelectedTask] = useState<number | null>(null); // State to track selected task
   const { highlights, isHighlightsLoading, isHighlightsError } = useHighlights();
   const { timer_details, istimer_detailsLoading, istimer_detailsError } = useTimers();
+  const [menuOpened, setMenuOpened] = useState(false);
+
 
 
   useEffect(() => {
@@ -185,18 +194,23 @@ const Stopwatch: React.FC = () => {
   const minutes = Math.floor(time / 60);
   const seconds = time % 60;
   const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  
+  const handleHighlightSelect = (index: number) => {
+    setSelectedTask(index);
+    setMenuOpened(false);
+  };
 
   return (
     <div className={styles.stopwatch}>
       <div>
         <div className={styles.focusLink}>
-          <Menu withArrow>
+        <Menu withArrow opened={menuOpened} onChange={setMenuOpened}>
             <Menu.Target>
-              <UserButton
-                label="Focus"
+            <UserButton
+                label={selectedTask !== null && highlights ? highlights[selectedTask]?.title : "Focus"}
                 styles={{
                   label: {
-                    fontSize: '14px', // Adjust font size
+                    fontSize: '14px',
                   },
                 }}
               />
@@ -207,7 +221,7 @@ const Stopwatch: React.FC = () => {
                   <Tabs.Tab value="Task">Task</Tabs.Tab>
                   <Tabs.Tab value="Timer">Timer</Tabs.Tab>
                 </Tabs.List>
-                {highlights ? <HighlightMenu highlights={highlights} /> : null}
+                {highlights ? <HighlightMenu highlights={highlights} onHighlightSelect={handleHighlightSelect} closeMenu={() => setMenuOpened(false)} /> : null}
                 {timer_details ? <TimerMenu timer_details={timer_details} /> : null}
 
            

@@ -8,6 +8,7 @@ import { AuthenticationResult, EventType, InteractionType, PublicClientApplicati
 import { msalConfig } from '../authConfig';
 import { NextPage } from 'next';
 import { ReactElement, ReactNode, StrictMode } from 'react';
+import { RecoilRoot } from 'recoil';
 
 export const msalInstance = new PublicClientApplication(msalConfig);
 
@@ -51,7 +52,9 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
             <MsalProvider instance={msalInstance}>
                 <MsalAuthenticationTemplate interactionType={InteractionType.Redirect}>
                     <MantineProvider theme={theme}>
-                        {getLayout(<Component {...pageProps} />)}
+                        <RecoilRoot>
+                            {getLayout(<Component {...pageProps} />)}
+                        </RecoilRoot>
                     </MantineProvider>
                 </MsalAuthenticationTemplate>
             </MsalProvider>

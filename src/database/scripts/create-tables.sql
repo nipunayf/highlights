@@ -63,6 +63,8 @@ CREATE TABLE `hi`(
   `type` VARCHAR(255) DEFAULT 'MAIN TASK'
 );
 
+
+
 ALTER TABLE `highlights` ADD FOREIGN KEY (`event_id`) REFERENCES `events` (`id`);
 
 ALTER TABLE `highlight_tasks` ADD FOREIGN KEY (`highlight_id`) REFERENCES `highlights` (`id`);

@@ -48,16 +48,21 @@ export async function createTask(task: Task): Promise<Task> {
     return response.data;
 }
 
-
 export async function updateTask(task: Task): Promise<Task> {
-    console.log(task)
-    const response = await getAxiosClient('tasks').request<Task>({
-        method: 'POST',
-        data: task
-    });
-    console.log("mbbbbbm")
-
-    return response.data;
+    console.log("Updating task:", task);
+    try {
+        const client = getAxiosClient('tasks');
+        const response = await client.request<Task>({
+            method: 'PUT',
+            url: `/${task.id}`, // Ensure the URL includes the task ID
+            data: task
+        });
+        console.log("Task updated:", response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error updating task:", error);
+        throw error;
+    }
 }
 
 

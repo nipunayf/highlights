@@ -129,7 +129,7 @@ service / on new http:Listener(9090) {
             return e;
         }
 // io:print(tasklist);
-io:println(tasksList);
+// io:println(tasksList);
         return tasksList;
     }
 
@@ -166,6 +166,50 @@ io:println(tasksList);
         check caller->respond(http:STATUS_CREATED);
     }
 }
+
+resource function put tasks/[int taskId](http:Caller caller, http:Request req) returns error? {
+    io:println("ss");
+    io:println(Task);
+    
+    json|http:ClientError payload = req.getJsonPayload();
+    if payload is http:ClientError {
+        log:printError("Error while parsing request payload", 'error = payload);
+        io:println("xdd");
+        check caller->respond(http:STATUS_BAD_REQUEST);
+        return;
+    }
+
+    Task|error task = payload.cloneWithType(Task);
+    if task is error {
+        log:printError("Error while converting JSON to Task", 'error = task);
+        check caller->respond(http:STATUS_BAD_REQUEST);
+        return;
+    }
+
+    // Convert ISO 8601 date to MySQL compatible date format
+    string dueDate = task.dueDate != () ? formatDateTime(task.dueDate.toString()) : "";
+    string startTime = task.startTime != () ? formatTime(task.startTime.toString()) : "";
+    string endTime = task.endTime != () ? formatTime(task.endTime.toString()) : "";
+
+    sql:ExecutionResult|sql:Error result = self.db->execute(`
+        UPDATE hi SET title = ${task.title}, 
+                      Date = ${dueDate}, 
+                      start_time = ${startTime}, 
+                      end_time = ${endTime}, 
+                      reminder = ${task.reminder}, 
+                      priority = ${task.priority}, 
+                      description = ${task.description}
+        WHERE id = ${taskId};
+    `);
+
+    if result is sql:Error {
+        log:printError("Error occurred while updating task", 'error = result);
+        check caller->respond(http:STATUS_INTERNAL_SERVER_ERROR);
+    } else {
+        check caller->respond(http:STATUS_OK);
+    }
+}
+
 
 
    

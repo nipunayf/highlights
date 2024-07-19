@@ -18,7 +18,7 @@ interface Task {
   endTime: string;
   reminder: string;
   priority: string;
-  // subTasks: Task[];
+  
 }
 
 interface ApiTask {
@@ -29,7 +29,7 @@ interface ApiTask {
   endTime: string;
   reminder: string;
   priority: string;
-  // subTasks: ApiTask[];
+ 
 }
 
 export default function AddtaskPopup({ open, onClose }: AddtaskPopupProps) {

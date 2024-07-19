@@ -23,10 +23,11 @@ const SubMenu: React.FC<SubMenuProps> = ({ opened, onClose }) => (
 
 interface OptionsMenuProps {
   onOpenPopup: () => void;
-  onUpdateClick: () => void; // Define the prop if it's used for update functionality
+  onUpdateClick: () => void;
+  onDelete: () => void; // Define the prop if it's used for update functionality
 }
 
-const OptionsMenu: React.FC<OptionsMenuProps> = ({ onOpenPopup, onUpdateClick }) => {
+const OptionsMenu: React.FC<OptionsMenuProps> = ({ onOpenPopup, onUpdateClick, onDelete }) => {
   const [opened, setOpened] = useState(false);
   const [submenuOpened, setSubmenuOpened] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null); // Define ref type explicitly
@@ -45,6 +46,7 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({ onOpenPopup, onUpdateClick })
         confirmButtonText: "Yes, delete it!"
       }).then((result) => {
         if (result.isConfirmed) {
+          onDelete();
           Swal.fire({
             title: "Deleted!",
             text: "Your file has been deleted.",

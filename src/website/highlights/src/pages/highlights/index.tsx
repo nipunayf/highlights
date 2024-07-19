@@ -12,6 +12,8 @@ import UpdateTaskPopup from "@/components/UpdateTask/UpdateTaskPopup";
 import classes from "./ActionsGrid.module.css";
 import { useTasks } from "@/hooks/useTasks";
 import { Task } from "@/models/Task";
+import { deleteTask } from '@/services/api';
+// import { deleteTask } from "@/api";
 
 function ActionsGrid() {
   const theme = useMantineTheme();
@@ -65,6 +67,16 @@ function ActionsGrid() {
 
   const { tasks, isLoading, isError } = useTasks();
 
+  const handleDelete = async (taskId: number) => {
+    try {
+      await deleteTask(taskId); // Use the deleteTask function from api.ts
+      // Optionally, refresh tasks after deletion
+      // mutate(); // Uncomment this line if you use SWR or other data-fetching libraries
+    } catch (error) {
+      console.error('Failed to delete task:', error);
+    }
+  };
+
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Error loading tasks.</div>;
 
@@ -95,7 +107,7 @@ function ActionsGrid() {
                   </div>
                 </div>
                 <div className={classes.bars_icon}>
-                  <OptionsMenu onOpenPopup={handleCardClick} onUpdateClick={() => handleUpdateClick(task)} />
+                  <OptionsMenu onOpenPopup={handleCardClick} onUpdateClick={() => handleUpdateClick(task)} onDelete={() => handleDelete(task.id)} />
                 </div>
               </div>
               <br />

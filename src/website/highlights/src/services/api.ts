@@ -66,4 +66,17 @@ export async function updateTask(task: Task): Promise<Task> {
 }
 
 
-  
+export async function deleteTask(taskId: number): Promise<void> {
+    console.log("Deleting task with ID:", taskId);
+    try {
+        const client = getAxiosClient('tasks');
+        await client.request<void>({
+            method: 'DELETE',
+            url: `/${taskId}` // Ensure the URL includes the task ID
+        });
+        console.log("Task deleted");
+    } catch (error) {
+        console.error("Error deleting task:", error);
+        throw error;
+    }
+}

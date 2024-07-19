@@ -212,9 +212,40 @@ resource function put tasks/[int taskId](http:Caller caller, http:Request req) r
 
 
 
+ resource function delete tasks/[int taskId](http:Caller caller) returns error? {
+    io:println("xdd");
+        sql:ExecutionResult|sql:Error result = self.db->execute(`
+            DELETE FROM hi WHERE id = ${taskId};
+        `);
+
+        if result is sql:Error {
+            log:printError("Error occurred while deleting task", result);
+            check caller->respond(http:STATUS_INTERNAL_SERVER_ERROR);
+        } else {
+            check caller->respond(http:STATUS_OK);
+        }
+    }
+
+
    
     
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 function formatDateTime(string isoDateTime) returns string {
     time:Utc utc = checkpanic time:utcFromString(isoDateTime);
     time:Civil dt = time:utcToCivil(utc);

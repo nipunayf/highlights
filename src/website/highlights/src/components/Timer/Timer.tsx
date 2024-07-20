@@ -4,11 +4,12 @@ import 'react-circular-progressbar/dist/styles.css';
 import { showNotification } from '@mantine/notifications';
 import { IconInfoCircle, IconChevronRight, IconCalendarDue, IconHourglassHigh } from '@tabler/icons-react';
 import { Group, Avatar, Text, Menu, UnstyledButton, TextInput, Tabs } from '@mantine/core';
+import axios from 'axios';  // Import axios
 import styles from './Timer.module.css';
 import { useHighlights } from "@/hooks/useHighlights";
 import { useTimers } from '@/hooks/useTimer';
 import { HighlightTask } from "@/models/HighlightTask";
-import { mTimer } from '@/models/Timer';
+import { mTimer,mPomo_details } from '@/models/Timer';
 
 interface UserButtonProps {
   image?: string;
@@ -186,6 +187,36 @@ const Timer = () => {
     setCount(0);
     setPaused(true);
     setStarted(false);
+
+    showNotification({
+      title: 'Timer Ended',
+      message: 'Time to switch!',
+      icon: <IconInfoCircle />,
+      color: 'teal',
+    });
+
+    sendEndData();  // Send data to backend when the timer ends
+  };
+
+  const sendEndData = async () => {
+    console.log('hello world');
+    try {
+      const response = await axios.post('/api/sendTimerEndData', {
+        
+        active,
+        minCount,
+        count,
+        paused,
+        started,
+        cycles,
+        selectedTask,
+      });
+      console.log('iiiiiiiii');
+      console.log(response.data);
+    } catch (error) {
+      console.log('uuuuuuu');
+      console.error('Error sending data to backend:', error);
+    }
   };
 
   const endTimer = () => {
@@ -216,6 +247,9 @@ const Timer = () => {
         },
       }),
     });
+    // console.log('hello world');
+    sendEndData();  // Send data to backend when the timer ends
+    // console.log('hello world');
   };
 
   const totalSeconds = minCount * 60 + count;

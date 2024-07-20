@@ -42,6 +42,19 @@ type TimerDetails record {|
     int user_id;
 |};
 
+
+type HighlightPomoDetails record {|
+    int timer_id;
+    string highlight_id;
+    time:TimeOfDay pomo_duration;
+    time:TimeOfDay short_break_duration;
+    time:TimeOfDay long_break_duration;
+    int pomos_per_long_break;
+    int user_id;
+|};
+
+
+
 Task[] tasks = [
     {id: "1", title: "Task 1"},
     {id: "2", title: "Task 2"},
@@ -183,7 +196,15 @@ service / on new http:Listener(9090) {
             return highlightList;
     }
 
-    
+
+    resource function post add_pomo_details() returns  PomoDetails{
+
+
+        sql:ParameterizedQuery sqlQuery = ;
+
+
+        
+    }
 
 
 }

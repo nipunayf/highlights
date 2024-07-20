@@ -197,14 +197,46 @@ service / on new http:Listener(9090) {
     }
 
 
-    resource function post add_pomo_details() returns  PomoDetails{
+resource function post add_pomo_details(http:Caller caller, http:Request req) returns error? {
 
+    json|http:ClientError payload = req.getJsonPayload();
 
-        sql:ParameterizedQuery sqlQuery = ;
-
-
-        
+    if payload is http:ClientError {
+        log:printError("Error while parsing request payload (pomo_details)", 'error = payload);
+        check caller->respond(http:STATUS_BAD_REQUEST);
+        return;
     }
+
+    HighlightPomoDetails|error highlightPomoDetails = payload.cloneWithType(HighlightPomoDetails);
+    
+    if highlightPomoDetails is error {
+        log:printError("Error while converting JSON to HighlightPomoDetails", 'error = highlightPomoDetails);
+        check caller->respond(http:STATUS_BAD_REQUEST);
+        return;
+    }
+
+    // Convert time to MySQL compatible time format (if necessary)
+    string pomoDuration = highlightPomoDetails.pomo_duration.toString();
+    string shortBreakDuration = highlightPomoDetails.short_break_duration.toString();
+    string longBreakDuration = highlightPomoDetails.long_break_duration.toString();
+
+    sql:ExecutionResult|sql:Error result = self.db->execute(`
+        INSERT INTO HighlightPomoDetails (timer_id, highlight_id, pomo_duration, short_break_duration, long_break_duration, pomos_per_long_break, user_id) 
+        VALUES (${highlightPomoDetails.timer_id}, ${highlightPomoDetails.highlight_id}, ${pomoDuration}, ${shortBreakDuration}, ${longBreakDuration}, ${highlightPomoDetails.pomos_per_long_break}, ${highlightPomoDetails.user_id});
+    `);
+
+    if result is sql:Error {
+        log:printError("Error while inserting data into HighlightPomoDetails", 'error = result);
+        check caller->respond(http:STATUS_INTERNAL_SERVER_ERROR);
+        return;
+    }
+
+    check caller->respond(http:STATUS_OK);
+}
+
 
 
 }
+
+
+

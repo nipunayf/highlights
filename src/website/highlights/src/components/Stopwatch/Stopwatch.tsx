@@ -46,7 +46,7 @@ const HighlightMenu = ({ highlights, onHighlightSelect, closeMenu }: { highlight
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredHighlights = highlights.filter((highlight) =>
-    highlight.title.toLowerCase().includes(searchQuery.toLowerCase())
+    highlight.highlight_name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleSelect = (index: number) => {
@@ -70,7 +70,7 @@ const HighlightMenu = ({ highlights, onHighlightSelect, closeMenu }: { highlight
         <Menu>
           {filteredHighlights.map((highlight, index) => (
             <Menu.Item key={highlight.id} onClick={() => handleSelect(index)}>
-              {highlight.title}
+              {highlight.highlight_name}
             </Menu.Item>
           ))}
         </Menu>
@@ -207,7 +207,7 @@ const Stopwatch: React.FC = () => {
         <Menu withArrow opened={menuOpened} onChange={setMenuOpened}>
             <Menu.Target>
             <UserButton
-                label={selectedTask !== null && highlights ? highlights[selectedTask]?.title : "Focus"}
+                label={selectedTask !== null && highlights ? highlights[selectedTask]?.highlight_name : "Focus"}
                 styles={{
                   label: {
                     fontSize: '14px',

@@ -27,9 +27,9 @@ type Task record {|
 |};
 
 type Highlight record {|
-    string? id = null;
-    string title;
-    time:Utc? dueDate = null;
+    int highlight_id;
+    string highlight_name;
+    int user_id;
 |};
 
 type TimerDetails record {|
@@ -48,11 +48,7 @@ Task[] tasks = [
     {id: "3", title: "Task 3"}
 ];
 
-Highlight[] highlights = [
-    {id: "1", title: "Learning Ballerina"},
-    {id: "2", title: "React Project"},
-    {id: "3", title: "Exercise"}
-];
+
 
 // Define the configuration variables
 configurable string azureAdIssuer = ?;
@@ -117,15 +113,6 @@ service / on new http:Listener(9090) {
         return task;
     }
 
-    resource function get highlights() returns Highlight[] {
-        return highlights;
-    }
-
-    resource function post highlights(Highlight highlight) returns Highlight {
-        highlights.push({id: (highlights.length() + 1).toString(), title: highlight.title});
-        log:printInfo("Highlight added");
-        return highlight;
-    }
 
     resource function get timer_details() returns TimerDetails[]|error {
 
@@ -163,5 +150,40 @@ service / on new http:Listener(9090) {
 
         return timerDetailsList;
     }
+
+
+
+    // Function to get highlights from the database
+        resource function get highlights() returns Highlight[]|error {
+
+            sql:ParameterizedQuery sqlQuery = `SELECT highlight_id, highlight_name, user_id FROM hilights_hasintha`;
+
+            // Execute the query and retrieve the results
+            stream<record {| 
+                int highlight_id; 
+                string highlight_name; 
+                int user_id; 
+            |}, sql:Error?> resultStream = self.db->query(sqlQuery);
+
+            Highlight[] highlightList = [];
+
+            // Iterate over the results
+            check from var highlight in resultStream
+                do {
+                    log:printInfo("Retrieved Highlight: " + highlight.toString());
+                    highlightList.push({
+                        highlight_id: highlight.highlight_id,
+                        highlight_name: highlight.highlight_name,
+                        user_id: highlight.user_id
+                    });
+                };
+
+            io:println(highlightList);
+
+            return highlightList;
+    }
+
+    
+
 
 }

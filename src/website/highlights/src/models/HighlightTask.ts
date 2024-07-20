@@ -1,7 +1,7 @@
 import { HighlightTaskEntity } from "./HighlightTaskEntity";
 
 export interface HighlightTask extends HighlightTaskEntity {
-    title: string;
+    highlight_name: string;
     dueDate: Date | null;
 }
 

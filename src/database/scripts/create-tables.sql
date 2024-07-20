@@ -53,6 +53,12 @@ CREATE TABLE `timer_details` (
   `pomos_per_long_break` INT NOT NULL,
   `user_id` INTEGER NOT NULL
 );
+
+CREATE TABLE `hilights_hasintha` (
+  `highlight_id` integer,
+  `highlight_name`VARCHAR(255) NOT NULL,
+  `user_id` INTEGER NOT NULL
+);
   
 
 ALTER TABLE `highlights` ADD FOREIGN KEY (`event_id`) REFERENCES `events` (`id`);

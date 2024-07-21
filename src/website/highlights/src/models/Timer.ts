@@ -9,13 +9,24 @@ export interface mTimer {
 }
 
 export interface mPomo_details {
-          timer_id: string;
+          timer_id: number;
           highlight_id: string;
-          pomoDuration: TimeRanges;
-          shortBreakDuration: TimeRanges;
-          longBreakDuration: TimeRanges;
-          pomos_per_long_break : number;
-          user_id: string;
-
-}
+          pomo_duration: {
+              hour: number;
+              minute: number;
+              second: number;
+          };
+          short_break_duration: {
+              hour: number;
+              minute: number;
+              second: number;
+          };
+          long_break_duration: {
+              hour: number;
+              minute: number;
+              second: number;
+          };
+          pomos_per_long_break: number;
+          user_id: number;
+      }
 

@@ -3,12 +3,13 @@ import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import { showNotification } from '@mantine/notifications';
 import { IconInfoCircle, IconChevronRight, IconCalendarDue, IconHourglassHigh } from '@tabler/icons-react';
-import { Group, Avatar, Text, Menu, UnstyledButton, TextInput, Tabs } from '@mantine/core';
+import { Group, Avatar, Text, Menu, UnstyledButton, TextInput, Tabs, Modal, Button } from '@mantine/core';
 import styles from './Timer.module.css';
 import { useHighlights } from "@/hooks/useHighlights";
 import { useTimers } from '@/hooks/useTimer';
 import { HighlightTask } from "@/models/HighlightTask";
-import { mTimer,mPomo_details } from '@/models/Timer';
+import { mTimer, mPomo_details } from '@/models/Timer';
+import { sendTimerEndData } from "@/services/api";
 
 interface UserButtonProps {
   image?: string;
@@ -198,37 +199,123 @@ const Timer = () => {
   };
 
 
+  const endTimer = async () => {
+    // if (timerId) clearInterval(timerId);
+  
+    // // Ensure timerId is a number
+    // const currentTimerId = selectedTask !== null && timer_details
+    //   ? Number(timer_details[selectedTask]?.timer_id) // Convert to number
+    //   : -1; // Default value or handle as needed
+  
+    // // Handle cases where highlightId might be undefined
+    // const highlightId = selectedTask !== null && highlights
+    //   ? highlights[selectedTask]?.id || '' // Provide a default value or handle as needed
+    //   : ''; // Default to empty string if no task is selected
+  
+    // const pomoDuration = {
+    //   hour: Math.floor(WORK_TIME / 60),
+    //   minute: WORK_TIME % 60,
+    //   second: 0
+    // };
+    // const shortBreakDuration = {
+    //   hour: Math.floor(SHORT_BREAK / 60),
+    //   minute: SHORT_BREAK % 60,
+    //   second: 0
+    // };
+    // const longBreakDuration = {
+    //   hour: Math.floor(LONG_BREAK / 60),
+    //   minute: LONG_BREAK % 60,
+    //   second: 0
+    // };
+    // const userId = 1; // Replace with actual user ID if available
+  
+    // const pomoDetails = {
+    //   timer_id: currentTimerId, // Ensure this is a number
+    //   highlight_id: highlightId,
+    //   pomo_duration: pomoDuration,
+    //   short_break_duration: shortBreakDuration,
+    //   long_break_duration: longBreakDuration,
+    //   pomos_per_long_break: CYCLES_BEFORE_LONG_BREAK,
+    //   user_id: userId
+    // };
 
-  const endTimer = () => {
-    if (timerId) clearInterval(timerId);
+    const pomoDetails = {
+      timer_id: 1234, // Example timer ID (ensure it's a number)
+      highlight_id: 'abc123', // Example highlight ID (string)
+      pomo_duration: {
+        hour: 0, // Example duration in hours
+        minute: 25, // Example duration in minutes
+        second: 0 // Example duration in seconds
+      },
+      short_break_duration: {
+        hour: 0,
+        minute: 5,
+        second: 0
+      },
+      long_break_duration: {
+        hour: 0,
+        minute: 15,
+        second: 0
+      },
+      pomos_per_long_break: 4, // Example number of Pomodoros before a long break
+      user_id: 1 // Example user ID
+    };
+    
+  
+    try {
+      await sendTimerEndData(pomoDetails);
+      showNotification({
+        title: 'Timer Ended',
+        message: 'The timer has been reset to the beginning and details have been sent.',
+        icon: <IconInfoCircle />,
+        color: 'blue',
+        autoClose: 3000,
+        radius: 'md',
+        styles: (theme) => ({
+          root: {
+            backgroundColor: theme.colors.blue[6],
+            borderColor: theme.colors.blue[6],
+            '&::before': { backgroundColor: theme.white },
+          },
+          title: { color: theme.white },
+          description: { color: theme.white },
+          closeButton: {
+            color: theme.white,
+            '&:hover': { backgroundColor: theme.colors.blue[7] },
+          },
+        }),
+      });
+    } catch (error) {
+      showNotification({
+        title: 'Error',
+        message: 'Failed to send timer details.',
+        icon: <IconInfoCircle />,
+        color: 'red',
+        autoClose: 3000,
+        radius: 'md',
+        styles: (theme) => ({
+          root: {
+            backgroundColor: theme.colors.red[6],
+            borderColor: theme.colors.red[6],
+            '&::before': { backgroundColor: theme.white },
+          },
+          title: { color: theme.white },
+          description: { color: theme.white },
+          closeButton: {
+            color: theme.white,
+            '&:hover': { backgroundColor: theme.colors.red[7] },
+          },
+        }),
+      });
+    }
+  
     setActive('focus');
     setMinCount(WORK_TIME);
     setCount(0);
     setPaused(true);
     setStarted(false);
-    showNotification({
-      title: 'Timer Ended',
-      message: 'The timer has been reset to the beginning.',
-      icon: <IconInfoCircle />,
-      color: 'blue',
-      autoClose: 3000,
-      radius: 'md',
-      styles: (theme) => ({
-        root: {
-          backgroundColor: theme.colors.blue[6],
-          borderColor: theme.colors.blue[6],
-          '&::before': { backgroundColor: theme.white },
-        },
-        title: { color: theme.white },
-        description: { color: theme.white },
-        closeButton: {
-          color: theme.white,
-          '&:hover': { backgroundColor: theme.colors.blue[7] },
-        },
-      }),
-    });
-  1
   };
+  
 
   const totalSeconds = minCount * 60 + count;
   const initialTotalSeconds = active === 'focus'

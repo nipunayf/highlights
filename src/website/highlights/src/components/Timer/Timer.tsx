@@ -4,7 +4,6 @@ import 'react-circular-progressbar/dist/styles.css';
 import { showNotification } from '@mantine/notifications';
 import { IconInfoCircle, IconChevronRight, IconCalendarDue, IconHourglassHigh } from '@tabler/icons-react';
 import { Group, Avatar, Text, Menu, UnstyledButton, TextInput, Tabs } from '@mantine/core';
-import axios from 'axios';  // Import axios
 import styles from './Timer.module.css';
 import { useHighlights } from "@/hooks/useHighlights";
 import { useTimers } from '@/hooks/useTimer';
@@ -195,29 +194,10 @@ const Timer = () => {
       color: 'teal',
     });
 
-    sendEndData();  // Send data to backend when the timer ends
+    
   };
 
-  const sendEndData = async () => {
-    console.log('hello world');
-    try {
-      const response = await axios.post('/api/sendTimerEndData', {
-        
-        active,
-        minCount,
-        count,
-        paused,
-        started,
-        cycles,
-        selectedTask,
-      });
-      console.log('iiiiiiiii');
-      console.log(response.data);
-    } catch (error) {
-      console.log('uuuuuuu');
-      console.error('Error sending data to backend:', error);
-    }
-  };
+
 
   const endTimer = () => {
     if (timerId) clearInterval(timerId);
@@ -247,9 +227,7 @@ const Timer = () => {
         },
       }),
     });
-    // console.log('hello world');
-    sendEndData();  // Send data to backend when the timer ends
-    // console.log('hello world');
+  1
   };
 
   const totalSeconds = minCount * 60 + count;

@@ -2,7 +2,7 @@ import { apiEndpoint } from "@/apiConfig";
 import { aquireAccessToken } from "@/util/auth";
 import { Task } from "@/models/Task";
 import { HighlightTask } from "@/models/HighlightTask";
-import { mTimer } from "@/models/Timer";
+import { mTimer,mPomo_details } from "@/models/Timer";
 import axios, { AxiosInstance } from "axios";
 
 function getAxiosClient(route: string): AxiosInstance {
@@ -53,18 +53,20 @@ export async function getTimerDetails(): Promise<mTimer[]> {
     return response.data;
 }
 
-// New function to send timer end data
 export async function sendTimerEndData(timerData: {
-    active: string,
-    minCount: number,
-    count: number,
-    paused: boolean,
-    started: boolean,
-    cycles: number,
-    selectedTask: number | null
-}): Promise<void> {
-    await getAxiosClient('add_pomo_details').request({
+    timer_id: number;
+    highlight_id: string;
+    pomo_duration: string;  // Adjusted to string, assuming TimeOfDay is represented as a string
+    short_break_duration: string;  // Adjusted to string, assuming TimeOfDay is represented as a string
+    long_break_duration: string;  // Adjusted to string, assuming TimeOfDay is represented as a string
+    pomos_per_long_break: number;
+    user_id: number;
+}): Promise<mPomo_details> {
+    const response = await getAxiosClient('add_pomo_details').request({
         method: 'POST',
         data: timerData
     });
+
+    return response.data;
+
 }

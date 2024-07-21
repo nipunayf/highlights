@@ -63,12 +63,13 @@ CREATE TABLE `hilights_hasintha` (
 CREATE TABLE `HighlightPomoDetails` (
   `timer_id` INTEGER,
   `highlight_id` VARCHAR(255) NOT NULL,
-  `pomo_duration` TIME,
-  `short_break_duration` TIME,
-  `long_break_duration` TIME,
+  `pomo_duration` TIME DEFAULT '00:00:00',
+  `short_break_duration` TIME DEFAULT '00:00:00',
+  `long_break_duration` TIME DEFAULT '00:00:00',
   `pomos_per_long_break` INTEGER,
   `user_id` INTEGER NOT NULL
 );
+
 
   
 

@@ -63,7 +63,7 @@ CREATE TABLE `hi` (
   
 );
 
-CREATE TABLE `hi` (
+CREATE TABLE `his` (
   `id` INTEGER PRIMARY KEY AUTO_INCREMENT,
   `title` VARCHAR(512),
   `Date` DATE,
@@ -73,10 +73,10 @@ CREATE TABLE `hi` (
   `priority` VARCHAR(255),
   `description` TEXT,
   `status` VARCHAR(1) DEFAULT '0',
-  `parent_id` INTEGER
-  -- `type` VARCHAR(255) DEFAULT 'MAIN TASK'
-  
+  `parent_id` INTEGER,
+  FOREIGN KEY (`parent_id`) REFERENCES `hi` (`id`)
 );
+
 
 
 

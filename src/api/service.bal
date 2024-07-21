@@ -36,9 +36,21 @@ type Task record {
     string? endTime;
     string? reminder;
     string priority;
+    //  SubTask[] subTasks;
+    // int? parentTaskId;
     // Task[] subTasks;
 };
 
+type SubTask record{
+    string title;
+    string description;
+    string? dueDate;
+    string? startTime;
+    string? endTime;
+    string? reminder;
+    string priority;
+    int parentTaskId;
+};
 
 // Task[] tasks = [
 //     {id: "1", title: "Task 1"},
@@ -227,10 +239,39 @@ resource function put tasks/[int taskId](http:Caller caller, http:Request req) r
     }
 
 
-    resource function post subtasks/[int taskId]() {
-        io:println(taskId);
-        
+    resource function post subtasks(http:Caller caller, http:Request req) returns error? {
+        json|http:ClientError payload = req.getJsonPayload();
+        if payload is http:ClientError {
+            log:printError("Error while parsing request payload", 'error = payload);
+            check caller->respond(http:STATUS_BAD_REQUEST);
+            return;
+        }
+
+        SubTask|error task = payload.cloneWithType(SubTask);
+        if task is error {
+            log:printError("Error while converting JSON to Task", 'error = task);
+            check caller->respond(http:STATUS_BAD_REQUEST);
+            return;
+        }
+
+        // Convert ISO 8601 date to MySQL compatible date format
+        string dueDate = task.dueDate != () ? formatDateTime(task.dueDate.toString()) : "";
+        string startTime = task.startTime != () ? formatTime(task.startTime.toString()) : "";
+        string endTime = task.endTime != () ? formatTime(task.endTime.toString()) : "";
+
+        sql:ExecutionResult|sql:Error result = self.db->execute(`
+            INSERT INTO his (title, Date, start_time, end_time, reminder, priority, description, parent_id) 
+            VALUES (${task.title}, ${dueDate}, ${startTime}, ${endTime}, ${task.reminder}, ${task.priority}, ${task.description}, ${task.parentTaskId});
+        `);
+
+        if result is sql:Error {
+            log:printError("Error occurred while inserting task", 'error = result);
+            check caller->respond(http:STATUS_INTERNAL_SERVER_ERROR);
+        } else {
+            check caller->respond(http:STATUS_CREATED);
+        }
     }
+
 
 
    

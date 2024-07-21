@@ -58,11 +58,28 @@ CREATE TABLE `hi` (
   `reminder` VARCHAR(255),
   `priority` VARCHAR(255),
   `description` TEXT,
-  `status` VARCHAR(1) DEFAULT '0',
-  `type` VARCHAR(255) DEFAULT 'MAIN TASK',
-  `parent_id` INTEGER,
-  FOREIGN KEY (`parent_id`) REFERENCES `hi`(`id`) ON DELETE CASCADE
+  `status` VARCHAR(1) DEFAULT '0'
+  -- `type` VARCHAR(255) DEFAULT 'MAIN TASK'
+  
 );
+
+CREATE TABLE `hi` (
+  `id` INTEGER PRIMARY KEY AUTO_INCREMENT,
+  `title` VARCHAR(512),
+  `Date` DATE,
+  `start_time` TIME,
+  `end_time` TIME,
+  `reminder` VARCHAR(255),
+  `priority` VARCHAR(255),
+  `description` TEXT,
+  `status` VARCHAR(1) DEFAULT '0',
+  `parent_id` INTEGER
+  -- `type` VARCHAR(255) DEFAULT 'MAIN TASK'
+  
+);
+
+
+
 
 
 

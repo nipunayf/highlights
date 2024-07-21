@@ -2,12 +2,12 @@ import React, { useState, useRef } from 'react';
 import { Modal, TextInput, Button, Textarea, Select, ActionIcon, rem, Text } from '@mantine/core';
 import { DatePicker, TimeInput } from '@mantine/dates';
 import { IconClock, IconX } from '@tabler/icons-react';
-import { createTask as createApiTask } from '@/services/api';
+import { addsubtask } from '@/services/api';
 
 interface AddSubtaskPopupProps {
   open: boolean;
   onClose: () => void;
-  parentTaskId: number | null; 
+  parentTaskId: number | null;
 }
 
 interface Task {
@@ -18,6 +18,7 @@ interface Task {
   endTime: string;
   reminder: string;
   priority: string;
+  parentTaskId: number | null;
 }
 
 interface ApiTask {
@@ -28,9 +29,10 @@ interface ApiTask {
   endTime: string;
   reminder: string;
   priority: string;
+  parentTaskId: number | null;
 }
 
-export default function AddSubtaskPopup({ open, onClose, parentTaskId }: AddSubtaskPopupProps) {
+const AddSubtaskPopup: React.FC<AddSubtaskPopupProps> = ({ open, onClose, parentTaskId }) => {
   const [formState, setFormState] = useState({
     title: '',
     description: '',
@@ -75,6 +77,7 @@ export default function AddSubtaskPopup({ open, onClose, parentTaskId }: AddSubt
       endTime: endTime,
       reminder: formState.reminder,
       priority: formState.priority,
+      parentTaskId: parentTaskId,
     };
 
     const apiSubtask: ApiTask = {
@@ -88,7 +91,7 @@ export default function AddSubtaskPopup({ open, onClose, parentTaskId }: AddSubt
     console.log("API Subtask:", apiSubtask);
 
     try {
-      await createApiTask(apiSubtask as any);
+      await addsubtask(apiSubtask as any);
 
       setFormState({
         title: '',
@@ -220,4 +223,6 @@ export default function AddSubtaskPopup({ open, onClose, parentTaskId }: AddSubt
       </form>
     </Modal>
   );
-}
+};
+
+export default AddSubtaskPopup;

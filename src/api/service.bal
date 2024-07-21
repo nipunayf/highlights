@@ -217,13 +217,19 @@ resource function put tasks/[int taskId](http:Caller caller, http:Request req) r
         sql:ExecutionResult|sql:Error result = self.db->execute(`
             DELETE FROM hi WHERE id = ${taskId};
         `);
-
+   
         if result is sql:Error {
             log:printError("Error occurred while deleting task", result);
             check caller->respond(http:STATUS_INTERNAL_SERVER_ERROR);
         } else {
             check caller->respond(http:STATUS_OK);
         }
+    }
+
+
+    resource function post subtasks/[int taskId]() {
+        io:println(taskId);
+        
     }
 
 

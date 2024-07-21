@@ -80,3 +80,19 @@ export async function deleteTask(taskId: number): Promise<void> {
         throw error;
     }
 }
+
+
+export async function addsubtask(taskId: number): Promise<void> {
+    console.log("Deleting task with ID:", taskId);
+    try {
+        const client = getAxiosClient('subtasks');
+        await client.request<void>({
+            method: 'post',
+            url: `/${taskId}` // Ensure the URL includes the task ID
+        });
+        console.log("Add subtask");
+    } catch (error) {
+        console.error("Error adding task:", error);
+        throw error;
+    }
+}

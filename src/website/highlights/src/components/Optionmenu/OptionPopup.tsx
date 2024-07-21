@@ -24,13 +24,13 @@ const SubMenu: React.FC<SubMenuProps> = ({ opened, onClose }) => (
 interface OptionsMenuProps {
   onOpenPopup: () => void;
   onUpdateClick: () => void;
-  onDelete: () => void; // Define the prop if it's used for update functionality
+  onDelete: () => void;
 }
 
 const OptionsMenu: React.FC<OptionsMenuProps> = ({ onOpenPopup, onUpdateClick, onDelete }) => {
   const [opened, setOpened] = useState(false);
   const [submenuOpened, setSubmenuOpened] = useState(false);
-  const buttonRef = useRef<HTMLButtonElement>(null); // Define ref type explicitly
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   const handleClose = (action?: string) => {
     setOpened(false);
@@ -68,7 +68,7 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({ onOpenPopup, onUpdateClick, o
         <Button
           color="#F0F4F5"
           onClick={() => setOpened((o) => !o)}
-          ref={buttonRef} // Assign the ref here
+          ref={buttonRef}
         >
           <FontAwesomeIcon icon={faEllipsis} style={{ color: 'black' }} />
         </Button>
@@ -78,7 +78,7 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({ onOpenPopup, onUpdateClick, o
         <Menu.Item
           onClick={() => {
             handleClose();
-            onUpdateClick(); // Call the update function passed from parent component
+            onUpdateClick();
           }}
         >
           Update

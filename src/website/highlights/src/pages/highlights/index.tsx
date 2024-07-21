@@ -9,21 +9,23 @@ import AddtaskPopup from "@/components/AddTask/AddtaskPopup";
 import OptionsMenu from "@/components/Optionmenu/OptionPopup";
 import AlertDialogSlide from "@/components/Feedback/AlertDialogSlide";
 import UpdateTaskPopup from "@/components/UpdateTask/UpdateTaskPopup";
+import AddSubtaskPopup from "@/components/AddTask/AddSubtaskPopup"; // Import the AddSubtaskPopup component
 import classes from "./ActionsGrid.module.css";
 import { useTasks } from "@/hooks/useTasks";
 import { Task } from "@/models/Task";
 import { deleteTask } from '@/services/api';
-// import { deleteTask } from "@/api";
 
 function ActionsGrid() {
   const theme = useMantineTheme();
   const [popupOpen, setPopupOpen] = useState(false);
   const [updatePopupOpen, setUpdatePopupOpen] = useState(false);
+  const [subtaskPopupOpen, setSubtaskPopupOpen] = useState(false); // State for the AddSubtaskPopup
   const [confettiActive, setConfettiActive] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [currentTask, setCurrentTask] = useState<{ id: number, title: string } | null>(null);
   const [completedTask, setCompletedTask] = useState<{ id: number, title: string } | null>(null);
   const [taskToUpdate, setTaskToUpdate] = useState<Task | null>(null);
+  const [parentTaskId, setParentTaskId] = useState<number | null>(null); // State to store the parent task ID for the subtask
 
   const handleCardClick = () => {
     setPopupOpen(true);
@@ -63,6 +65,16 @@ function ActionsGrid() {
   const handleUpdateClose = () => {
     setUpdatePopupOpen(false);
     setTaskToUpdate(null);
+  };
+
+  const handleOpenSubtaskPopup = (taskId: number) => {
+    setParentTaskId(taskId);
+    setSubtaskPopupOpen(true);
+  };
+
+  const handleCloseSubtaskPopup = () => {
+    setSubtaskPopupOpen(false);
+    setParentTaskId(null);
   };
 
   const { tasks, isLoading, isError } = useTasks();
@@ -107,7 +119,11 @@ function ActionsGrid() {
                   </div>
                 </div>
                 <div className={classes.bars_icon}>
-                  <OptionsMenu onOpenPopup={handleCardClick} onUpdateClick={() => handleUpdateClick(task)} onDelete={() => handleDelete(task.id)} />
+                  <OptionsMenu
+                    onOpenPopup={() => handleOpenSubtaskPopup(task.id)}
+                    onUpdateClick={() => handleUpdateClick(task)}
+                    onDelete={() => handleDelete(task.id)}
+                  />
                 </div>
               </div>
               <br />
@@ -136,6 +152,12 @@ function ActionsGrid() {
           console.log('Updated Task:', updatedTask);
         }} />
       )}
+
+      <AddSubtaskPopup
+        open={subtaskPopupOpen}
+        onClose={handleCloseSubtaskPopup}
+        parentTaskId={parentTaskId}
+      />
     </>
   );
 }

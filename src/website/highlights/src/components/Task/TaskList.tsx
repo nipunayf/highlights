@@ -1,19 +1,15 @@
-import { useTasks } from "@/hooks/useTasks";
+import { useAppSelector } from "@/hooks";
 import type { Task } from "@/models/Task";
 import type { TaskList } from "@/models/TaskList";
-import { taskListState } from "@/recoil_state";
-import { useRecoilValue } from "recoil";
 
 export default function TaskList() {
-    const taskLists = useRecoilValue(taskListState);
+    const tasks = useAppSelector(state => state.tasks);
 
     return (
         <>
             <ul>
-                {taskLists?.map((list: TaskList) => (
-                    list.tasks.map((task: Task) => (
-                        <li key={task.id}>{task.title}</li>
-                    ))
+                {tasks.map((task: Task) => (
+                    <li key={task.id}>{task.title}</li>
                 ))}
             </ul>
         </>

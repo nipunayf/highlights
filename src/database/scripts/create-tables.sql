@@ -68,13 +68,13 @@ CREATE TABLE `his` (
   `title` VARCHAR(512),
   `dueDate` DATE,
   `startTime` TIME,
-  ` endTime` TIME,
+  `endTime` TIME,
   `reminder` VARCHAR(255),
   `priority` VARCHAR(255),
   `description` TEXT,
   `status` VARCHAR(1) DEFAULT '0',
-  `parent_id` INTEGER,
-  FOREIGN KEY (`parent_id`) REFERENCES `hi` (`id`)
+  `parentTaskId` INTEGER,
+  FOREIGN KEY (`parentTaskId`) REFERENCES `hi` (`id`)
 );
 
 

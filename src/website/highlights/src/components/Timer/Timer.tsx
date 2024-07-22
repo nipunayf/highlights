@@ -198,16 +198,14 @@ const Timer = () => {
   };
 
   const endTimer = () => {
-    // Open modal instead of directly sending data
-    setModalOpened(true);
+    if (timerId) clearInterval(timerId); // Ensure the timer is stopped
+    setModalOpened(true); // Open modal instead of directly sending data
   };
 
   const handleEndTimerConfirm = async (isTaskComplete: boolean) => {
     setModalOpened(false);
 
     if (isTaskComplete) {
-      if (timerId) clearInterval(timerId);
-
       // Ensure timerId is a number
       const currentTimerId = selectedTask !== null && timer_details
         ? Number(timer_details[selectedTask]?.timer_id) // Convert to number
@@ -215,8 +213,8 @@ const Timer = () => {
     
       // Handle cases where highlightId might be undefined
       const highlightId = selectedTask !== null && highlights
-        ? highlights[selectedTask]?.id || '' // Provide a default value or handle as needed
-        : ''; // Default to empty string if no task is selected
+        ? highlights[selectedTask]?.id || '4' // Provide a default value or handle as needed
+        : '2'; // Default to empty string if no task is selected
     
       const pomoDuration = {
         hour: Math.floor(WORK_TIME / 60),
@@ -233,7 +231,7 @@ const Timer = () => {
         minute: LONG_BREAK % 60,
         second: 0
       };
-      const userId = 1; // Replace with actual user ID if available
+      const userId = 11; // Replace with actual user ID if available
       
       const pomoDetails = {
         timer_id: currentTimerId, // Ensure this is a number
@@ -397,6 +395,7 @@ const Timer = () => {
           <Button color="green" onClick={() => handleEndTimerConfirm(true)}>Yes</Button>
           <Button color="red" onClick={() => handleEndTimerConfirm(false)}>No</Button>
         </Group>
+
       </Modal>
     </div>
   );

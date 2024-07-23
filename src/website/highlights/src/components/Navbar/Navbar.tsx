@@ -7,10 +7,11 @@ import {
     rem,
     Space,
 } from '@mantine/core';
-import { IconBulb, IconUser, IconCheckbox, IconPlus, IconChartDots2, IconCalendarMonth , IconBellRinging,IconTie,IconAlarm} from '@tabler/icons-react';
+import { IconBulb, IconUser, IconCheckbox, IconPlus, IconChartDots2, IconCalendarMonth, IconTie, IconAlarm } from '@tabler/icons-react';
 import classes from './Navbar.module.css';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
 
 const links = [
     { icon: IconBulb, label: 'Highlights', path: '/highlights' },
@@ -21,7 +22,6 @@ const links = [
     { icon: IconUser, label: 'Profile', path: '/profile' },
     { icon: IconTie, label: 'Dailytips', path: '/dailytips' },
     // { icon: IconBellRinging, label: 'Notification', path: '/notification' },
-    
 ];
 
 const collections = [
@@ -37,7 +37,16 @@ const collections = [
 ];
 
 export default function Navbar() {
-    const [active, setActive] = useState('Billing');
+    const router = useRouter();
+    const [active, setActive] = useState('Highlights');
+
+    useEffect(() => {
+        const currentPath = router.pathname;
+        const currentSection = links.find(item => item.path === currentPath);
+        if (currentSection) {
+            setActive(currentSection.label);
+        }
+    }, [router.pathname]);
 
     const mainLinks = links.map((link) => (
         <UnstyledButton

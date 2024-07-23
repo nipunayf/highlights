@@ -60,18 +60,33 @@ CREATE TABLE `hilights_hasintha` (
   `user_id` INTEGER NOT NULL
 );
 
+-- CREATE TABLE `HighlightPomoDetails` (
+--   `timer_id` INTEGER,
+--   `highlight_id` VARCHAR(255) NOT NULL,
+--   `pomo_duration` TIME DEFAULT '00:00:00',
+--   `short_break_duration` TIME DEFAULT '00:00:00',
+--   `long_break_duration` TIME DEFAULT '00:00:00',
+--   `pomos_per_long_break` INTEGER,
+--   `user_id` INTEGER NOT NULL
+-- );
+
 CREATE TABLE `HighlightPomoDetails` (
   `timer_id` INTEGER,
-  `highlight_id` VARCHAR(255) NOT NULL,
-  `pomo_duration` TIME DEFAULT '00:00:00',
-  `short_break_duration` TIME DEFAULT '00:00:00',
-  `long_break_duration` TIME DEFAULT '00:00:00',
-  `pomos_per_long_break` INTEGER,
-  `user_id` INTEGER NOT NULL
+  `highlight_id` INT AUTO_INCREMENT PRIMARY KEY,
+  `user_id` INTEGER NOT NULL,
+  `start_time` DATETIME,
+  `end_time` DATETIME,
+  `status` ENUM('complete', 'uncomplete') DEFAULT 'uncomplete',
+  -- `pauses_time_slots` DATETIME
+);
+CREATE TABLE `PausesPomoDetails` (
+  `pauses_pomo_id` INT AUTO_INCREMENT PRIMARY KEY,
+  `highlight_id` INT ,
+  `pause_time` INTEGER NOT NULL,
+  `continue_time` DATETIME,
+  
 );
 
-
-  
 
 ALTER TABLE `highlights` ADD FOREIGN KEY (`event_id`) REFERENCES `events` (`id`);
 

@@ -1,7 +1,8 @@
-import { createAsyncThunk, createEntityAdapter, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, createEntityAdapter, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '@/store';
 import { Highlight } from '@/models/Highlight';
 import { taskCompleted, taskUncompleted } from '../tasks/tasksSlice';
+import { getHighlights } from '@/services/api';
 
 const defaultState: Highlight[] = [
     { id: 'highlight1', title: 'Finish project proposal', date: new Date('2024-07-25').toISOString(), completed: false, taskIds: ['task1', 'task5'], created: new Date().toISOString() },
@@ -14,10 +15,21 @@ const highlightsAdapter = createEntityAdapter<Highlight>({
     sortComparer: (a, b) => b.created.localeCompare(a.created)
 });
 
-const initialState = highlightsAdapter.getInitialState({
+interface HighlightsState extends EntityState<Highlight, string> {
+    status: 'idle' | 'loading' | 'succeeded' | 'failed';
+    error: string | undefined;
+}
+
+const initialState: HighlightsState = highlightsAdapter.getInitialState({
     status: 'idle',
-    error: null
+    error: undefined
 }, defaultState);
+
+export const fetchHighlights = createAsyncThunk('highlights/fetchHighlights', async () => {
+    const response = await getHighlights();
+    console.log(response.data);
+    return response.data;
+})
 
 export const completeTasksForHighlight = createAsyncThunk(
     'highlights/completeTasksForHighlight',
@@ -78,6 +90,20 @@ export const highlightsSlice = createSlice({
                 highlight.taskIds = highlight.taskIds.filter(id => id !== taskId);
             }
         }
+    },
+    extraReducers(builder) {
+        builder
+            .addCase(fetchHighlights.pending, (state, action) => {
+                state.status = 'loading';
+            })
+            .addCase(fetchHighlights.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+                highlightsAdapter.upsertMany(state, action.payload);
+            })
+            .addCase(fetchHighlights.rejected, (state, action) => {
+                state.status = 'failed';
+                state.error = action.error.message;
+            })
     }
 })
 

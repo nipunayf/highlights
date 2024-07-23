@@ -2,6 +2,7 @@ import { apiEndpoint } from "@/apiConfig";
 import { aquireAccessToken } from "@/util/auth";
 import { Task } from "@/models/Task";
 import axios, { AxiosInstance } from "axios";
+import { Highlight } from "@/models/Highlight";
 
 function getAxiosClient(route: string): AxiosInstance {
     const client = axios.create({
@@ -33,4 +34,12 @@ export async function createTask(task: Task): Promise<Task> {
     });
 
     return response.data;
+}
+
+export async function getHighlights() {
+    const response = await getAxiosClient('highlights').request<Highlight[]>({
+        method: 'GET'
+    });
+
+    return response;
 }

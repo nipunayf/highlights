@@ -28,9 +28,7 @@ export function HighlightActionsMenu({ highlight, onModifyHighlight }: Highlight
 
             <Menu.Dropdown>
                 <Menu.Item onClick={() => onModifyHighlight(highlight)}>Modify</Menu.Item>
-                <Menu.Item>Add Task</Menu.Item>
                 <Menu.Item onClick={() => handleRemove(highlight.id)}>Remove</Menu.Item>
-                <Menu.Item>Start Focus</Menu.Item>
             </Menu.Dropdown>
         </Menu>
     );

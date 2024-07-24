@@ -20,8 +20,8 @@ const links = [
     { icon: IconChartDots2, label: 'Analytics', path: '/analytics' },
     { icon: IconUser, label: 'Profile', path: '/profile' },
     { icon: IconTie, label: 'Dailytips', path: '/dailytips' },
+    { icon: IconBellRinging, label: 'Projects', path: '/projects' },
     // { icon: IconBellRinging, label: 'Notification', path: '/notification' },
-    
 ];
 
 const collections = [

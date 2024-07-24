@@ -28,7 +28,9 @@ type User record {|
 
 
 
-type Task record {
+// type Task record {
+type Task record {|
+    int id;
     string title;
     string description;
     string? dueDate;
@@ -36,12 +38,11 @@ type Task record {
     string? endTime;
     string? reminder;
     string priority;
-    // Task[] subTasks;
-};
+    SubTask[] subTasks;
+|};
 
-
-
-type SubTask record {
+type SubTask record {|
+    int id;
     string title;
     string description;
     string? dueDate;
@@ -50,8 +51,31 @@ type SubTask record {
     string? reminder;
     string priority;
     int parentTaskId;
-    // Task[] subTasks;
-};
+|};
+
+
+type CreateTask record {|
+    string title;
+    string description;
+    string? dueDate;
+    string? startTime;
+    string? endTime;
+    string? reminder;
+    string priority;
+|};
+
+type CreateSubTask record {|
+    string title;
+    string description;
+    string? dueDate;
+    string? startTime;
+    string? endTime;
+    string? reminder;
+    string priority;
+    int parentTaskId;
+|};
+
+
 
 
 
@@ -124,24 +148,111 @@ service / on new http:Listener(9090) {
         return http:INTERNAL_SERVER_ERROR;
     }
 
-    resource function get tasks() returns Task[]|error {
-        sql:ParameterizedQuery query = `SELECT id,title, dueDate, startTime, endTime, reminder, priority, description FROM hi`;
-        stream<Task, sql:Error?> resultStream = self.db->query(query);
+resource function get tasks() returns Task[]|error {
+    // Fetch all tasks
+    sql:ParameterizedQuery taskQuery = `SELECT id, title, description, dueDate, startTime, endTime, reminder, priority FROM hi`;
+    stream<record {|
+        int id;
+        string title;
+        string description;
+        string? dueDate;
+        string? startTime;
+        string? endTime;
+        string? reminder;
+        string priority;
+    |}, sql:Error?> taskStream = self.db->query(taskQuery);
 
-        Task[] tasksList = [];
-        error? e = resultStream.forEach(function(Task task) {
-            tasksList.push(task);
-        });
+    Task[] taskList = [];
+    error? taskError = taskStream.forEach(function(record {|
+        int id;
+        string title;
+        string description;
+        string? dueDate;
+        string? startTime;
+        string? endTime;
+        string? reminder;
+        string priority;
+    |} dbTask) {
+        // Create a Task object from the database record
+        Task task = {
+            id: dbTask.id,
+            title: dbTask.title,
+            description: dbTask.description,
+            dueDate: dbTask.dueDate,
+            startTime: dbTask.startTime,
+            endTime: dbTask.endTime,
+            reminder: dbTask.reminder,
+            priority: dbTask.priority,
+            subTasks: [] // Ensure subTasks is always an initialized array
+        };
+        taskList.push(task);
+    });
 
-        if (e is error) {
-            log:printError("Error occurred while fetching tasks: ", 'error = e);
-            return e;
-        }
-// io:print(tasklist);
-// io:println(tasksList);
-        return tasksList;
+    if (taskError is error) {
+        log:printError("Error occurred while fetching tasks: ", 'error = taskError);
+        return taskError;
     }
 
+    // Fetch all subtasks
+    sql:ParameterizedQuery subTaskQuery = `SELECT id, title, description, dueDate, startTime, endTime, reminder, priority, parentTaskId FROM his`;
+    stream<record {|
+        int id;
+        string title;
+        string description;
+        string? dueDate;
+        string? startTime;
+        string? endTime;
+        string? reminder;
+        string priority;
+        int parentTaskId;
+    |}, sql:Error?> subTaskStream = self.db->query(subTaskQuery);
+
+    error? subTaskError = subTaskStream.forEach(function(record {|
+        int id;
+        string title;
+        string description;
+        string? dueDate;
+        string? startTime;
+        string? endTime;
+        string? reminder;
+        string priority;
+        int parentTaskId;
+    |} dbSubTask) {
+        // Create a SubTask object from the database record
+        SubTask subTask = {
+            id: dbSubTask.id,
+            title: dbSubTask.title,
+            description: dbSubTask.description,
+            dueDate: dbSubTask.dueDate,
+            startTime: dbSubTask.startTime,
+            endTime: dbSubTask.endTime,
+            reminder: dbSubTask.reminder,
+            priority: dbSubTask.priority,
+            parentTaskId: dbSubTask.parentTaskId
+        };
+        // Find the parent task and add this subtask to its subTasks array
+        foreach var task in taskList {
+            if (task.id == dbSubTask.parentTaskId) {
+                task.subTasks.push(subTask); // Push the subTask to the array
+                break;
+            }
+        }
+    });
+
+    if (subTaskError is error) {
+        log:printError("Error occurred while fetching subtasks: ", 'error = subTaskError);
+        return subTaskError;
+    }
+    io:println(taskList);
+
+    return taskList;
+}
+
+
+
+
+
+   
    
  resource function post tasks(http:Caller caller, http:Request req) returns error? {
     json|http:ClientError payload = req.getJsonPayload();
@@ -151,7 +262,7 @@ service / on new http:Listener(9090) {
         return;
     }
 
-    Task|error task = payload.cloneWithType(Task);
+    CreateTask|error task = payload.cloneWithType(CreateTask);
     if task is error {
         log:printError("Error while converting JSON to Task", 'error = task);
         check caller->respond(http:STATUS_BAD_REQUEST);
@@ -244,7 +355,7 @@ resource function put tasks/[int taskId](http:Caller caller, http:Request req) r
             return;
         }
 io:println(payload);
-        SubTask|error subTask = payload.cloneWithType(SubTask);
+        CreateSubTask|error subTask = payload.cloneWithType(CreateSubTask);
         if subTask is error {
             log:printError("Error while converting JSON to SubTask", 'error = subTask);
             check caller->respond(http:STATUS_BAD_REQUEST);

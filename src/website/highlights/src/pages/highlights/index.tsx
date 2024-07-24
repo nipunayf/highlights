@@ -114,7 +114,7 @@ function ActionsGrid() {
                   <div className={classes.task_name}>
                     <h3>{task.title}</h3>
                     <div className={classes.task_date}>
-                      <p>{task.Date?.toString()}</p>
+                      <p>{task.dueDate?.toString()}</p>
                     </div>
                   </div>
                 </div>

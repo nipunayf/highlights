@@ -1,5 +1,3 @@
-import { taskAdded } from '@/features/tasks/tasksSlice';
-import { useAppDispatch } from '@/hooks';
 import { createTask } from '@/services/api';
 import { Box, Button, Group, Menu, TextInput, rem } from '@mantine/core';
 import { DatePicker } from '@mantine/dates';
@@ -7,9 +5,6 @@ import { useForm } from '@mantine/form';
 import { IconPlus } from '@tabler/icons-react';
 
 export default function TaskForm() {
-
-    const dispatch = useAppDispatch();
-
     const form = useForm({
         mode: 'uncontrolled',
         initialValues: {
@@ -22,17 +17,8 @@ export default function TaskForm() {
         },
     });
 
-    const handleAddTask = (values: any) => {
-        // createTask({ ...values, completed: false });
-        values.id = Math.random().toString(36);
-        values.created = new Date().toISOString();
-        values.dueDate = values.dueDate?.toISOString();
-        dispatch(taskAdded(values));
-        form.reset();
-    };
-
     return (
-        <form onSubmit={form.onSubmit((values) => handleAddTask(values))}>
+        <form onSubmit={form.onSubmit((values) => createTask(values))}>
             <TextInput
                 leftSectionPointerEvents="none"
                 leftSection={<IconPlus style={{ width: rem(16), height: rem(16) }}></IconPlus>}
@@ -54,12 +40,13 @@ export default function TaskForm() {
                                 allowDeselect
                                 key={form.key('dueDate')}
                                 {...form.getInputProps('dueDate')}
-                                onChange={(value: any) => form.setFieldValue('dueDate', value)}
-                                defaultDate={form.getValues().dueDate || undefined}
                             />
                         </Menu.Item>
                     </Menu.Dropdown>
                 </Menu>
+            </Group>
+            <Group justify="flex-end" mt="md">
+                <Button type="submit">Submit</Button>
             </Group>
         </form>
     );

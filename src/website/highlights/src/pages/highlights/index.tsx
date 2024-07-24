@@ -1,264 +1,187 @@
 import React, { ReactNode, useState } from 'react';
-import { Box, Button, Center, Checkbox, Flex, Grid, Group, Modal, Paper, Select, Space, Stack, Text, Title } from '@mantine/core';
+import { Card, Group, Text, useMantineTheme } from '@mantine/core';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSquare as faRegularSquare } from '@fortawesome/free-regular-svg-icons';
+import { faCheckSquare as faSolidSquare } from '@fortawesome/free-solid-svg-icons';
+
+import Confetti from 'react-confetti';
 import PageLayout from "@/components/PageLayout";
-import { IconBulb, IconPlayerPlayFilled, IconPlus } from '@tabler/icons-react';
-import { useDisclosure } from '@mantine/hooks';
-import { useAppDispatch, useAppSelector } from '@/hooks';
-import { completeTasksForHighlight, highlightAdded, highlightCompleted, highlightUncompleted, highlightUpdated, selectHighlightById, selectHighlightIds, taskAddedToHighlight, taskRemovedFromHighlight, uncompleteTasksForHighlight } from '@/features/highlights/highlightsSlice';
-import { selectTaskById, taskCompleted, taskUncompleted } from '@/features/tasks/tasksSlice';
-import { HighlightForm, HighlightActionsMenu, TaskActionsMenu, } from '@/features/highlights/components';
-import { Highlight } from '@/models/Highlight';
-import { useRouter } from 'next/router';
+import Addtask_popup from "@/components/AddTask/AddtaskPopup";
+import OptionsMenu from "@/components/Optionmenu/OptionPopup";
+import AlertDialogSlide from "@/components/Feedback/AlertDialogSlide";
+import classes from "./ActionsGrid.module.css";
 
-interface PopupProps {
-    title: string;
-    opened: boolean;
-    onClose: () => void;
-    children: ReactNode;
-}
+function ActionsGrid() {
+  const theme = useMantineTheme();
 
-function Popup({ title, opened, onClose, children }: PopupProps) {
-    return (
-        <Modal.Root opened={opened} onClose={onClose} centered>
-            <Modal.Overlay />
-            <Modal.Content p={'xs'}>
-                <Modal.Header>
-                    <Modal.Title><Text fz={'lg'} fw={'bold'}>{title}</Text></Modal.Title>
-                    <Modal.CloseButton />
-                </Modal.Header>
-                <Modal.Body>
-                    {children}
-                </Modal.Body>
-            </Modal.Content>
-        </Modal.Root>
-    );
-}
-
-let TasksExcerpt = ({ taskId, onTaskRemove }: { taskId: string, onTaskRemove: (id: string) => void }) => {
-
-    const dispatch = useAppDispatch();
-    const task = useAppSelector(state => selectTaskById(state, taskId));
-
-    if (!task) return null;
-
-    return (
-        <Group wrap={'nowrap'}>
-            <Checkbox
-                checked={task.completed}
-                radius={'lg'}
-                onChange={() => {
-                    task.completed ?
-                        dispatch(taskUncompleted(task.id)) :
-                        dispatch(taskCompleted(task.id))
-                }}
-            ></Checkbox>
-            <Box style={{ flexGrow: 1 }}>{task.title}</Box>
-            <TaskActionsMenu id={task.id} onTaskRemove={onTaskRemove} />
-        </Group>
-    );
-}
-
-interface HighlightExcerptProps {
-    highlightId: string;
-    onModifyHighlight: (highlight: Highlight) => void;
-    onAddTask: (highlight: Highlight) => void;
-}
-
-let HighlightExcerpt = ({ highlightId, onModifyHighlight, onAddTask }: HighlightExcerptProps) => {
-
-    const router = useRouter();
-    const dispatch = useAppDispatch();
-    const highlight = useAppSelector(state => selectHighlightById(state, highlightId));
-
-    if (!highlight) return null;
-
-    const handleStartFocus = (highlightId: string) => {
-        router.push({
-            pathname: '/focus',
-            query: {
-                highlight: highlightId,
-            },
-        });
+  const [tasks, setTasks] = useState([
+    {
+      id: 1,
+      title: "Task 1",
+      description: "Description for task 1",
+      date: "2024-07-03",
+      subTasks: [
+        { id: 1, title: "Sub-task 1.1", date: "2024-07-03" },
+        { id: 2, title: "Sub-task 1.2", date: "2024-07-03" }
+      ]
+    },
+    {
+      id: 2,
+      title: "Task 2",
+      description: "Description for task 2",
+      date: "2024-07-03",
+      subTasks: [
+        { id: 3, title: "Sub-task 2.1", date: "2024-07-03" },
+        { id: 4, title: "Sub-task 2.2", date: "2024-07-03" }
+      ]
+    },
+    {
+      id: 3,
+      title: "Task 3",
+      description: "Description for task 3",
+      date: "2024-07-03",
+      subTasks: [
+        { id: 5, title: "Sub-task 3.1", date: "2024-07-03" },
+        { id: 6, title: "Sub-task 3.2", date: "2024-07-03" }
+      ]
     }
+  ]);
 
-    const handleOnTaskRemove = (taskId: string) => {
-        dispatch(taskRemovedFromHighlight({ highlightId: highlight.id, taskId }));
+  const [popupOpen, setPopupOpen] = useState(false);
+  const [confettiActive, setConfettiActive] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [currentTask, setCurrentTask] = useState<{ id: number, title: string } | null>(null);
+  const [completedTask, setCompletedTask] = useState<{ id: number, title: string } | null>(null);
+
+  const handleCardClick = () => {
+    setPopupOpen(true);
+  };
+
+  const handleClosePopup = () => {
+    setPopupOpen(false);
+  };
+
+  const handleComplete = (task: { id: number, title: string }) => {
+    setCompletedTask(task);
+    setConfettiActive(true);
+    setTimeout(() => {
+      setCompletedTask(null);
+      setConfettiActive(false);
+    }, 3000);
+  };
+
+  const handleDialogOpen = (task: { id: number, title: string }) => {
+    setCurrentTask(task);
+    setDialogOpen(true);
+  };
+
+  const handleDialogClose = (agree: boolean) => {
+    setDialogOpen(false);
+    if (agree && currentTask) {
+      handleComplete(currentTask);
     }
+    setCurrentTask(null);
+  };
 
-    return (
-        <Grid.Col span={6} key={highlight.id}>
-            <Paper withBorder radius={'md'} py={'xs'} style={{ height: '100%' }}>
-                <Flex py={'sm'} px={'lg'} align={'center'} gap={'md'} wrap={'nowrap'}>
-                    <Checkbox
-                        checked={highlight.completed}
-                        radius={'lg'}
-                        onChange={() => {
-                            if (highlight.completed) {
-                                dispatch(highlightUncompleted(highlight.id));
-                                dispatch(uncompleteTasksForHighlight(highlight.id));
-                            }
-                            else {
-                                dispatch(highlightCompleted(highlight.id));
-                                dispatch(completeTasksForHighlight(highlight.id));
-                            }
-                        }}
-                    />
-                    <Title order={4} style={{ flexGrow: 1 }}>{highlight.title}</Title>
-                    {new Date(highlight.date).toLocaleDateString()}
-                    <HighlightActionsMenu highlight={highlight} onModifyHighlight={onModifyHighlight} />
-                </Flex>
-                <Box mx={'lg'} px={'sm'} pb={'sm'}>
-                    {highlight.taskIds.length > 0 ? (
-                        <>
-                            <Space h={'xs'} />
-                            <Group pl={'xl'}>
-                                <Button
-                                    leftSection={<IconPlayerPlayFilled size={18} />}
-                                    size={'compact-sm'}
-                                    onClick={() => handleStartFocus(highlight.id)}
-                                >
-                                    Start focus
-                                </Button>
-                                <Button
-                                    leftSection={<IconPlus size={18} />}
-                                    variant={'outline'}
-                                    size={'compact-sm'}
-                                    onClick={() => onAddTask(highlight)}
-                                >
-                                    Add task
-                                </Button>
-                            </Group>
-                            <Space h={'lg'} />
-                            <Stack gap={'xm'}>
-                                {highlight.taskIds.map((taskId) => (
-                                    <TasksExcerpt key={taskId} taskId={taskId} onTaskRemove={handleOnTaskRemove} />
-                                ))}
-                            </Stack>
-                        </>
-                    ) : (
-                        <>
-                            <Space h={'md'} />
-                            <Center>
-                                <Button
-                                    variant={'outline'}
-                                    onClick={() => onAddTask(highlight)}
-                                >
-                                    Add task
-                                </Button>
-                            </Center>
-                        </>
-                    )}
-                </Box>
-            </Paper>
-        </Grid.Col >
-    );
+  const addTask = (newTask: any) => {
+    // Add the new task to the tasks array
+    setTasks([...tasks, newTask]);
+    setPopupOpen(false); // Close the popup after adding the task
+  };
+
+  return (
+    <>
+      <div className={classes.highlight_card}>
+        <Card withBorder radius="10px" className={classes.card} onClick={handleCardClick}>
+          <Group>
+            <img
+              src="/add-plus-svgrepo-com (1).svg"
+              alt="Add Task Icon"
+              className={classes.icon}
+            />
+            <Text className={classes.title}>Add Highlights</Text>
+          </Group>
+        </Card>
+        <div className={classes.separator}></div>
+
+        <div className={classes.list_task}>
+          {tasks.map((task) => (
+            <div key={task.id}>
+              <div className={classes.d}>
+                <div className={classes.task}>
+                  <div
+                    className={`${classes.flag_icon} ${completedTask && completedTask.id === task.id ? classes.completed : ''}`}
+                    onClick={() => handleDialogOpen(task)}
+                  >
+                    <FontAwesomeIcon icon={completedTask && completedTask.id === task.id ? faSolidSquare : faRegularSquare} />
+                  </div>
+                  <div className={classes.task_name}>
+                    <h3>{task.title}</h3>
+                    <div className={classes.task_date}>
+                      <p>{task.date}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className={classes.bars_icon}>
+                  <OptionsMenu onOpenPopup={handleCardClick} />
+                </div>
+              </div>
+              {task.subTasks.map((subTask) => (
+                <div key={subTask.id} className={`${classes.d} ${classes.subTask}`}>
+                  <div className={classes.task}>
+                    <div
+                      className={`${classes.flag_icon} ${completedTask && completedTask.id === subTask.id ? classes.completed : ''}`}
+                      onClick={() => handleDialogOpen(subTask)}
+                    >
+                      <FontAwesomeIcon icon={completedTask && completedTask.id === subTask.id ? faSolidSquare : faRegularSquare} />
+                    </div>
+                    <div className={classes.task_name}>
+                      <h3>{subTask.title}</h3>
+                      <div className={classes.task_date}>
+                        <p>{subTask.date}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className={classes.bars_icon}>
+                    <OptionsMenu onOpenPopup={handleCardClick} />
+                  </div>
+                </div>
+              ))}
+              <br />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <Addtask_popup open={popupOpen} onClose={handleClosePopup} addTask={addTask} />
+
+      {confettiActive && (
+        <Confetti
+          width={window.innerWidth}
+          height={window.innerHeight}
+          recycle={false}
+        />
+      )}
+
+      {completedTask && (
+        <div className={classes.completedMessage}>
+          <p>{`Completed: ${completedTask.title}`}</p>
+        </div>
+      )}
+
+      <AlertDialogSlide open={dialogOpen} handleClose={handleDialogClose} />
+    </>
+  );
 }
 
 export default function Highlights() {
-    const dispatch = useAppDispatch();
-    const orderedHighlightIds = useAppSelector(selectHighlightIds);
-
-    const [addPopupOpened, { open: openAddPopup, close: closeAddPopup }] = useDisclosure(false);
-    const [updatePopupOpened, { open: openUpdatePopup, close: closeUpdatePopup }] = useDisclosure(false);
-    const [addTaskPopupOpened, { open: openAddTaskPopup, close: closeAddTaskPopup }] = useDisclosure(false);
-
-    const [modifyingItem, setModifyingItem] = useState<Highlight | undefined>(undefined);
-    const [addingTask, setAddingTask] = useState<Highlight | undefined>(undefined);
-
-    const handleModifyHighlight = (highlight: Highlight) => {
-        setModifyingItem(highlight);
-    }
-
-    const handleOnAddHighlight = (values: any) => {
-        values = {
-            ...values,
-            id: `highlight${orderedHighlightIds.length + 1}`,
-            date: values.date.toISOString(),
-            created: new Date().toISOString(),
-            taskIds: [],
-        };
-        dispatch(highlightAdded(values));
-        closeAddPopup();
-    }
-
-    const handleOnModifyHighlight = (values: any) => {
-        values = {
-            ...values,
-            date: values.date.toISOString(),
-        }
-        dispatch(highlightUpdated(values));
-        modifyingItem && setModifyingItem(undefined);
-    }
-
-    const handleAddTask = (highlight: Highlight) => {
-        setAddingTask(highlight);
-        openAddTaskPopup();
-    }
-
-    const handleOnAddTask = (taskId: string) => {
-        if (addingTask) {
-            dispatch(taskAddedToHighlight({ highlightId: addingTask.id, taskId }));
-        }
-        closeAddTaskPopup();
-    }
-
-    return (
-        <>
-            <Grid align={'stretch'}>
-                <Grid.Col span={3}>
-                    <Button style={{ height: 50 }} leftSection={<IconPlus />} fullWidth onClick={openAddPopup}>
-                        Add a Highlight
-                    </Button>
-                </Grid.Col>
-                <Grid.Col span={3}>
-                    <Button leftSection={<IconBulb />} variant='default' style={{ height: 50 }} fullWidth>
-                        Suggest Highlights
-                    </Button>
-                </Grid.Col>
-            </Grid>
-            <Space h={'xl'} />
-            <Grid>
-                {orderedHighlightIds.map((highlightId) => (
-                    <HighlightExcerpt
-                        key={highlightId}
-                        highlightId={highlightId}
-                        onModifyHighlight={handleModifyHighlight}
-                        onAddTask={handleAddTask}
-                    />
-                ))}
-            </Grid>
-
-            <Popup title={'Add a Highlight'} opened={addPopupOpened} onClose={closeAddPopup}>
-                <HighlightForm onSubmit={handleOnAddHighlight} onCancel={closeAddPopup} />
-            </Popup>
-
-            <Popup title={'Modify Highlight'} opened={!!modifyingItem} onClose={() => setModifyingItem(undefined)}>
-                <HighlightForm onSubmit={handleOnModifyHighlight} onCancel={() => setModifyingItem(undefined)} initialValue={modifyingItem} />
-            </Popup>
-
-            <Popup title={'Add a Task'} opened={addTaskPopupOpened} onClose={closeAddTaskPopup}>
-                <Select
-                    label="Task list"
-                    data={['Default', 'Microsoft To Do', 'Google Tasks', 'Shopping']}
-                    defaultValue={'Shopping'}
-                />
-                <Space h={'md'} />
-                <Box>
-                    list of tasks to choose from
-                </Box>
-                <Space h={'md'} />
-                <Group justify={'flex-end'}>
-                    <Button onClick={() => handleOnAddTask('task8')}>Add Task</Button>
-                </Group>
-            </Popup>
-        </>
-    );
+  return (
+    <>
+      <ActionsGrid />
+    </>
+  );
 }
 
 Highlights.getLayout = function getLayout(page: ReactNode) {
-    return (
-        <PageLayout>
-            {page}
-        </PageLayout>
-    );
-}
+  return <PageLayout>{page}</PageLayout>;
+};

@@ -1,18 +1,21 @@
 import PageLayout from "@/components/PageLayout";
-import { Space, Title } from "@mantine/core";
+import { Box, Flex, ScrollArea, Title } from "@mantine/core";
 import { ReactNode } from "react";
 import TaskForm from "@/features/tasks/TaskForm";
 import TaskList from "@/features/tasks/TaskList";
+import classes from './Tasks.module.css';
 
 export default function Tasks() {
     return (
-        <>
+        <Flex className={classes.tasks} direction={"column"}>
             <Title order={1}>Tasks</Title>
-            <Space h="lg" />
-            <TaskForm />
-            <Space h="lg" />
-            <TaskList />
-        </>
+            <ScrollArea>
+                <TaskList />
+            </ScrollArea>
+            <Box mt={'auto'} mb={0}>
+                <TaskForm />
+            </Box>
+        </Flex>
     )
 }
 

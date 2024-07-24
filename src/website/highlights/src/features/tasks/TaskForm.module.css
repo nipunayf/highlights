@@ -1,8 +1,8 @@
 .container {
-    background-color: light-dark(var(--mantine-color-gray-1), var(--mantine-color-dark-5));
+    background-color: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-6));
 
     &:hover,
     &:focus-within {
-        background-color: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-6));
+        background-color: light-dark(var(--mantine-color-white), var(--mantine-color-dark-5));
     }
 }

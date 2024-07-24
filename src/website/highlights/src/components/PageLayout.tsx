@@ -14,7 +14,7 @@ export default function PageLayout({ children }: { children: React.ReactNode }) 
                 breakpoint: 'sm',
                 collapsed: { mobile: !opened },
             }}
-            padding="md"
+        // padding="md"
         >
             <AppShell.Header>
                 <Header opened={opened} toggle={toggle} />
@@ -25,9 +25,9 @@ export default function PageLayout({ children }: { children: React.ReactNode }) 
             </AppShell.Navbar>
 
             <AppShell.Main>
-                <Box m={'xs'}>
-                    {children}
-                </Box>
+                {/* <Box m={'xs'}> */}
+                {children}
+                {/* </Box> */}
             </AppShell.Main>
         </AppShell>
     );

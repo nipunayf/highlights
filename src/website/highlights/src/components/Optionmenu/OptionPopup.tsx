@@ -1,7 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Menu, Button } from '@mantine/core';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEllipsis } from '@fortawesome/free-solid-svg-icons';
+import { IconDotsVertical } from '@tabler/icons-react';
 import Swal from 'sweetalert2';
 
 interface SubMenuProps {
@@ -65,12 +64,16 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({ onOpenPopup, onUpdateClick, o
       onClose={() => handleClose()}
     >
       <Menu.Target>
-        <Button
-          color="#F0F4F5"
+      <Button
+          color="rgb(253, 253, 253)"
+          
+        
+          // margin-right= "(-500%)"
+
           onClick={() => setOpened((o) => !o)}
           ref={buttonRef}
         >
-          <FontAwesomeIcon icon={faEllipsis} style={{ color: 'black' }} />
+          <IconDotsVertical stroke={2} style={{ color: 'black' }} />  
         </Button>
       </Menu.Target>
 

@@ -209,80 +209,76 @@ service / on new http:Listener(9090) {
     }
 
 
-
 resource function post add_pomo_details(http:Caller caller, http:Request req) returns error? {
-    io:println("highlightPomoDetails");
+        io:println("highlightPomoDetails");
 
-    // Extract JSON payload from the request
-    json payload = check req.getJsonPayload();
-    
-    // Convert the payload to the HighlightPomoDetailsTemp record
-    HighlightPomoDetailsTemp tempDetails = check payload.cloneWithType(HighlightPomoDetailsTemp);
+        // Extract JSON payload from the request
+        json payload = check req.getJsonPayload();
+        
+        // Convert the payload to the HighlightPomoDetailsTemp record
+        HighlightPomoDetailsTemp tempDetails = check payload.cloneWithType(HighlightPomoDetailsTemp);
+        io:println("qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq");
+        io:println(tempDetails);
 
-    // Convert start_time and end_time strings to time:Utc
-    time:Utc|error startTime = time:utcFromString(tempDetails.start_time);
-    time:Utc|error endTime = time:utcFromString(tempDetails.end_time);
+        // Convert start_time and end_time strings to time:Utc
+        time:Utc|error startTime = time:utcFromString(tempDetails.start_time);
+        time:Utc|error endTime = time:utcFromString(tempDetails.end_time);
+        io:println(startTime);
 
-    if (startTime is error) {
-        log:printError("Error parsing start_time", 'error = startTime);
-        check caller->respond(http:STATUS_BAD_REQUEST);
-        return;
+        io:println(endTime);
+
+
+        if (startTime is error) {
+            log:printError("Error parsing start_time", 'error = startTime);
+            check caller->respond(http:STATUS_BAD_REQUEST);
+            return;
+        }
+        
+        if (endTime is error) {
+            log:printError("Error parsing end_time", 'error = endTime);
+            check caller->respond(http:STATUS_BAD_REQUEST);
+            return;
+        }
+
+        // Create HighlightPomoDetails record with converted times
+        HighlightPomoDetails highlightPomoDetails = {
+            timer_id: tempDetails.timer_id,
+            highlight_id: tempDetails.highlight_id,
+            user_id: tempDetails.user_id,
+            start_time: <time:Utc>startTime,
+            end_time: <time:Utc>endTime,
+            status: tempDetails.status
+        };
+
+        io:println("Converted highlightPomoDetails:", highlightPomoDetails);
+
+        // Convert time:Utc to RFC 3339 strings
+        string startTimeStr = time:utcToString(highlightPomoDetails.start_time);
+        string endTimeStr = time:utcToString(highlightPomoDetails.end_time);
+              io:println(startTimeStr);
+        io:println(endTimeStr);
+
+        // Manual formatting from RFC 3339 to "yyyy-MM-dd HH:mm:ss"
+        string formattedStartTime = startTimeStr.substring(0, 10) + " " + startTimeStr.substring(11, 19);
+        string formattedEndTime = endTimeStr.substring(0, 10) + " " + endTimeStr.substring(11, 19);
+                      io:println(formattedStartTime);
+        io:println(formattedEndTime);
+
+        // Insert data into database
+        sql:ExecutionResult|sql:Error result = self.db->execute(`
+            INSERT INTO HighlightPomoDetails (timer_id, highlight_id, user_id, start_time, end_time, status) 
+            VALUES (${highlightPomoDetails.timer_id}, ${highlightPomoDetails.highlight_id}, ${highlightPomoDetails.user_id}, ${formattedStartTime}, ${formattedEndTime}, ${highlightPomoDetails.status});
+        `);
+
+        if result is sql:Error {
+            log:printError("Error while inserting data into HighlightPomoDetails", 'error = result);
+            check caller->respond(http:STATUS_INTERNAL_SERVER_ERROR);
+            return;
+        }
+
+        io:println("Data inserted successfully");
+        check caller->respond(http:STATUS_OK);
     }
-    
-    if (endTime is error) {
-        log:printError("Error parsing end_time", 'error = endTime);
-        check caller->respond(http:STATUS_BAD_REQUEST);
-        return;
-    }
-
-    // Create HighlightPomoDetails record with converted times
-    HighlightPomoDetails highlightPomoDetails = {
-        timer_id: tempDetails.timer_id,
-        highlight_id: tempDetails.highlight_id,
-        user_id: tempDetails.user_id,
-        start_time: <time:Utc>startTime,
-        end_time: <time:Utc>endTime,
-        status: tempDetails.status
-    };
-
-    io:println("Converted highlightPomoDetails:", highlightPomoDetails);
-
-    // Convert time:Utc to RFC 3339 strings
-    string startTimeStr = time:utcToString(highlightPomoDetails.start_time);
-    string endTimeStr = time:utcToString(highlightPomoDetails.end_time);
-    io:println("-------------------:", startTimeStr);
-    io:println("-------------------:", endTimeStr);
-
-    // Manual formatting from RFC 3339 to "yyyy-MM-dd HH:mm:ss"
-    string formattedStartTime = startTimeStr.substring(0, 10) + " " + startTimeStr.substring(11, 19);
-    string formattedEndTime = endTimeStr.substring(0, 10) + " " + endTimeStr.substring(11, 19);
-    io:println("0000000000000000000", formattedStartTime);
-    io:println("0000000000000000000", formattedEndTime);
-    io:println("-----------------------");
-    io:println(highlightPomoDetails.timer_id);
-    io:println(highlightPomoDetails.highlight_id);
-    io:println(highlightPomoDetails.user_id);
-    io:println(formattedStartTime);
-    io:println(formattedEndTime);
-    io:println(highlightPomoDetails.status);
-
-    // Insert data into database
-    sql:ExecutionResult|sql:Error result = self.db->execute(`
-        INSERT INTO HighlightPomoDetails (timer_id, highlight_id, user_id, start_time, end_time, status) 
-        VALUES (${highlightPomoDetails.timer_id}, ${highlightPomoDetails.highlight_id}, ${highlightPomoDetails.user_id}, ${formattedStartTime}, ${formattedEndTime}, ${highlightPomoDetails.status});
-    `);
-    io:println("444444444");
-
-    if result is sql:Error {
-        io:println("66666666666", formattedEndTime);
-        log:printError("Error while inserting data into HighlightPomoDetails", 'error = result);
-        check caller->respond(http:STATUS_INTERNAL_SERVER_ERROR);
-        return;
-    }
-
-    io:println("Data inserted successfully");
-    check caller->respond(http:STATUS_OK);
-}
 
 
 

@@ -209,24 +209,25 @@ service / on new http:Listener(9090) {
     }
 
 
-resource function post add_pomo_details(http:Caller caller, http:Request req) returns error? {
-        io:println("highlightPomoDetails");
 
-        // Extract JSON payload from the request
-        json payload = check req.getJsonPayload();
+
+    resource function post add_pomo_details(http:Caller caller, http:Request req) returns error? {
+
+        json|http:ClientError payload = req.getJsonPayload();
+
+        if payload is http:ClientError {
+            log:printError("Error while parsing request payload (pomo_details)", 'error = payload);
+            check caller->respond(http:STATUS_BAD_REQUEST);
+            return;
+        }
         
         // Convert the payload to the HighlightPomoDetailsTemp record
         HighlightPomoDetailsTemp tempDetails = check payload.cloneWithType(HighlightPomoDetailsTemp);
-        io:println("qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq");
-        io:println(tempDetails);
+        io:println("Received highlightPomoDetails:", tempDetails);
 
         // Convert start_time and end_time strings to time:Utc
         time:Utc|error startTime = time:utcFromString(tempDetails.start_time);
         time:Utc|error endTime = time:utcFromString(tempDetails.end_time);
-        io:println(startTime);
-
-        io:println(endTime);
-
 
         if (startTime is error) {
             log:printError("Error parsing start_time", 'error = startTime);
@@ -240,29 +241,27 @@ resource function post add_pomo_details(http:Caller caller, http:Request req) re
             return;
         }
 
-        // Create HighlightPomoDetails record with converted times
+        // Create a negative duration of 5 hours and 30 minutes
+        time:Utc adjustedStartTime = time:utcAddSeconds(startTime, +(5 * 3600 + 30 * 60));
+        time:Utc adjustedEndTime = time:utcAddSeconds(endTime, +(5 * 3600 + 30 * 60));
+
+        // Create HighlightPomoDetails record with adjusted times
         HighlightPomoDetails highlightPomoDetails = {
             timer_id: tempDetails.timer_id,
             highlight_id: tempDetails.highlight_id,
             user_id: tempDetails.user_id,
-            start_time: <time:Utc>startTime,
-            end_time: <time:Utc>endTime,
+            start_time: adjustedStartTime,
+            end_time: adjustedEndTime,
             status: tempDetails.status
         };
-
-        io:println("Converted highlightPomoDetails:", highlightPomoDetails);
 
         // Convert time:Utc to RFC 3339 strings
         string startTimeStr = time:utcToString(highlightPomoDetails.start_time);
         string endTimeStr = time:utcToString(highlightPomoDetails.end_time);
-              io:println(startTimeStr);
-        io:println(endTimeStr);
 
         // Manual formatting from RFC 3339 to "yyyy-MM-dd HH:mm:ss"
         string formattedStartTime = startTimeStr.substring(0, 10) + " " + startTimeStr.substring(11, 19);
         string formattedEndTime = endTimeStr.substring(0, 10) + " " + endTimeStr.substring(11, 19);
-                      io:println(formattedStartTime);
-        io:println(formattedEndTime);
 
         // Insert data into database
         sql:ExecutionResult|sql:Error result = self.db->execute(`
@@ -279,7 +278,6 @@ resource function post add_pomo_details(http:Caller caller, http:Request req) re
         io:println("Data inserted successfully");
         check caller->respond(http:STATUS_OK);
     }
-
 
 
 }

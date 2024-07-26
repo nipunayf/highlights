@@ -9,24 +9,12 @@ export interface mTimer {
 }
 
 export interface mPomo_details {
-          timer_id: number;
-          highlight_id: string;
-          pomo_duration: {
-              hour: number;
-              minute: number;
-              second: number;
-          };
-          short_break_duration: {
-              hour: number;
-              minute: number;
-              second: number;
-          };
-          long_break_duration: {
-              hour: number;
-              minute: number;
-              second: number;
-          };
-          pomos_per_long_break: number;
-          user_id: number;
-      }
+    timer_id: number;
+    highlight_id: number; // Changed from string to number
+    user_id: number;
+    start_time: string;   // Assuming ISO 8601 string format for time
+    end_time: string;     // Assuming ISO 8601 string format for time
+    status: string;
+}
+
 

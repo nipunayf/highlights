@@ -1,9 +1,3 @@
-INSERT INTO `users` (`sub`) VALUES
-  ('user1_sub_identifier'),
-  ('user2_sub_identifier'),
-  ('user3_sub_identifier'),
-  ('user4_sub_identifier'),
-  ('user5_sub_identifier');
 
 
 INSERT INTO `timer_details` (

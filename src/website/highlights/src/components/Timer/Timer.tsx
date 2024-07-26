@@ -154,6 +154,7 @@ const Timer = () => {
   };
 
   const startTimer = () => {
+    
     setStarted(true);
     if (paused) {
       setPaused(false);
@@ -216,32 +217,21 @@ const Timer = () => {
         ? highlights[selectedTask]?.id || '4' // Provide a default value or handle as needed
         : '2'; // Default to empty string if no task is selected
     
-      const pomoDuration = {
-        hour: Math.floor(WORK_TIME / 60),
-        minute: WORK_TIME % 60,
-        second: 0
-      };
-      const shortBreakDuration = {
-        hour: Math.floor(SHORT_BREAK / 60),
-        minute: SHORT_BREAK % 60,
-        second: 0
-      };
-      const longBreakDuration = {
-        hour: Math.floor(LONG_BREAK / 60),
-        minute: LONG_BREAK % 60,
-        second: 0
-      };
+        const start_time = new Date();
+        const end_time = new Date();
+
       const userId = 11; // Replace with actual user ID if available
       
       const pomoDetails = {
-        timer_id: currentTimerId, // Ensure this is a number
-        highlight_id: highlightId,
-        pomo_duration: pomoDuration,
-        short_break_duration: shortBreakDuration,
-        long_break_duration: longBreakDuration,
-        pomos_per_long_break: CYCLES_BEFORE_LONG_BREAK,
-        user_id: userId
-      };    
+        timer_id: currentTimerId,
+        highlight_id: selectedTask !== null ? selectedTask : -1, // Ensure selectedTask is a number
+        user_id: userId,
+        start_time: start_time.toISOString(), // Format as ISO 8601 string
+        end_time: end_time.toISOString(), // Format as ISO 8601 string
+        status: "complete"
+        
+      }; 
+      console.log(pomoDetails) ;  
 
       try {
         await sendTimerEndData(pomoDetails);

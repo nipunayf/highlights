@@ -74,8 +74,8 @@ CREATE TABLE `HighlightPomoDetails` (
 CREATE TABLE `PausesPomoDetails` (
   `pauses_pomo_id` INT AUTO_INCREMENT PRIMARY KEY,
   `highlight_id` INT ,
-  `pause_time` INTEGER NOT NULL,
-  `continue_time` DATETIME
+  `pause_time` DATETIME NOT NULL,
+  `continue_time` DATETIME 
   
 );
 

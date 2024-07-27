@@ -61,10 +61,20 @@ type HighlightPomoDetailsTemp record {
     string end_time;
     string status;
 };
-// public type Response record {|
-//     int highlight_id;
-//     string message;
-// |};
+
+type PausesDetails record {
+    // int pauses_pomo_id;
+    int highlight_id;
+    string pause_time;
+    // string continue_time;
+};
+
+type PausesDetailsTemp record {
+    // int pauses_pomo_id;
+    int highlight_id;
+    string pause_time;
+    // string continue_time;
+};
 
 
 Task[] tasks = [
@@ -278,6 +288,63 @@ service / on new http:Listener(9090) {
         io:println("Data inserted successfully");
         check caller->respond(http:STATUS_OK);
     }
+
+
+
+
+  resource function post pause_pomo_details(http:Caller caller, http:Request req) returns error? {
+
+    json|http:ClientError payload = req.getJsonPayload();
+
+    if payload is http:ClientError {
+        log:printError("Error while parsing request payload (pomo_details)", 'error = payload);
+        check caller->respond(http:STATUS_BAD_REQUEST);
+        return;
+    }
+
+    // Convert the payload to the HighlightPomoDetailsTemp record
+    PausesDetailsTemp tempDetails = check payload.cloneWithType(PausesDetailsTemp);
+    io:println("Received highlightPomoDetails:", tempDetails);
+
+    // Convert pause_time string to time:Utc
+    time:Utc|error pauseTime = time:utcFromString(tempDetails.pause_time);
+
+    if (pauseTime is error) {
+        log:printError("Error parsing pause_time", 'error = pauseTime);
+        check caller->respond(http:STATUS_BAD_REQUEST);
+        return;
+    }
+
+    // Create a negative duration of 5 hours and 30 minutes
+    time:Utc adjustedPauseTime = time:utcAddSeconds(pauseTime, +(5 * 3600 + 30 * 60));
+
+    // Convert time:Utc to RFC 3339 string
+    string adjustedPauseTimeStr = time:utcToString(adjustedPauseTime);
+
+    // Manual formatting from RFC 3339 to "yyyy-MM-dd HH:mm:ss"
+    string formattedPauseTime = adjustedPauseTimeStr.substring(0, 10) + " " + adjustedPauseTimeStr.substring(11, 19);
+
+    // Create PausesDetails record with adjusted times
+    PausesDetails pausesDetails = {
+        highlight_id: tempDetails.highlight_id,
+        pause_time: formattedPauseTime
+    };
+
+    // Insert data into database
+    sql:ExecutionResult|sql:Error result = self.db->execute(`
+        INSERT INTO PausesPomoDetails (highlight_id, pause_time) 
+        VALUES (${pausesDetails.highlight_id}, ${pausesDetails.pause_time});
+    `);
+
+    if result is sql:Error {
+        log:printError("Error while inserting data into HighlightPomoDetails", 'error = result);
+        check caller->respond(http:STATUS_INTERNAL_SERVER_ERROR);
+        return;
+    }
+
+    io:println("Data inserted successfully");
+    check caller->respond(http:STATUS_OK);
+}
 
 
 }

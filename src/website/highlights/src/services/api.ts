@@ -2,7 +2,7 @@ import { apiEndpoint } from "@/apiConfig";
 import { aquireAccessToken } from "@/util/auth";
 import { Task } from "@/models/Task";
 import { HighlightTask } from "@/models/HighlightTask";
-import { mTimer, mPomo_details } from "@/models/Timer";
+import { mTimer, mPomo_details,mPauses_details } from "@/models/Timer";
 import axios, { AxiosInstance } from "axios";
 
 // Function to create an Axios client with authorization
@@ -48,6 +48,10 @@ export async function getHighlights(): Promise<HighlightTask[]> {
 
     return response.data;
 }
+
+
+
+
 
 // Function to get timer details
 export async function getTimerDetails(): Promise<mTimer[]> {
@@ -96,4 +100,42 @@ export async function getTimerDetails(): Promise<mTimer[]> {
         }
     }
 
+
+
+
+
+
+
+// Function to send pause data
+export async function sendPauseData(pauseDetails: {
+    highlight_id: number;
+    pause_time: string;
+    
+}): Promise<mPauses_details> {
+    try {
+        // Print the details of the data being sent
+        console.log('Sending pause data:', JSON.stringify(pauseDetails, null, 2));
+
+        // Create the Axios instance with the appropriate base URL
+        const axiosInstance = getAxiosClient('pause_pomo_details');
+
+        // Make the POST request to the backend API
+        const response = await axiosInstance.post('', pauseDetails);
+
+        // Return the response data
+        return response.data;
+    } catch (error) {
+        // Handle errors
+        if (axios.isAxiosError(error)) {
+            // Handle known Axios errors
+            console.error('Error sending pause data:', error.response?.data || error.message);
+        } else {
+            // Handle other errors
+            console.error('Unexpected error:', error);
+        }
+
+        // Optionally, you can throw the error again or handle it differently
+        throw error;
+    }
+}
 

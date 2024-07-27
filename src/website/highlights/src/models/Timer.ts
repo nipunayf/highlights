@@ -17,4 +17,13 @@ export interface mPomo_details {
     status: string;
 }
 
+export interface mPauses_details {
+    pauses_pomo_id: number;
+    highlight_id: number; // Changed from string to number
+    // user_id: number;
+    pause_time: string;   // Assuming ISO 8601 string format for time
+    continue_time: string;     // Assuming ISO 8601 string format for time
+    
+}
+
 

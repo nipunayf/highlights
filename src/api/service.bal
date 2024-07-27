@@ -20,15 +20,7 @@ type User record {|
     string sub;
 |};
 
-// type Task record {|
-//     string? id = null;
-//     string title;
-//     time:Utc? dueDate = null;
-// |};
 
-
-
-// type Task record {
 type Task record {|
     int id;
     string title;
@@ -38,20 +30,20 @@ type Task record {|
     string? endTime;
     string? reminder;
     string priority;
-    SubTask[] subTasks;
+    // SubTask[] subTasks;
 |};
 
-type SubTask record {|
-    int id;
-    string title;
-    string description;
-    string? dueDate;
-    string? startTime;
-    string? endTime;
-    string? reminder;
-    string priority;
-    int parentTaskId;
-|};
+// type SubTask record {|
+//     int id;
+//     string title;
+//     string description;
+//     string? dueDate;
+//     string? startTime;
+//     string? endTime;
+//     string? reminder;
+//     string priority;
+//     int parentTaskId;
+// |};
 
 
 type CreateTask record {|
@@ -60,20 +52,22 @@ type CreateTask record {|
     string? dueDate;
     string? startTime;
     string? endTime;
+    string? label;
     string? reminder;
     string priority;
+
 |};
 
-type CreateSubTask record {|
-    string title;
-    string description;
-    string? dueDate;
-    string? startTime;
-    string? endTime;
-    string? reminder;
-    string priority;
-    int parentTaskId;
-|};
+// type CreateSubTask record {|
+//     string title;
+//     string description;
+//     string? dueDate;
+//     string? startTime;
+//     string? endTime;
+//     string? reminder;
+//     string priority;
+//     int parentTaskId;
+// |};
 
 
 
@@ -182,8 +176,8 @@ resource function get tasks() returns Task[]|error {
             startTime: dbTask.startTime,
             endTime: dbTask.endTime,
             reminder: dbTask.reminder,
-            priority: dbTask.priority,
-            subTasks: [] // Ensure subTasks is always an initialized array
+            priority: dbTask.priority
+            // subTasks: [] 
         };
         taskList.push(task);
     });
@@ -219,21 +213,21 @@ resource function get tasks() returns Task[]|error {
         int parentTaskId;
     |} dbSubTask) {
         // Create a SubTask object from the database record
-        SubTask subTask = {
-            id: dbSubTask.id,
-            title: dbSubTask.title,
-            description: dbSubTask.description,
-            dueDate: dbSubTask.dueDate,
-            startTime: dbSubTask.startTime,
-            endTime: dbSubTask.endTime,
-            reminder: dbSubTask.reminder,
-            priority: dbSubTask.priority,
-            parentTaskId: dbSubTask.parentTaskId
-        };
+        // SubTask subTask = {
+        //     id: dbSubTask.id,
+        //     title: dbSubTask.title,
+        //     description: dbSubTask.description,
+        //     dueDate: dbSubTask.dueDate,
+        //     startTime: dbSubTask.startTime,
+        //     endTime: dbSubTask.endTime,
+        //     reminder: dbSubTask.reminder,
+        //     priority: dbSubTask.priority,
+        //     parentTaskId: dbSubTask.parentTaskId
+        // };
         // Find the parent task and add this subtask to its subTasks array
         foreach var task in taskList {
             if (task.id == dbSubTask.parentTaskId) {
-                task.subTasks.push(subTask); // Push the subTask to the array
+                // task.subTasks.push(subTask); // Push the subTask to the array
                 break;
             }
         }
@@ -275,8 +269,8 @@ resource function get tasks() returns Task[]|error {
     string endTime = task.endTime != () ? formatTime(task.endTime.toString()) : "";
 
     sql:ExecutionResult|sql:Error result = self.db->execute(`
-        INSERT INTO hi (title, dueDate, startTime, endTime, reminder, priority, description) 
-        VALUES (${task.title}, ${dueDate}, ${startTime}, ${endTime}, ${task.reminder}, ${task.priority}, ${task.description});
+        INSERT INTO hi (title, dueDate, startTime, endTime, label, reminder, priority, description) 
+        VALUES (${task.title}, ${dueDate}, ${startTime}, ${endTime}, ${task.label} ,${task.reminder}, ${task.priority}, ${task.description});
     `);
 
     if result is sql:Error {
@@ -347,38 +341,38 @@ resource function put tasks/[int taskId](http:Caller caller, http:Request req) r
     }
 
 
-     resource function post subtasks(http:Caller caller, http:Request req) returns error? {
-        json|http:ClientError payload = req.getJsonPayload();
-        if payload is http:ClientError {
-            log:printError("Error while parsing request payload", 'error = payload);
-            check caller->respond(http:STATUS_BAD_REQUEST);
-            return;
-        }
-io:println(payload);
-        CreateSubTask|error subTask = payload.cloneWithType(CreateSubTask);
-        if subTask is error {
-            log:printError("Error while converting JSON to SubTask", 'error = subTask);
-            check caller->respond(http:STATUS_BAD_REQUEST);
-            return;
-        }
+//      resource function post subtasks(http:Caller caller, http:Request req) returns error? {
+//         json|http:ClientError payload = req.getJsonPayload();
+//         if payload is http:ClientError {
+//             log:printError("Error while parsing request payload", 'error = payload);
+//             check caller->respond(http:STATUS_BAD_REQUEST);
+//             return;
+//         }
+// io:println(payload);
+//         CreateSubTask|error subTask = payload.cloneWithType(CreateSubTask);
+//         if subTask is error {
+//             log:printError("Error while converting JSON to SubTask", 'error = subTask);
+//             check caller->respond(http:STATUS_BAD_REQUEST);
+//             return;
+//         }
 
-        // Convert ISO 8601 date to MySQL compatible date format
-        string Date = subTask.dueDate != () ? formatDateTime(subTask.dueDate.toString()) : "";
-        string startTime = subTask.startTime != () ? formatTime(subTask.startTime.toString()) : "";
-        string endTime = subTask.endTime != () ? formatTime(subTask.endTime.toString()) : "";
+//         // Convert ISO 8601 date to MySQL compatible date format
+//         string Date = subTask.dueDate != () ? formatDateTime(subTask.dueDate.toString()) : "";
+//         string startTime = subTask.startTime != () ? formatTime(subTask.startTime.toString()) : "";
+//         string endTime = subTask.endTime != () ? formatTime(subTask.endTime.toString()) : "";
 
-        sql:ExecutionResult|sql:Error result = self.db->execute(`
-            INSERT INTO his (title, dueDate, startTime, endTime, reminder, priority, description, parentTaskId) 
-            VALUES (${subTask.title}, ${Date}, ${startTime}, ${endTime}, ${subTask.reminder}, ${subTask.priority}, ${subTask.description}, ${subTask.parentTaskId});
-        `);
+//         sql:ExecutionResult|sql:Error result = self.db->execute(`
+//             INSERT INTO his (title, dueDate, startTime, endTime, reminder, priority, description, parentTaskId) 
+//             VALUES (${subTask.title}, ${Date}, ${startTime}, ${endTime}, ${subTask.reminder}, ${subTask.priority}, ${subTask.description}, ${subTask.parentTaskId});
+//         `);
 
-        if result is sql:Error {
-            log:printError("Error occurred while inserting subtask", 'error = result);
-            check caller->respond(http:STATUS_INTERNAL_SERVER_ERROR);
-        } else {
-            check caller->respond(http:STATUS_CREATED);
-        }
-    }
+//         if result is sql:Error {
+//             log:printError("Error occurred while inserting subtask", 'error = result);
+//             check caller->respond(http:STATUS_INTERNAL_SERVER_ERROR);
+//         } else {
+//             check caller->respond(http:STATUS_CREATED);
+//         }
+//     }
 
 
    

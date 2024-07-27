@@ -55,6 +55,7 @@ CREATE TABLE `hi` (
   `dueDate` DATE,
   `startTime` TIME,
   `endTime` TIME,
+  `label` VARCHAR(255),
   `reminder` VARCHAR(255),
   `priority` VARCHAR(255),
   `description` TEXT,

@@ -181,6 +181,13 @@ const UpdateTaskPopup: React.FC<UpdateTaskPopupProps> = ({ open, onClose, task, 
         </div>
 
         <Select
+      label="Your favorite library"
+      placeholder="Pick value"
+      data={['React', 'Angular', 'Vue', 'Svelte']}
+      searchable
+    />
+
+        <Select
           label="Reminder"
           placeholder="Pick value"
           name="reminder"

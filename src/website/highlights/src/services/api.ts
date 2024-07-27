@@ -82,13 +82,13 @@ export async function deleteTask(taskId: number): Promise<void> {
 }
 
 
-export async function addsubtask(task: Task): Promise<Task> {
-    console.log(task)
-    const response = await getAxiosClient('subtasks').request<Task>({
-        method: 'POST',
-        data: task
-    });
-    console.log("mbbbbbm")
+// export async function addsubtask(task: Task): Promise<Task> {
+//     console.log(task)
+//     const response = await getAxiosClient('subtasks').request<Task>({
+//         method: 'POST',
+//         data: task
+//     });
+//     console.log("mbbbbbm")
 
-    return response.data;
-}
+//     return response.data;
+// }

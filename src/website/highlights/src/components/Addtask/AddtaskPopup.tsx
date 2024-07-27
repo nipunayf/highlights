@@ -16,6 +16,7 @@ interface Task {
   dueDate: Date | null;
   startTime: string;
   endTime: string;
+  label: string;
   reminder: string;
   priority: string;
   
@@ -27,6 +28,7 @@ interface ApiTask {
   dueDate: string | null;
   startTime: string;
   endTime: string;
+  label: string;
   reminder: string;
   priority: string;
  
@@ -39,6 +41,7 @@ export default function AddtaskPopup({ open, onClose }: AddtaskPopupProps) {
     description: '',
     reminder: '',
     priority: '',
+    label: '', 
   });
   const [dueDate, setDueDate] = useState<Date | null>(null);
   const [startTime, setStartTime] = useState<string>('');
@@ -66,6 +69,10 @@ export default function AddtaskPopup({ open, onClose }: AddtaskPopupProps) {
     }
     if (dueDate && dueDate.getTime() < new Date().setHours(0, 0, 0, 0)) newErrors.dueDate = 'Due date should be today or a future date';
 
+    if (!formState.label) newErrors.label = 'Label is required';
+    if (!formState.reminder) newErrors.reminder = 'Reminder is required';
+    if (!formState.priority) newErrors.priority = 'Priority is required';
+
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
@@ -81,6 +88,7 @@ export default function AddtaskPopup({ open, onClose }: AddtaskPopupProps) {
       dueDate: adjustedDueDate,
       startTime: startTime,
       endTime: endTime,
+      label: formState.label,
       reminder: formState.reminder,
       priority: formState.priority,
       // subTasks: [],
@@ -111,6 +119,9 @@ export default function AddtaskPopup({ open, onClose }: AddtaskPopupProps) {
         description: '',
         reminder: '',
         priority: '',
+        label: '', 
+        
+        
       });
       setDueDate(null);
       setStartTime('');
@@ -196,6 +207,20 @@ export default function AddtaskPopup({ open, onClose }: AddtaskPopupProps) {
           />
           {/* {errors.time && <Text color="red">{errors.time}</Text>} */}
         </div>
+
+        <Select
+  label="Your favorite library"
+  placeholder="Pick value"
+  data={['React', 'Angular', 'Vue', 'Svelte']}
+  searchable
+  value={formState.label}
+  onChange={(value) => setFormState(prevState => ({
+    ...prevState,
+    label: value || '',
+  }))}
+  error={errors.label}
+/>
+
 
         {/* Select component for Reminder */}
         <Select

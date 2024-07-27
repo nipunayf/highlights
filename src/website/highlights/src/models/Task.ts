@@ -14,6 +14,7 @@ export interface Task extends Entity {
     endTime: string;
     reminder: string;
     priority: string;
+    label:string;
    
     
 }

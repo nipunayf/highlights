@@ -59,10 +59,10 @@ CREATE TABLE `hi` (
   `reminder` VARCHAR(255),
   `priority` VARCHAR(255),
   `description` TEXT,
-  `status` VARCHAR(1) DEFAULT '0'
+  `status` ENUM('pending', 'completed', 'overdue') DEFAULT 'pending'
   -- `type` VARCHAR(255) DEFAULT 'MAIN TASK'
-  
 );
+
 
 CREATE TABLE `his` (
   `id` INTEGER PRIMARY KEY AUTO_INCREMENT,

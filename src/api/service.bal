@@ -21,7 +21,7 @@ type User record {|
 |};
 
 
-type Task record {|
+type Task record {
     int id;
     string title;
     string description;
@@ -30,8 +30,9 @@ type Task record {|
     string? endTime;
     string? reminder;
     string priority;
-    // SubTask[] subTasks;
-|};
+    string label;
+    string status;
+};
 
 // type SubTask record {|
 //     int id;
@@ -142,105 +143,32 @@ service / on new http:Listener(9090) {
         return http:INTERNAL_SERVER_ERROR;
     }
 
-resource function get tasks() returns Task[]|error {
-    // Fetch all tasks
-    sql:ParameterizedQuery taskQuery = `SELECT id, title, description, dueDate, startTime, endTime, reminder, priority FROM hi`;
-    stream<record {|
-        int id;
-        string title;
-        string description;
-        string? dueDate;
-        string? startTime;
-        string? endTime;
-        string? reminder;
-        string priority;
-    |}, sql:Error?> taskStream = self.db->query(taskQuery);
-
-    Task[] taskList = [];
-    error? taskError = taskStream.forEach(function(record {|
-        int id;
-        string title;
-        string description;
-        string? dueDate;
-        string? startTime;
-        string? endTime;
-        string? reminder;
-        string priority;
-    |} dbTask) {
-        // Create a Task object from the database record
-        Task task = {
-            id: dbTask.id,
-            title: dbTask.title,
-            description: dbTask.description,
-            dueDate: dbTask.dueDate,
-            startTime: dbTask.startTime,
-            endTime: dbTask.endTime,
-            reminder: dbTask.reminder,
-            priority: dbTask.priority
-            // subTasks: [] 
-        };
-        taskList.push(task);
-    });
-
-    if (taskError is error) {
-        log:printError("Error occurred while fetching tasks: ", 'error = taskError);
-        return taskError;
-    }
-
-    // Fetch all subtasks
-    sql:ParameterizedQuery subTaskQuery = `SELECT id, title, description, dueDate, startTime, endTime, reminder, priority, parentTaskId FROM his`;
-    stream<record {|
-        int id;
-        string title;
-        string description;
-        string? dueDate;
-        string? startTime;
-        string? endTime;
-        string? reminder;
-        string priority;
-        int parentTaskId;
-    |}, sql:Error?> subTaskStream = self.db->query(subTaskQuery);
-
-    error? subTaskError = subTaskStream.forEach(function(record {|
-        int id;
-        string title;
-        string description;
-        string? dueDate;
-        string? startTime;
-        string? endTime;
-        string? reminder;
-        string priority;
-        int parentTaskId;
-    |} dbSubTask) {
-        // Create a SubTask object from the database record
-        // SubTask subTask = {
-        //     id: dbSubTask.id,
-        //     title: dbSubTask.title,
-        //     description: dbSubTask.description,
-        //     dueDate: dbSubTask.dueDate,
-        //     startTime: dbSubTask.startTime,
-        //     endTime: dbSubTask.endTime,
-        //     reminder: dbSubTask.reminder,
-        //     priority: dbSubTask.priority,
-        //     parentTaskId: dbSubTask.parentTaskId
-        // };
-        // Find the parent task and add this subtask to its subTasks array
-        foreach var task in taskList {
-            if (task.id == dbSubTask.parentTaskId) {
-                // task.subTasks.push(subTask); // Push the subTask to the array
-                break;
-            }
+ resource function get tasks() returns Task[]|error {
+        sql:ParameterizedQuery query = `SELECT id,title, dueDate, startTime, endTime, label, reminder, priority, description , status FROM hi`;
+        stream<Task, sql:Error?> resultStream = self.db->query(query);
+        Task[] tasksList = [];
+        error? e = resultStream.forEach(function(Task task) {
+            tasksList.push(task);
+        });
+        if (e is error) {
+            log:printError("Error occurred while fetching tasks: ", 'error = e);
+            return e;
         }
-    });
-
-    if (subTaskError is error) {
-        log:printError("Error occurred while fetching subtasks: ", 'error = subTaskError);
-        return subTaskError;
+// io:print(tasklist);
+io:println(tasksList);
+        return tasksList;
     }
-    io:println(taskList);
 
-    return taskList;
-}
+
+
+
+
+
+
+
+
+
+
 
 
 

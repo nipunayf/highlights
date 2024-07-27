@@ -76,6 +76,19 @@ type PausesDetailsTemp record {
     // string continue_time;
 };
 
+type  ContinueDetails record {
+    // int pauses_pomo_id;
+    int highlight_id;
+    // string pause_time;
+    string continue_time;
+};
+type ContinueDetailsTemp record {
+    // int pauses_pomo_id;
+    int highlight_id;
+    // string pause_time;
+    string continue_time;
+};
+
 
 Task[] tasks = [
     {id: "1", title: "Task 1"},
@@ -297,7 +310,7 @@ service / on new http:Listener(9090) {
     json|http:ClientError payload = req.getJsonPayload();
 
     if payload is http:ClientError {
-        log:printError("Error while parsing request payload (pomo_details)", 'error = payload);
+        log:printError("Error while parsing request payload (pause_pomo_details)", 'error = payload);
         check caller->respond(http:STATUS_BAD_REQUEST);
         return;
     }
@@ -338,6 +351,67 @@ service / on new http:Listener(9090) {
 
     if result is sql:Error {
         log:printError("Error while inserting data into HighlightPomoDetails", 'error = result);
+        check caller->respond(http:STATUS_INTERNAL_SERVER_ERROR);
+        return;
+    }
+
+    io:println("Data inserted successfully");
+    check caller->respond(http:STATUS_OK);
+}
+
+
+
+
+
+  resource function post continue_pomo_details(http:Caller caller, http:Request req) returns error? {
+
+    json|http:ClientError payload = req.getJsonPayload();
+
+    if payload is http:ClientError {
+        log:printError("Error while parsing request payload (continue_pomo_details)", 'error = payload);
+        check caller->respond(http:STATUS_BAD_REQUEST);
+        return;
+    }
+
+    // Convert the payload to the HighlightPomoDetailsTemp record
+    ContinueDetailsTemp tempDetails = check payload.cloneWithType(ContinueDetailsTemp);
+    io:println("Received highlightContinuePomoDetails:", tempDetails);
+
+    // Convert pause_time string to time:Utc
+    time:Utc|error continueTime = time:utcFromString(tempDetails.continue_time);
+
+    if (continueTime is error) {
+        log:printError("Error parsing pause_time", 'error = continueTime);
+        check caller->respond(http:STATUS_BAD_REQUEST);
+        return;
+    }
+
+    // Create a negative duration of 5 hours and 30 minutes
+    time:Utc adjustedContinueTime = time:utcAddSeconds(continueTime, +(5 * 3600 + 30 * 60));
+
+    // Convert time:Utc to RFC 3339 string
+    string adjustedContinueTimeStr = time:utcToString(adjustedContinueTime);
+
+    // Manual formatting from RFC 3339 to "yyyy-MM-dd HH:mm:ss"
+    string formattedContinueTime = adjustedContinueTimeStr.substring(0, 10) + " " + adjustedContinueTimeStr.substring(11, 19);
+
+    // Create PausesDetails record with adjusted times
+    ContinueDetails continueDetails = {
+        highlight_id: tempDetails.highlight_id,
+        continue_time: formattedContinueTime
+    };
+
+    
+    sql:ExecutionResult|sql:Error result = self.db->execute(`
+        UPDATE PausesPomoDetails 
+        SET continue_time = ${continueDetails.continue_time} 
+        WHERE highlight_id = ${continueDetails.highlight_id} 
+        AND continue_time IS NULL;
+    `);
+
+
+    if result is sql:Error {
+        log:printError("Error while updating data into PausesDetails", 'error = result);
         check caller->respond(http:STATUS_INTERNAL_SERVER_ERROR);
         return;
     }

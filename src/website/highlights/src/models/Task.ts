@@ -1,6 +1,7 @@
 import { Entity } from "./Entity";
 
 export interface Task extends Entity {
+    // status: any;
     completed: any;
     // Date: ReactNode;
    
@@ -15,6 +16,8 @@ export interface Task extends Entity {
     reminder: string;
     priority: string;
     label:string;
+    status: 'overdue' | 'pending' | 'completed';
+    
    
     
 }

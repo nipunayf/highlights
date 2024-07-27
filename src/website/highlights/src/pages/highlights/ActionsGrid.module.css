@@ -99,7 +99,7 @@
     text-transform: uppercase; 
     letter-spacing: 1px; 
   }
-  .overduetask{
+  .overdue{
     margin-left: 0%;
     box-shadow: 0 4px 8px rgba(255, 0, 0, 0.1);
     width: 600px;

@@ -143,65 +143,21 @@ service / on new http:Listener(9090) {
         return http:INTERNAL_SERVER_ERROR;
     }
 
- resource function get tasks() returns json|error {
-    // Define the SQL query to fetch tasks
-    sql:ParameterizedQuery query = `SELECT id, title, description, dueDate, startTime, endTime, reminder, priority, label, status FROM hi`;
-    
-    // Execute the query and get a stream of tasks
-    stream<Task, sql:Error?> resultStream = self.db->query(query);
-    
-    // Initialize the map to hold the grouped tasks
-    map<json> groupedTasks = {};
-
-    // Process the result stream
-    error? e = resultStream.forEach(function(Task task) {
-        string status = task.status;
-        string label = task.label;
-
-        // Initialize the status map if it doesn't exist
-        if (!groupedTasks.hasKey(status)) {
-            groupedTasks[status] = {};
+ resource function get tasks() returns Task[]|error {
+        sql:ParameterizedQuery query = `SELECT id,title, dueDate, startTime, endTime, label, reminder, priority, description , status FROM hi`;
+        stream<Task, sql:Error?> resultStream = self.db->query(query);
+        Task[] tasksList = [];
+        error? e = resultStream.forEach(function(Task task) {
+            tasksList.push(task);
+        });
+        if (e is error) {
+            log:printError("Error occurred while fetching tasks: ", 'error = e);
+            return e;
         }
-        
-        map<json> statusMap = <map<json>> groupedTasks[status];
-
-        // Initialize the label array if it doesn't exist
-        if (!statusMap.hasKey(label)) {
-            statusMap[label] = [];
-        }
-
-        // Create a JSON object for the task
-        json taskJson = {
-            "id": task.id,
-            "title": task.title,
-            "description": task.description,
-            "dueDate": task.dueDate,
-            "startTime": task.startTime,
-            "endTime": task.endTime,
-            "reminder": task.reminder,
-            "priority": task.priority,
-            "label": task.label
-        };
-        
-        // Append the task JSON object to the label array
-        json[] existingTasks = <json[]> statusMap[label];
-        existingTasks.push(taskJson);
-        statusMap[label] = existingTasks;
-        
-        // Update the status map in groupedTasks
-        groupedTasks[status] = statusMap;
-    });
-
-    if (e is error) {
-        log:printError("Error occurred while fetching tasks: ", 'error = e);
-        return e;
+// io:print(tasklist);
+io:println(tasksList);
+        return tasksList;
     }
-    
-    // Convert the map to JSON format and return it
-    json response = groupedTasks;
-    io:println(response);
-    return response;
-}
 
 
 

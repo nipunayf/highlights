@@ -6,7 +6,7 @@ import { createTask as createApiTask } from '@/services/api';
 
 interface AddtaskPopupProps {
   open: boolean;
-  onClose: () => void;
+  onClose: () => void;   
   // addTask: (newTask: Task) => void;
 }
 
@@ -109,7 +109,8 @@ export default function AddtaskPopup({ open, onClose }: AddtaskPopupProps) {
 
     try {
       // Calling API function to create task
-      await createApiTask(apiTask as any); // Casting to 'any' to bypass type error
+      await createApiTask(apiTask as any); 
+      // Casting to 'any' to bypass type error
       // Adding new task locally after successful API call
       // addTask(newTask);
       
@@ -251,7 +252,7 @@ export default function AddtaskPopup({ open, onClose }: AddtaskPopupProps) {
             { value: 'high', label: 'High' },
           ]}
           mb="md"
-          error={errors.priority}
+         error={errors.priority}
         />
 
         {/* Textarea component for Description */}

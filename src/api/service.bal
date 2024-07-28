@@ -143,24 +143,46 @@ service / on new http:Listener(9090) {
         return http:INTERNAL_SERVER_ERROR;
     }
 
- resource function get tasks() returns Task[]|error {
-        sql:ParameterizedQuery query = `SELECT id,title, dueDate, startTime, endTime, label, reminder, priority, description , status FROM hi`;
+//  resource function get tasks() returns Task[]|error {
+//         sql:ParameterizedQuery query = `SELECT id,title, dueDate, startTime, endTime, label, reminder, priority, description , status FROM hi`;
+//         stream<Task, sql:Error?> resultStream = self.db->query(query);
+//         Task[] tasksList = [];
+//         error? e = resultStream.forEach(function(Task task) {
+//             tasksList.push(task);
+//         });
+//         if (e is error) {
+//             log:printError("Error occurred while fetching tasks: ", 'error = e);
+//             return e;
+//         }
+// // io:print(tasklist);
+// io:println(tasksList);
+//         return tasksList;
+//     }
+
+   private function fetchTasksForToday() returns Task[]|error {
+        sql:ParameterizedQuery query = `SELECT id, title, dueDate, startTime, endTime, label, reminder, priority, description, status
+                                        FROM hi
+                                        WHERE dueDate = CURRENT_DATE`;
+
         stream<Task, sql:Error?> resultStream = self.db->query(query);
         Task[] tasksList = [];
         error? e = resultStream.forEach(function(Task task) {
             tasksList.push(task);
         });
+
         if (e is error) {
             log:printError("Error occurred while fetching tasks: ", 'error = e);
             return e;
         }
-// io:print(tasklist);
-io:println(tasksList);
+
+        check resultStream.close();
         return tasksList;
     }
 
-
-
+    resource function get tasks() returns Task[]|error {
+        io:println("cbbbb");
+        return self.fetchTasksForToday();
+    }
 
 
 
@@ -204,10 +226,24 @@ io:println(tasksList);
 
     if result is sql:Error {
         log:printError("Error occurred while inserting task", 'error = result);
-        check caller->respond(http:STATUS_INTERNAL_SERVER_ERROR);
-    } else {
-        check caller->respond(http:STATUS_CREATED);
-    }
+        check caller->respond(http:STATUS_INTERNAL_SERVER_ERROR);}
+
+        Task[]|error tasks = self.fetchTasksForToday();
+        if (tasks is error) {
+            log:printError("Error occurred while fetching tasks: ", 'error = tasks);
+            check caller->respond(http:STATUS_INTERNAL_SERVER_ERROR);
+            return;
+        }
+
+        io:println(tasks);
+
+        check caller->respond(tasks);
+    
+
+
+    // } else {
+    //     check caller->respond(http:STATUS_CREATED);
+    // }
 }
 
 resource function put tasks/[int taskId](http:Caller caller, http:Request req) returns error? {

@@ -17,12 +17,19 @@ import { IconPlayerPlay, IconPlus } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
 
 function ActionsGrid() {
+  
   const [popupOpen, setPopupOpen] = useState(false);
   const [updatePopupOpen, setUpdatePopupOpen] = useState(false);
   const [confettiActive, setConfettiActive] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [currentTask, setCurrentTask] = useState<{ id: number; title: string } | null>(null);
-  const [completedTask, setCompletedTask] = useState<{ id: number; title: string } | null>(null);
+  const [currentTask, setCurrentTask] = useState<{
+    id: number;
+    title: string;
+  } | null>(null);
+  const [completedTask, setCompletedTask] = useState<{
+    id: number;
+    title: string;
+  } | null>(null);
   const [taskToUpdate, setTaskToUpdate] = useState<Task | null>(null);
 
   const handleCardClick = () => setPopupOpen(true);
@@ -70,7 +77,7 @@ function ActionsGrid() {
   // Group tasks by status and label
   const groupByStatusAndLabel = (status: string) => {
     const tasksByLabel: { [label: string]: Task[] } = {};
-    tasks?.forEach(task => {
+    tasks?.forEach((task) => {
       if (task.status === status) {
         if (!tasksByLabel[task.label]) {
           tasksByLabel[task.label] = [];
@@ -85,15 +92,24 @@ function ActionsGrid() {
   const pendingTasksByLabel = groupByStatusAndLabel("pending");
   const completedTasksByLabel = groupByStatusAndLabel("completed");
 
-  console.log(pendingTasksByLabel)
+  console.log(pendingTasksByLabel);
 
   return (
     <>
       <div className={classes.highlight_card}>
         <div className={classes.list_taskm}>
-          <Card withBorder radius="10px" className={classes.card} onClick={handleCardClick}>
+          <Card
+            withBorder
+            radius="10px"
+            className={classes.card}
+            onClick={handleCardClick}
+          >
             <Group>
-              <img src="/add.svg" alt="Add Task Icon" className={classes.icon} />
+              <img
+                src="/add.svg"
+                alt="Add Task Icon"
+                className={classes.icon}
+              />
               <Text className={classes.title}>Add Highlights</Text>
             </Group>
           </Card>
@@ -104,49 +120,62 @@ function ActionsGrid() {
             <b>Over Due</b>
           </div>
           <div className={classes.overdue}>
-  {Object.entries(overdueTasksByLabel).map(([label, tasks]) => (
-    <div key={label} className={classes.labelSection}>
-      <div className={classes.labelname}>
-        <b>{label}</b>
-      </div>
-      <div className={classes.button}>
-        <Button style={{ marginRight: "20px" }} rightSection={<IconPlayerPlay size={16} />}>
-          Start Focus
-        </Button>
-        <Button variant="outline" rightSection={<IconPlus size={16} />}>
-          Add Highlight
-        </Button>
-      </div>
-      {tasks.map(task => (
-        <div key={task.id} className={classes.overduetask}>
-          <div className={classes.taskContainer}>
-            <div className={classes.sqare}>
-              <div
-                className={`flagIcon ${completedTask && completedTask.id === task.id ? "completed" : ""}`}
-                onClick={() => handleDialogOpen(task)}
-              >
-                <FontAwesomeIcon
-                  icon={completedTask && completedTask.id === task.id ? faSolidSquare : faRegularSquare}
-                />
+            {Object.entries(overdueTasksByLabel).map(([label, tasks]) => (
+              <div key={label} className={classes.labelSection}>
+                <div className={classes.labelname}>
+                  <b>{label}</b>
+                </div>
+                <div className={classes.button}>
+                  <Button
+                    style={{ marginRight: "20px" }}
+                    rightSection={<IconPlayerPlay size={16} />}
+                  >
+                    Start Focus
+                  </Button>
+                  <Button
+                    variant="outline"
+                    rightSection={<IconPlus size={16} />}
+                  >
+                    Add Highlight
+                  </Button>
+                </div>
+                {tasks.map((task) => (
+                  <div key={task.id} className={classes.overduetask}>
+                    <div className={classes.taskContainer}>
+                      <div className={classes.sqare}>
+                        <div
+                          className={`flagIcon ${
+                            completedTask && completedTask.id === task.id
+                              ? "completed"
+                              : ""
+                          }`}
+                          onClick={() => handleDialogOpen(task)}
+                        >
+                          <FontAwesomeIcon
+                            icon={
+                              completedTask && completedTask.id === task.id
+                                ? faSolidSquare
+                                : faRegularSquare
+                            }
+                          />
+                        </div>
+                      </div>
+                      <div className={classes.taskname}>
+                        <b>{task.title}</b>
+                      </div>
+                      <div className={classes.menu}>
+                        <OptionsMenu
+                          onUpdateClick={() => handleUpdateClick(task)}
+                          onDelete={() => handleDelete(task.id)}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                <br />
               </div>
-            </div>
-            <div className={classes.taskname}>
-              <b>{task.title}</b>
-            </div>
-            <div className={classes.menu}>
-              <OptionsMenu
-                onUpdateClick={() => handleUpdateClick(task)}
-                onDelete={() => handleDelete(task.id)}
-              />
-            </div>
+            ))}
           </div>
-        </div>
-      ))}
-      <br />
-    </div>
-  ))}
-</div>
-
         </div>
 
         <div className={classes.separator}></div>
@@ -157,104 +186,134 @@ function ActionsGrid() {
             <b>Pending</b>
           </div>
           <div className={classes.pendingBox}>
-  {Object.entries(pendingTasksByLabel).map(([label, tasks]) => (
-    <div key={label} className={classes.labelSection}>
-      <div className={classes.labelname}>
-        <b>{label}</b>
-      </div>
-      <div className={classes.button}>
-        <Button style={{ marginRight: "20px" }} rightSection={<IconPlayerPlay size={16} />}>
-          Start Focus
-        </Button>
-        <Button variant="outline" rightSection={<IconPlus size={16} />}>
-          Add Highlight
-        </Button>
-      </div>
-      {tasks.map(task => (
-        <div key={task.id} className={classes.task}>
-          <div className={classes.taskContainer}>
-            <div className={classes.sqare}>
-              <div
-                className={`flagIcon ${completedTask && completedTask.id === task.id ? "completed" : ""}`}
-                onClick={() => handleDialogOpen(task)}
-              >
-                <FontAwesomeIcon
-                  icon={completedTask && completedTask.id === task.id ? faSolidSquare : faRegularSquare}
-                />
+            {Object.entries(pendingTasksByLabel).map(([label, tasks]) => (
+              <div key={label} className={classes.labelSection}>
+                <div className={classes.labelname}>
+                  <b>{label}</b>
+                </div>
+                <div className={classes.button}>
+                  <Button
+                    style={{ marginRight: "20px" }}
+                    rightSection={<IconPlayerPlay size={16} />}
+                  >
+                    Start Focus
+                  </Button>
+                  <Button
+                    variant="outline"
+                    rightSection={<IconPlus size={16} />}
+                  >
+                    Add Highlight
+                  </Button>
+                </div>
+                {tasks.map((task) => (
+                  <div key={task.id} className={classes.task}>
+                    <div className={classes.taskContainer}>
+                      <div className={classes.sqare}>
+                        <div
+                          className={`flagIcon ${
+                            completedTask && completedTask.id === task.id
+                              ? "completed"
+                              : ""
+                          }`}
+                          onClick={() => handleDialogOpen(task)}
+                        >
+                          <FontAwesomeIcon
+                            icon={
+                              completedTask && completedTask.id === task.id
+                                ? faSolidSquare
+                                : faRegularSquare
+                            }
+                          />
+                        </div>
+                      </div>
+                      <div className={classes.taskname}>
+                        <b>{task.title}</b>
+                      </div>
+                      <div className={classes.menu}>
+                        <OptionsMenu
+                          onUpdateClick={() => handleUpdateClick(task)}
+                          onDelete={() => handleDelete(task.id)}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                <br />
               </div>
-            </div>
-            <div className={classes.taskname}>
-              <b>{task.title}</b>
-            </div>
-            <div className={classes.menu}>
-              <OptionsMenu
-                onUpdateClick={() => handleUpdateClick(task)}
-                onDelete={() => handleDelete(task.id)}
-              />
-            </div>
+            ))}
           </div>
-        </div>
-      ))}
-      <br />
-    </div>
-  ))}
-</div>
-
 
           {/* Completed Tasks Section */}
           <div className={classes.completetitle}>
             <b>Completed</b>
           </div>
           <div className={classes.completed}>
-  {Object.entries(completedTasksByLabel).map(([label, tasks]) => (
-    <div key={label} className={classes.labelSection}>
-      <div className={classes.labelname}>
-        <b>{label}</b>
-      </div>
-      <div className={classes.button}>
-        <Button style={{ marginRight: "20px" }} rightSection={<IconPlayerPlay size={16} />}>
-          Start Focus
-        </Button>
-        <Button variant="outline" rightSection={<IconPlus size={16} />}>
-          Add Highlight
-        </Button>
-      </div>
-      {tasks.map(task => (
-        <div key={task.id} className={classes.completedtask}>
-          <div className={classes.taskContainer}>
-            <div className={classes.sqare}>
-              <div
-                className={`flagIcon ${completedTask && completedTask.id === task.id ? "completed" : ""}`}
-                onClick={() => handleDialogOpen(task)}
-              >
-                <FontAwesomeIcon
-                  icon={completedTask && completedTask.id === task.id ? faSolidSquare : faRegularSquare}
-                />
+            {Object.entries(completedTasksByLabel).map(([label, tasks]) => (
+              <div key={label} className={classes.labelSection}>
+                <div className={classes.labelname}>
+                  <b>{label}</b>
+                </div>
+                <div className={classes.button}>
+                  <Button
+                    style={{ marginRight: "20px" }}
+                    rightSection={<IconPlayerPlay size={16} />}
+                  >
+                    Start Focus
+                  </Button>
+                  <Button
+                    variant="outline"
+                    rightSection={<IconPlus size={16} />}
+                  >
+                    Add Highlight
+                  </Button>
+                </div>
+                {tasks.map((task) => (
+                  <div key={task.id} className={classes.completedtask}>
+                    <div className={classes.taskContainer}>
+                      <div className={classes.sqare}>
+                        <div
+                          className={`flagIcon ${
+                            completedTask && completedTask.id === task.id
+                              ? "completed"
+                              : ""
+                          }`}
+                          onClick={() => handleDialogOpen(task)}
+                        >
+                          <FontAwesomeIcon
+                            icon={
+                              completedTask && completedTask.id === task.id
+                                ? faSolidSquare
+                                : faRegularSquare
+                            }
+                          />
+                        </div>
+                      </div>
+                      <div className={classes.taskname}>
+                        <b>{task.title}</b>
+                      </div>
+                      <div className={classes.menu}>
+                        <OptionsMenu
+                          onUpdateClick={() => handleUpdateClick(task)}
+                          onDelete={() => handleDelete(task.id)}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                <br />
               </div>
-            </div>
-            <div className={classes.taskname}>
-              <b>{task.title}</b>
-            </div>
-            <div className={classes.menu}>
-              <OptionsMenu
-                onUpdateClick={() => handleUpdateClick(task)}
-                onDelete={() => handleDelete(task.id)}
-              />
-            </div>
+            ))}
           </div>
-        </div>
-      ))}
-      <br />
-    </div>
-  ))}
-</div>
-
         </div>
       </div>
 
       <AddtaskPopup open={popupOpen} onClose={handleClosePopup} />
       {confettiActive && (
-        <Confetti width={window.innerWidth} height={window.innerHeight} recycle={false} />
+        <Confetti
+          width={window.innerWidth}
+          height={window.innerHeight}
+          recycle={false}
+        />
       )}
       {completedTask && (
         <div className={classes.completedMessage}>

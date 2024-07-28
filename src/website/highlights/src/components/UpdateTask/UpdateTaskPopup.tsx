@@ -18,6 +18,7 @@ interface Task {
   dueDate: Date | null;
   startTime: string;
   endTime: string;
+  label: string;
   reminder: string;
   priority: string;
 }
@@ -29,6 +30,7 @@ interface ApiTask {
   dueDate: string | null;
   startTime: string;
   endTime: string;
+  label: string;
   reminder: string;
   priority: string;
 }
@@ -37,6 +39,7 @@ const UpdateTaskPopup: React.FC<UpdateTaskPopupProps> = ({ open, onClose, task, 
   const [formState, setFormState] = useState({
     title: '',
     description: '',
+    label: '',
     reminder: '',
     priority: '',
   });
@@ -53,10 +56,11 @@ const UpdateTaskPopup: React.FC<UpdateTaskPopupProps> = ({ open, onClose, task, 
       setFormState({
         title: task.title,
         description: task.description,
+        label: task.label,
         reminder: task.reminder,
         priority: task.priority,
       });
-      setDueDate(task.dueDate);
+      setDueDate(task.dueDate instanceof Date ? task.dueDate : new Date(task.dueDate as any));
       setStartTime(task.startTime);
       setEndTime(task.endTime);
     }
@@ -75,7 +79,9 @@ const UpdateTaskPopup: React.FC<UpdateTaskPopupProps> = ({ open, onClose, task, 
     if (startTime && endTime && new Date(`1970-01-01T${startTime}Z`).getTime() >= new Date(`1970-01-01T${endTime}Z`).getTime()) {
       newErrors.time = 'Start time should be less than end time';
     }
-    if (dueDate && dueDate.getTime() < new Date().setHours(0, 0, 0, 0)) newErrors.dueDate = 'Due date should be today or a future date';
+    if (dueDate instanceof Date && dueDate.getTime() < new Date().setHours(0, 0, 0, 0)) {
+      newErrors.dueDate = 'Due date should be today or a future date';
+    }
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -91,6 +97,7 @@ const UpdateTaskPopup: React.FC<UpdateTaskPopupProps> = ({ open, onClose, task, 
       dueDate: adjustedDueDate,
       startTime: startTime,
       endTime: endTime,
+      label: formState.label,
       reminder: formState.reminder,
       priority: formState.priority,
     };
@@ -102,8 +109,8 @@ const UpdateTaskPopup: React.FC<UpdateTaskPopupProps> = ({ open, onClose, task, 
       endTime: updatedTask.endTime,
     };
 
-    console.log("Updated Task:", updatedTask);
-    console.log("API Task:", apiTask);
+    console.log('Updated Task:', updatedTask);
+    console.log('API Task:', apiTask);
 
     try {
       await updateApiTask(apiTask as any);
@@ -121,7 +128,7 @@ const UpdateTaskPopup: React.FC<UpdateTaskPopupProps> = ({ open, onClose, task, 
   );
 
   const handleSelectChange = (value: string | null) => {
-    setFormState(prevState => ({
+    setFormState((prevState) => ({
       ...prevState,
       reminder: value || '',
     }));
@@ -143,19 +150,17 @@ const UpdateTaskPopup: React.FC<UpdateTaskPopupProps> = ({ open, onClose, task, 
           label="Title"
           name="title"
           value={formState.title}
-          onChange={(e) => setFormState(prevState => ({
-            ...prevState,
-            title: e.target.value,
-          }))}
+          onChange={(e) =>
+            setFormState((prevState) => ({
+              ...prevState,
+              title: e.target.value,
+            }))
+          }
           error={errors.title}
         />
 
         <div style={{ display: 'flex', justifyContent: 'center', margin: '16px 0' }}>
-          <DatePicker 
-            value={dueDate} 
-            onChange={setDueDate} 
-            minDate={new Date()}
-          />
+          <DatePicker value={dueDate} onChange={setDueDate} minDate={new Date()} />
           {errors.dueDate && <Text color="red">{errors.dueDate}</Text>}
         </div>
 
@@ -181,11 +186,19 @@ const UpdateTaskPopup: React.FC<UpdateTaskPopupProps> = ({ open, onClose, task, 
         </div>
 
         <Select
-      label="Your favorite library"
-      placeholder="Pick value"
-      data={['React', 'Angular', 'Vue', 'Svelte']}
-      searchable
-    />
+          label="Label"
+          placeholder="Pick value"
+          name="label"
+          value={formState.label}
+          onChange={(value) =>
+            setFormState((prevState) => ({
+              ...prevState,
+              label: value || '',
+            }))
+          }
+          data={['React', 'Angular', 'Vue', 'Svelte'].map((value) => ({ value, label: value }))}
+          searchable
+        />
 
         <Select
           label="Reminder"
@@ -193,7 +206,12 @@ const UpdateTaskPopup: React.FC<UpdateTaskPopupProps> = ({ open, onClose, task, 
           name="reminder"
           value={formState.reminder}
           onChange={handleSelectChange}
-          data={['Before 10 minutes', 'Before 15 minutes', 'Before 20 minutes', 'Before 30 minutes'].map(value => ({ value, label: value }))}
+          data={[
+            'Before 10 minutes',
+            'Before 15 minutes',
+            'Before 20 minutes',
+            'Before 30 minutes',
+          ].map((value) => ({ value, label: value }))}
           mb="md"
           error={errors.reminder}
         />
@@ -203,10 +221,12 @@ const UpdateTaskPopup: React.FC<UpdateTaskPopupProps> = ({ open, onClose, task, 
           placeholder="Pick value"
           name="priority"
           value={formState.priority}
-          onChange={(value) => setFormState(prevState => ({
-            ...prevState,
-            priority: value || '',
-          }))}
+          onChange={(value) =>
+            setFormState((prevState) => ({
+              ...prevState,
+              priority: value || '',
+            }))
+          }
           data={[
             { value: 'none', label: 'None' },
             { value: 'low', label: 'Low' },
@@ -222,10 +242,12 @@ const UpdateTaskPopup: React.FC<UpdateTaskPopupProps> = ({ open, onClose, task, 
           label="Description"
           name="description"
           value={formState.description}
-          onChange={(e) => setFormState(prevState => ({
-            ...prevState,
-            description: e.target.value,
-          }))}
+          onChange={(e) =>
+            setFormState((prevState) => ({
+              ...prevState,
+              description: e.target.value,
+            }))
+          }
           mb="md"
           error={errors.description}
         />

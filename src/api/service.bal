@@ -130,8 +130,6 @@ service / on new http:Listener(9090) {
         self.db = check new ("localhost", "root", "root", "highlights", 3306);
     }
 
-
-
     resource function post users(CreateUser createUser) returns http:Created|http:Conflict|http:InternalServerError {
 
         User|sql:Error result = self.db->queryRow(`SELECT * FROM users WHERE sub = ${createUser.sub}`);
@@ -165,11 +163,6 @@ service / on new http:Listener(9090) {
         log:printInfo("Task added");
         return task;
     }
-
-
-
-
-
 
     resource function get timer_details() returns TimerDetails[]|error {
 
@@ -208,10 +201,6 @@ service / on new http:Listener(9090) {
         return timerDetailsList;
     }
 
-
-
-
-
     // Function to get highlights from the database
     resource function get highlights() returns Highlight[]|error {
 
@@ -241,10 +230,6 @@ service / on new http:Listener(9090) {
 
         return highlightList;
     }
-
-
-
-
 
     resource function post add_pomo_details(http:Caller caller, http:Request req) returns error? {
 
@@ -314,13 +299,6 @@ service / on new http:Listener(9090) {
         check caller->respond(http:STATUS_OK);
     }
 
-
-
-
-
-
-
-
     resource function post pause_pomo_details(http:Caller caller, http:Request req) returns error? {
 
         json|http:ClientError payload = req.getJsonPayload();
@@ -374,11 +352,6 @@ service / on new http:Listener(9090) {
         io:println("Data inserted successfully");
         check caller->respond(http:STATUS_OK);
     }
-
-
-
-
-
 
     resource function post continue_pomo_details(http:Caller caller, http:Request req) returns error? {
 
@@ -435,62 +408,86 @@ service / on new http:Listener(9090) {
         check caller->respond(http:STATUS_OK);
     }
 
+    // resource function get focus_record/[int userId]() returns TimeRecord|http:InternalServerError|error {
+    //     HighlightPomoDetailsTemp highlightPomoDetail = {
+    //         highlight_id: -1,
+    //         start_time: "",
+    //         end_time: "",
+    //         user_id: 0,
+    //         timer_id: 0,
+    //         status: ""
+    //     };
+    //     string[][] pauseAndContinueTimes = [];
 
+    //     // Query to get highlight_id, start_time, and end_time from HighlightPomoDetails
+    //     sql:ParameterizedQuery highlightQuery = `SELECT highlight_id, start_time, end_time FROM HighlightPomoDetails WHERE user_id = ${userId}`;
+    //     stream<record {|int highlight_id; string start_time; string end_time;|}, sql:Error?> highlightStream = self.db->query(highlightQuery);
 
+    //     // Iterate over the result stream
+    //     var highlightResult = highlightStream.next();
+    //     if (highlightResult is record {|record {|int highlight_id; string start_time; string end_time;|} value;|}) {
+    //         highlightPomoDetail = {
+    //             highlight_id: highlightResult.value.highlight_id,
+    //             start_time: highlightResult.value.start_time,
+    //             end_time: highlightResult.value.end_time,
+    //             user_id: 0,
+    //             timer_id: 0,
+    //             status: ""
+    //         };
+    //     } else {
+    //         io:println("Highlight not found.");
+    //     }
 
+    //     // Query to get pause_time and continue_time from PausesPomoDetails
+    //     sql:ParameterizedQuery pausesQuery = `SELECT pause_time, continue_time FROM PausesPomoDetails WHERE highlight_id = ${highlightPomoDetail.highlight_id}`;
+    //     stream<record {|string pause_time; string continue_time;|}, sql:Error?> pausesStream = self.db->query(pausesQuery);
 
+    //     check from var pause in pausesStream
+    //         do {
+    //             pauseAndContinueTimes.push([pause.pause_time, pause.continue_time]);
+    //         };
 
+    //     TimeRecord timeRecord = {
+    //         highlight_id: highlightPomoDetail.highlight_id,
+    //         start_time: highlightPomoDetail.start_time,
+    //         end_time: highlightPomoDetail.end_time,
+    //         pause_and_continue_times: pauseAndContinueTimes
+    //     };
+    //     io:println(timeRecord);
 
+    //     return timeRecord;
+    // }
 
-    resource function get focus_record/[int userId]() returns TimeRecord|http:InternalServerError|error {
-        HighlightPomoDetailsTemp highlightPomoDetail = {
-            highlight_id: -1,
-            start_time: "",
-            end_time: "",
-            user_id: 0,
-            timer_id: 0,
-            status: ""
-        };
-        string[][] pauseAndContinueTimes = [];
-
-        // Query to get highlight_id, start_time, and end_time from HighlightPomoDetails
+    resource function get focus_record/[int userId]() returns TimeRecord[]|http:InternalServerError|error {
+        // Query to get all highlights for the given user
         sql:ParameterizedQuery highlightQuery = `SELECT highlight_id, start_time, end_time FROM HighlightPomoDetails WHERE user_id = ${userId}`;
-        stream<record {|int highlight_id; string start_time; string end_time;|}, sql:Error?> highlightStream = self.db->query(highlightQuery);
+        stream<record {|int highlight_id; time:Utc start_time; time:Utc end_time;|}, sql:Error?> highlightStream = self.db->query(highlightQuery);
 
-        // Iterate over the result stream
-        var highlightResult = highlightStream.next();
-        if (highlightResult is record {|record {|int highlight_id; string start_time; string end_time;|} value;|}) {
-            highlightPomoDetail = {
-                highlight_id: highlightResult.value.highlight_id,
-                start_time: highlightResult.value.start_time,
-                end_time: highlightResult.value.end_time,
-                user_id: 0,
-                timer_id: 0,
-                status: ""
-            };
-        } else {
-            io:println("Highlight not found.");
-        }
+        TimeRecord[] highlightTimeRecords = [];
 
-        // Query to get pause_time and continue_time from PausesPomoDetails
-        sql:ParameterizedQuery pausesQuery = `SELECT pause_time, continue_time FROM PausesPomoDetails WHERE highlight_id = ${highlightPomoDetail.highlight_id}`;
-        stream<record {|string pause_time; string continue_time;|}, sql:Error?> pausesStream = self.db->query(pausesQuery);
-
-        check from var pause in pausesStream
+        // Iterate over the highlight results
+        check from var highlight in highlightStream
             do {
-                pauseAndContinueTimes.push([pause.pause_time, pause.continue_time]);
+                string[][] pauseAndContinueTimes = [];
+
+                // Convert time:Utc to RFC 3339 strings
+                string startTimeStr = time:utcToString(highlight.start_time);
+                string endTimeStr = time:utcToString(highlight.end_time);
+
+                // Manual formatting from RFC 3339 to "yyyy-MM-dd HH:mm:ss"
+                string formattedStartTime = startTimeStr.substring(0, 10) + " " + startTimeStr.substring(11, 19);
+                string formattedEndTime = endTimeStr.substring(0, 10) + " " + endTimeStr.substring(11, 19);
+
+                TimeRecord timeRecord = {
+                    highlight_id: highlight.highlight_id,
+                    start_time: formattedStartTime,
+                    end_time: formattedEndTime,
+                    pause_and_continue_times: pauseAndContinueTimes
+                };
+
+                highlightTimeRecords.push(timeRecord);
             };
-
-        TimeRecord timeRecord = {
-            highlight_id: highlightPomoDetail.highlight_id,
-            start_time: highlightPomoDetail.start_time,
-            end_time: highlightPomoDetail.end_time,
-            pause_and_continue_times: pauseAndContinueTimes
-        };
-        io:println(timeRecord);
-
-        return timeRecord;
+        return highlightTimeRecords;
     }
 
 }
-

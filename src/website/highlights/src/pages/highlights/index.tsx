@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from "react";
+import React, { ReactNode, useState, useEffect } from "react";
 import { Card, Group, Text, Button } from "@mantine/core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSquare as faRegularSquare } from "@fortawesome/free-regular-svg-icons";
@@ -10,14 +10,12 @@ import OptionsMenu from "@/components/Optionmenu/OptionPopup";
 import AlertDialogSlide from "@/components/Feedback/AlertDialogSlide";
 import UpdateTaskPopup from "@/components/UpdateTask/UpdateTaskPopup";
 import classes from "./ActionsGrid.module.css";
-import { useTasks } from "@/hooks/useTasks";
+import { getTasks, deleteTask } from "@/services/api";
 import { Task } from "@/models/Task";
-import { deleteTask } from "@/services/api";
 import { IconPlayerPlay, IconPlus } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
 
 function ActionsGrid() {
-  
   const [popupOpen, setPopupOpen] = useState(false);
   const [updatePopupOpen, setUpdatePopupOpen] = useState(false);
   const [confettiActive, setConfettiActive] = useState(false);
@@ -31,9 +29,32 @@ function ActionsGrid() {
     title: string;
   } | null>(null);
   const [taskToUpdate, setTaskToUpdate] = useState<Task | null>(null);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isError, setIsError] = useState<boolean>(false);
+
+  const fetchTasks = async () => {
+    setIsLoading(true);
+    try {
+      const fetchedTasks = await getTasks();
+      setTasks(fetchedTasks);
+      setIsError(false);
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
+      setIsError(true);
+    }
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    fetchTasks();
+  }, []);
 
   const handleCardClick = () => setPopupOpen(true);
-  const handleClosePopup = () => setPopupOpen(false);
+  const handleClosePopup = () => {
+    setPopupOpen(false);
+    fetchTasks();
+  };
   const handleComplete = (task: { id: number; title: string }) => {
     setCompletedTask(task);
     setConfettiActive(true);
@@ -60,12 +81,13 @@ function ActionsGrid() {
   const handleUpdateClose = () => {
     setUpdatePopupOpen(false);
     setTaskToUpdate(null);
+    fetchTasks();
   };
 
-  const { tasks, isLoading, isError } = useTasks();
   const handleDelete = async (taskId: number) => {
     try {
       await deleteTask(taskId);
+      fetchTasks();
     } catch (error) {
       console.error("Failed to delete task:", error);
     }

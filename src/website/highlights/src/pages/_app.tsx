@@ -9,6 +9,8 @@ import { AuthenticationResult, EventType, InteractionType, PublicClientApplicati
 import { msalConfig } from '../authConfig';
 import { NextPage } from 'next';
 import { ReactElement, ReactNode, StrictMode } from 'react';
+import { Provider } from 'react-redux';
+import { store } from '../store';
 
 export const msalInstance = new PublicClientApplication(msalConfig);
 
@@ -45,14 +47,16 @@ type AppPropsWithLayout = AppProps & {
 }
 
 export default function App({ Component, pageProps }: AppPropsWithLayout) {
-    const getLayout = Component.getLayout ?? ((page) => page)
+    const getLayout = Component.getLayout ?? ((page) => page);
 
     return (
         <StrictMode>
             <MsalProvider instance={msalInstance}>
                 <MsalAuthenticationTemplate interactionType={InteractionType.Redirect}>
                     <MantineProvider theme={theme}>
-                        {getLayout(<Component {...pageProps} />)}
+                        <Provider store={store}>
+                            {getLayout(<Component {...pageProps} />)}
+                        </Provider>
                     </MantineProvider>
                 </MsalAuthenticationTemplate>
             </MsalProvider>

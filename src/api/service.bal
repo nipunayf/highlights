@@ -5,10 +5,6 @@ import ballerina/time;
 import ballerinax/mysql;
 import ballerinax/mysql.driver as _;
 
-type Greeting record {|
-    string greeting;
-|};
-
 type CreateUser record {|
     string sub;
 |};
@@ -24,11 +20,58 @@ type Task record {|
     time:Utc? dueDate = null;
 |};
 
+type Highlight record {|
+    string id;
+    string created;
+    string title;
+    string date;
+    string startTime;
+    string endTime;
+    string notification;
+    string priority;
+    boolean completed;
+    string[] taskIds;
+|};
+
 Task[] tasks = [
     {id: "1", title: "Task 1"},
     {id: "2", title: "Task 2"},
     {id: "3", title: "Task 3"}
 ];
+
+Highlight[] highlights = [
+    {
+        id: "1",
+        created: time:utcToString(time:utcNow()),
+        title: "Highlight 1",
+        date: time:utcToString(check time:utcFromString("2024-09-01T00:00:00Z")),
+        startTime: time:utcToString(check time:utcFromString("2024-09-01T00:00:00Z")),
+        endTime: time:utcToString(check time:utcFromString("2024-09-01T00:00:00Z")),
+        notification: "0",
+        priority: "default",
+        completed: false,
+        taskIds: ["1", "2"]
+    },
+    {
+        id: "2",
+        created: time:utcToString(time:utcNow()),
+        title: "Highlight 2",
+        date: time:utcToString(check time:utcFromString("2024-09-01T00:00:00Z")),
+        startTime: time:utcToString(check time:utcFromString("2024-09-01T00:00:00Z")),
+        endTime: time:utcToString(check time:utcFromString("2024-09-01T00:00:00Z")),
+        notification: "0",
+        priority: "default",
+        completed: false,
+        taskIds: ["3"]
+    }
+];
+
+type TaskList record {|
+    int id;
+    @sql:Column {name: "user_id"}
+    int userId;
+    string title;
+|};
 
 // listener http:Listener securedEP = new (9090);
 
@@ -56,12 +99,6 @@ configurable string azureAdAudience = ?;
     }
 }
 service / on new http:Listener(9090) {
-
-    resource function get greeting(string? name) returns Greeting {
-        string greetingStr = string `Hello, ${name == () ? "visitor" : name}!`;
-        Greeting greeting = {greeting: greetingStr};
-        return greeting;
-    }
 
     private final mysql:Client db;
 
@@ -95,6 +132,21 @@ service / on new http:Listener(9090) {
         return http:INTERNAL_SERVER_ERROR;
     }
 
+    resource function get taskLists(string sub) returns TaskList[]|error {
+        User|sql:Error result = self.db->queryRow(`SELECT * FROM users WHERE sub = ${sub}`);
+
+        if result is sql:NoRowsError {
+            return error("User not found");
+        }
+
+        stream<TaskList, sql:Error?> taskListStream = self.db->query(
+            `SELECT * FROM task_lists WHERE user_id=(SELECT u.id FROM users AS u WHERE u.sub=${sub});`
+        );
+
+        return from TaskList taskList in taskListStream
+            select taskList;
+    }
+
     resource function get tasks() returns Task[] {
         return tasks;
     }
@@ -103,5 +155,9 @@ service / on new http:Listener(9090) {
         tasks.push({id: (tasks.length() + 1).toString(), title: task.title});
         log:printInfo("Task added");
         return task;
+    }
+
+    resource function get highlights() returns Highlight[] {
+        return highlights;
     }
 }

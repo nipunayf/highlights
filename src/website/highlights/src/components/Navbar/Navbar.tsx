@@ -7,10 +7,14 @@ import {
     rem,
     Space,
 } from '@mantine/core';
-import { IconBulb, IconUser, IconCheckbox, IconPlus, IconChartDots2, IconCalendarMonth , IconBellRinging,IconTie,IconAlarm} from '@tabler/icons-react';
+import { IconBulb, IconUser, IconCheckbox, IconPlus, IconChartDots2, IconCalendarMonth, IconTie, IconAlarm, IconList, IconBellRinging } from '@tabler/icons-react';
 import classes from './Navbar.module.css';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+import { fetchTaskLists, selectTaskListById, selectUserTaskListIds } from '@/features/taskLists/taskListsSlice';
+import { useAppDispatch, useAppSelector } from '@/hooks';
+import { useAppUser } from '@/hooks/useAppUser';
 
 const links = [
     { icon: IconBulb, label: 'Highlights', path: '/highlights' },
@@ -21,23 +25,56 @@ const links = [
     { icon: IconUser, label: 'Profile', path: '/profile' },
     { icon: IconTie, label: 'Dailytips', path: '/dailytips' },
     { icon: IconBellRinging, label: 'Projects', path: '/projects' },
-    // { icon: IconBellRinging, label: 'Notification', path: '/notification' },
 ];
 
-const collections = [
-    { emoji: '👍', label: 'Sales' },
-    { emoji: '🚚', label: 'Deliveries' },
-    { emoji: '💸', label: 'Discounts' },
-    { emoji: '💰', label: 'Profits' },
-    { emoji: '✨', label: 'Reports' },
-    { emoji: '🛒', label: 'Orders' },
-    { emoji: '📅', label: 'Events' },
-    { emoji: '🙈', label: 'Debts' },
-    { emoji: '💁‍♀️', label: 'Customers' },
-];
+let taskListIds: string[] = [];
+
+let TaskListExcerpt = ({ taskListId, active, setActive }: { taskListId: string, active: string, setActive: (label: string) => void }) => {
+    const taskList = useAppSelector(state => selectTaskListById(state, taskListId))
+    taskListIds.push(taskList.id);
+    return (
+        <UnstyledButton
+            component={Link}
+            href={`/tasks/${taskList.id}`}
+            key={taskList.id}
+            className={classes.mainLink}
+            data-active={taskList.id === active || undefined}
+            onClick={(e) => {
+                setActive(taskList.id);
+            }}>
+            <div className={classes.mainLinkInner}>
+                <IconList size={20} className={classes.mainLinkIcon} />
+                <span>{taskList.title}</span>
+            </div>
+        </UnstyledButton>
+    );
+}
 
 export default function Navbar() {
-    const [active, setActive] = useState('Billing');
+    const router = useRouter();
+    const [active, setActive] = useState('Highlights');
+
+    const dispatch = useAppDispatch();
+
+    const taskListIds = useAppSelector(selectUserTaskListIds);
+    const { user } = useAppUser();
+
+    useEffect(() => {
+        dispatch(fetchTaskLists(user));
+    }, [dispatch, user]);
+
+    useEffect(() => {
+        const currentPath = router.pathname;
+        const currentSection = links.find(item => item.path === currentPath);
+        if (currentSection) {
+            setActive(currentSection.label);
+        } else {
+            const currentTaskList = taskListIds.find(item => `/tasks/${item}` === router.asPath);
+            if (currentTaskList) {
+                setActive(currentTaskList);
+            }
+        }
+    }, [router.pathname, taskListIds]);
 
     const mainLinks = links.map((link) => (
         <UnstyledButton
@@ -54,18 +91,6 @@ export default function Navbar() {
                 <span>{link.label}</span>
             </div>
         </UnstyledButton >
-    ));
-
-    const collectionLinks = collections.map((collection) => (
-        <a
-            href="#"
-            onClick={(event) => event.preventDefault()}
-            key={collection.label}
-            className={classes.collectionLink}
-        >
-            <span style={{ marginRight: rem(9), fontSize: rem(16) }}>{collection.emoji}</span>{' '}
-            {collection.label}
-        </a>
     ));
 
     return (
@@ -86,7 +111,11 @@ export default function Navbar() {
                         </ActionIcon>
                     </Tooltip>
                 </Group>
-                <div className={classes.collections}>{collectionLinks}</div>
+                <div className={classes.collections}>
+                    {taskListIds.map((taskListId: string) => (
+                        <TaskListExcerpt key={taskListId} taskListId={taskListId} active={active} setActive={setActive} />
+                    ))}
+                </div>
             </div>
         </nav>
     );

@@ -79,8 +79,10 @@ const Help: React.FC = () => {
                 <div className='help2_bottom' data-aos="fade-up">
                     <div className='box'>
                         <h4>Pomodoro Timer</h4>
-                        <ul>
+        
                             <li><TbChecks /> Select a highlight from the list</li>
+
+                        
                             <li><TbChecks /> Click the 'Start Timer' button to begin a 25-minute work session</li>
                             <li><TbChecks /> After 25 minutes, take a 5-minute break</li>
                             <li><TbChecks /> Go to the 'Pomodoro' page to see your completed sessions</li>
@@ -101,6 +103,10 @@ const Help: React.FC = () => {
                         <ul>
                             <li><TbChecks /> </li>
                             <li><TbChecks /> </li>
+
+                            <li><TbChecks /></li>
+                            <li><TbChecks /></li>
+
                             
                         </ul>
                     </div>

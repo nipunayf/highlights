@@ -67,7 +67,6 @@ CREATE TABLE `HighlightPomoDetails` (
   `start_time` DATETIME,
   `end_time` DATETIME,
   `status` ENUM('complete', 'uncomplete') DEFAULT 'uncomplete'
-  -- `pauses_time_slots` DATETIME
 );
 
 

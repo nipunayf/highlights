@@ -95,15 +95,40 @@ type TimeRecord record {|
     string[][] pause_and_continue_times;
 |};
 
+
 Task[] tasks = [
     {id: "1", title: "Task 1"},
     {id: "2", title: "Task 2"},
     {id: "3", title: "Task 3"}
 ];
 
+
+type FocusRecord record {
+    string highlight_id;
+    time:TimeOfDay start_time;
+    time:TimeOfDay end_time;
+};
+
+type PauseContinueDetails record {
+    string highlight_id;
+    time:TimeOfDay pause_time;
+    time:TimeOfDay continue_time;
+};
+
+type FocusSummary record {
+    FocusRecord focusRecord;
+    PauseContinueDetails[] pauseContinueDetails;
+};
+
+
+
 // Define the configuration variables
 configurable string azureAdIssuer = ?;
 configurable string azureAdAudience = ?;
+
+type PauseAndContinueTime record {
+    
+};
 
 @http:ServiceConfig {
     cors: {
@@ -458,6 +483,18 @@ service / on new http:Listener(9090) {
     //     return timeRecord;
     // }
 
+
+
+
+
+
+
+
+
+
+
+
+
     resource function get focus_record/[int userId]() returns TimeRecord[]|http:InternalServerError|error {
         // Query to get all highlights for the given user
         sql:ParameterizedQuery highlightQuery = `SELECT highlight_id, start_time, end_time FROM HighlightPomoDetails WHERE user_id = ${userId}`;
@@ -487,7 +524,10 @@ service / on new http:Listener(9090) {
 
                 highlightTimeRecords.push(timeRecord);
             };
+            io:println(highlightTimeRecords);
         return highlightTimeRecords;
     }
 
+
 }
+

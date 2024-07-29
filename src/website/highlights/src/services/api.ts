@@ -2,7 +2,7 @@ import { apiEndpoint } from "@/apiConfig";
 import { aquireAccessToken } from "@/util/auth";
 import { Task } from "@/models/Task";
 import { HighlightTask } from "@/models/HighlightTask";
-import { mTimer, mPomo_details, mPauses_details } from "@/models/Timer";
+import { mTimer, mPomo_details, mPauses_details,mTimeRecord } from "@/models/Timer";
 import axios, { AxiosInstance } from "axios";
 
 // Function to create an Axios client with authorization
@@ -173,6 +173,32 @@ export async function sendContinueData(continueDetails: {
         throw error;
     }
 }
+
+
+
+
+
+
+
+
+
+
+export async function getFocusRecord(userId: number): Promise<mTimeRecord[]> {
+    try {
+      const response = await getAxiosClient('focus_record').request<mTimeRecord[]>({
+        method: 'GET',
+        url: `/${userId}`
+      });
+  
+      // Log the response data to the console
+      console.log('Data sent to the backend:----------------------------------------------------------', response.data);
+  
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching focus record:', error);
+      throw error;
+    }
+  }
 
 
 

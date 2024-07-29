@@ -73,7 +73,7 @@
 
 
 .sqare{
-  /* margin-left: 70%; */
+  margin-left: -3%;
   cursor: pointer;
  
 }
@@ -83,12 +83,31 @@
   margin-left: 12.6%;
   display: flex;
   justify-content: space-between;
+  display: flex;
  
   background-color: rgb(253, 253, 253);
+  gap: 10px;
   
   
  } 
+ .taskstarttime{
+  margin-right: -25%;
+ }
+ .taskendtime{
+  margin-right: -28%;
+  /* padding-right: 25%; */
+  /* background-color: aqua; */
+ 
+ }
+ .taskname{
+cursor: pointer;
+margin-left: -20%;
+ }
 
+/* .sqarex{
+  display: flex;
+  margin-right: 120%;
+} */
 
   .overduetitle {
     font-size: 24px; 

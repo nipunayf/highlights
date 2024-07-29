@@ -14,8 +14,13 @@ import { getTasks, deleteTask } from "@/services/api";
 import { Task } from "@/models/Task";
 import { IconPlayerPlay, IconPlus } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
+import Detailspopup from "@/components/AddTask/Detailspopup";
+
 
 function ActionsGrid() {
+  const [selectedTask,setSelectedTask] = useState<Task | null>(null);
+  const [taskDetailPopupOpen, setTaskDetailPopupOpen] = useState(false);
+
   const [popupOpen, setPopupOpen] = useState(false);
   const [updatePopupOpen, setUpdatePopupOpen] = useState(false);
   const [confettiActive, setConfettiActive] = useState(false);
@@ -46,10 +51,12 @@ function ActionsGrid() {
     setIsLoading(false);
   };
 
-  useEffect(() => {
-    fetchTasks();
-  }, []);
+  const handleTaskClick = (task: Task) => {
+    setSelectedTask(task);
+    setTaskDetailPopupOpen(true);
+  };
 
+ 
   const handleCardClick = () => setPopupOpen(true);
   const handleClosePopup = () => {
     setPopupOpen(false);
@@ -92,6 +99,11 @@ function ActionsGrid() {
       console.error("Failed to delete task:", error);
     }
   };
+
+  useEffect(() => {
+    fetchTasks();
+  }, []);
+
 
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Error loading tasks.</div>;
@@ -147,6 +159,7 @@ function ActionsGrid() {
                 <div className={classes.labelname}>
                   <b>{label}</b>
                 </div>
+
                 <div className={classes.button}>
                   <Button
                     style={{ marginRight: "20px" }}
@@ -182,8 +195,14 @@ function ActionsGrid() {
                           />
                         </div>
                       </div>
-                      <div className={classes.taskname}>
-                        <b>{task.title}</b>
+                      <div className="taskname" onClick={() => handleTaskClick(task)} >
+                      <b>{task.title}</b>
+                      </div>
+                      <div className={classes.taskstarttime}>
+                        <b>{task.startTime} </b>
+                      </div>
+                      <div className={classes.taskendtime}>
+                        <b>{task.endTime}</b>
                       </div>
                       <div className={classes.menu}>
                         <OptionsMenu
@@ -213,6 +232,7 @@ function ActionsGrid() {
                 <div className={classes.labelname}>
                   <b>{label}</b>
                 </div>
+
                 <div className={classes.button}>
                   <Button
                     style={{ marginRight: "20px" }}
@@ -230,6 +250,8 @@ function ActionsGrid() {
                 {tasks.map((task) => (
                   <div key={task.id} className={classes.task}>
                     <div className={classes.taskContainer}>
+                    
+
                       <div className={classes.sqare}>
                         <div
                           className={`flagIcon ${
@@ -248,9 +270,18 @@ function ActionsGrid() {
                           />
                         </div>
                       </div>
-                      <div className={classes.taskname}>
+                     
+                      <div className="taskname" onClick={() => handleTaskClick(task)} >
                         <b>{task.title}</b>
                       </div>
+                     
+                      <div className={classes.taskstarttime}>
+                        <b>{task.startTime}</b>
+                      </div>
+                      <div className={classes.taskendtime}>
+                        <b>{task.endTime}</b>
+                      </div>
+                   
                       <div className={classes.menu}>
                         <OptionsMenu
                           onUpdateClick={() => handleUpdateClick(task)}
@@ -310,8 +341,14 @@ function ActionsGrid() {
                           />
                         </div>
                       </div>
-                      <div className={classes.taskname}>
+                      <div className="taskname" onClick={() => handleTaskClick(task)} >
                         <b>{task.title}</b>
+                      </div>
+                      <div className={classes.taskstarttime}>
+                        <b>{task.startTime}</b>
+                      </div>
+                      <div className={classes.taskendtime}>
+                        <b>{task.endTime}</b>
                       </div>
                       <div className={classes.menu}>
                         <OptionsMenu
@@ -328,6 +365,9 @@ function ActionsGrid() {
           </div>
         </div>
       </div>
+      {/* {selectedTask && (
+  <Detailspopup task={selectedTask} opened={true} onClose={() => setSelectedTask(null)} />
+)} */}
 
       <AddtaskPopup open={popupOpen} onClose={handleClosePopup} />
       {confettiActive && (
@@ -342,6 +382,17 @@ function ActionsGrid() {
           <p>{`Completed: ${completedTask.title}`}</p>
         </div>
       )}
+
+{selectedTask && (
+          <Detailspopup
+            task={selectedTask}
+            opened={taskDetailPopupOpen}
+            onClose={() => {
+              setSelectedTask(null);
+              setTaskDetailPopupOpen(false);
+            }}
+          />
+        )}
       <AlertDialogSlide open={dialogOpen} handleClose={handleDialogClose} />
       {taskToUpdate && (
         <UpdateTaskPopup
@@ -368,3 +419,4 @@ export default function Highlights() {
 Highlights.getLayout = function getLayout(page: ReactNode) {
   return <PageLayout>{page}</PageLayout>;
 };
+

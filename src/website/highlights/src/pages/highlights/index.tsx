@@ -195,7 +195,7 @@ function ActionsGrid() {
                           />
                         </div>
                       </div>
-                      <div className="taskname" onClick={() => handleTaskClick(task)} >
+                      <div className={classes.taskname} onClick={() => handleTaskClick(task)}>
                       <b>{task.title}</b>
                       </div>
                       <div className={classes.taskstarttime}>
@@ -271,7 +271,7 @@ function ActionsGrid() {
                         </div>
                       </div>
                      
-                      <div className="taskname" onClick={() => handleTaskClick(task)} >
+                      <div className={classes.taskname} onClick={() => handleTaskClick(task)}>
                         <b>{task.title}</b>
                       </div>
                      
@@ -341,8 +341,8 @@ function ActionsGrid() {
                           />
                         </div>
                       </div>
-                      <div className="taskname" onClick={() => handleTaskClick(task)} >
-                        <b>{task.title}</b>
+                      <div className={classes.taskname} onClick={() => handleTaskClick(task)}>
+                      <b>{task.title}</b>
                       </div>
                       <div className={classes.taskstarttime}>
                         <b>{task.startTime}</b>

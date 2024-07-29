@@ -5,8 +5,9 @@ import { DatePicker } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import { IconPlus } from '@tabler/icons-react';
 import classes from './TaskForm.module.css';
+import { taskAddedToTaskList } from '../taskLists/taskListsSlice';
 
-export default function TaskForm() {
+export default function TaskForm({ taskListId }: { taskListId: string }) {
 
     const dispatch = useAppDispatch();
 
@@ -23,11 +24,11 @@ export default function TaskForm() {
     });
 
     const handleAddTask = (values: any) => {
-        // createTask({ ...values, completed: false });
         values.id = Math.random().toString(36);
         values.created = new Date().toISOString();
         values.dueDate = values.dueDate?.toISOString();
         dispatch(taskAdded(values));
+        dispatch(taskAddedToTaskList({ taskListId, taskId: values.id }));
         form.reset();
     };
 

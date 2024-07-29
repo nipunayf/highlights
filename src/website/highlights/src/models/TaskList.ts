@@ -1,7 +1,5 @@
-import { Entity } from "./Entity";
-import { Task } from "./Task";
-
-export interface TaskList extends Entity {
+export interface TaskList {
+    id: string;
     title: string;
-    tasks: Task[];
+    taskIds: string[];
 }

@@ -9,3 +9,4 @@ services:
       - "3306:3306"
     volumes:
       - ./scripts/create-tables.sql:/docker-entrypoint-initdb.d/create-tables.sql
+      - ./scripts/seed-data.sql:/docker-entrypoint-initdb.d/seed-data.sql

@@ -1,6 +1,6 @@
 import { Task } from '@/models/Task';
 import { RootState } from '@/store';
-import { createEntityAdapter, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createEntityAdapter, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
 
 const defaultState = [
     { id: 'task1', title: 'Finish project proposal', dueDate: new Date('2024-07-25').toISOString(), completed: false, created: new Date().toISOString() },
@@ -29,9 +29,14 @@ const tasksAdapter = createEntityAdapter<Task>({
     sortComparer: (a, b) => b.created.localeCompare(a.created)
 });
 
-const initialState = tasksAdapter.getInitialState({
+interface TasksState extends EntityState<Task, string> {
+    status: 'idle' | 'loading' | 'succeeded' | 'failed';
+    error: string | undefined;
+}
+
+const initialState: TasksState = tasksAdapter.getInitialState({
     status: 'idle',
-    error: null
+    error: undefined
 }, defaultState);
 
 export const tasksSlice = createSlice({

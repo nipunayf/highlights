@@ -5,10 +5,6 @@ import ballerina/time;
 import ballerinax/mysql;
 import ballerinax/mysql.driver as _;
 
-type Greeting record {|
-    string greeting;
-|};
-
 type CreateUser record {|
     string sub;
 |};
@@ -70,6 +66,13 @@ Highlight[] highlights = [
     }
 ];
 
+type TaskList record {|
+    int id;
+    @sql:Column {name: "user_id"}
+    int userId;
+    string title;
+|};
+
 // listener http:Listener securedEP = new (9090);
 
 // Define the configuration variables
@@ -96,12 +99,6 @@ configurable string azureAdAudience = ?;
     }
 }
 service / on new http:Listener(9090) {
-
-    resource function get greeting(string? name) returns Greeting {
-        string greetingStr = string `Hello, ${name == () ? "visitor" : name}!`;
-        Greeting greeting = {greeting: greetingStr};
-        return greeting;
-    }
 
     private final mysql:Client db;
 
@@ -133,6 +130,21 @@ service / on new http:Listener(9090) {
         }
 
         return http:INTERNAL_SERVER_ERROR;
+    }
+
+    resource function get taskLists(string sub) returns TaskList[]|error {
+        User|sql:Error result = self.db->queryRow(`SELECT * FROM users WHERE sub = ${sub}`);
+
+        if result is sql:NoRowsError {
+            return error("User not found");
+        }
+
+        stream<TaskList, sql:Error?> taskListStream = self.db->query(
+            `SELECT * FROM task_lists WHERE user_id=(SELECT u.id FROM users AS u WHERE u.sub=${sub});`
+        );
+
+        return from TaskList taskList in taskListStream
+            select taskList;
     }
 
     resource function get tasks() returns Task[] {

@@ -1,10 +1,12 @@
 import { configureStore } from '@reduxjs/toolkit';
 import tasksReducer from './features/tasks/tasksSlice';
+import taskListsReducer from './features/taskLists/taskListsSlice';
 import highlightsReducer from './features/highlights/highlightsSlice';
 
 export const store = configureStore({
     reducer: {
         tasks: tasksReducer,
+        taskLists: taskListsReducer,
         highlights: highlightsReducer
     }
 });

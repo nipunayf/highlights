@@ -10,7 +10,6 @@ import { NextPage } from 'next';
 import { ReactElement, ReactNode, StrictMode } from 'react';
 import { Provider } from 'react-redux';
 import { store } from '../store';
-import { fetchHighlights } from '@/features/highlights/highlightsSlice';
 
 export const msalInstance = new PublicClientApplication(msalConfig);
 
@@ -48,8 +47,6 @@ type AppPropsWithLayout = AppProps & {
 
 export default function App({ Component, pageProps }: AppPropsWithLayout) {
     const getLayout = Component.getLayout ?? ((page) => page);
-
-    store.dispatch(fetchHighlights());
 
     return (
         <StrictMode>

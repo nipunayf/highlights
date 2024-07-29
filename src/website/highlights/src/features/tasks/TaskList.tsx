@@ -1,7 +1,8 @@
-import { selectTaskById, selectTaskIds, taskCompleted, taskUncompleted } from "@/features/tasks/tasksSlice";
+import { selectTaskById, taskCompleted, taskUncompleted } from "@/features/tasks/tasksSlice";
 import { useAppDispatch, useAppSelector } from "@/hooks";
 import type { TaskList } from "@/models/TaskList";
 import { Checkbox, Group, Paper, Stack, Text } from "@mantine/core";
+import { selectTaskListById } from "../taskLists/taskListsSlice";
 
 let TaskExcerpt = ({ taskId }: { taskId: string }) => {
     const dispatch = useAppDispatch();
@@ -19,12 +20,13 @@ let TaskExcerpt = ({ taskId }: { taskId: string }) => {
     );
 }
 
-export default function TaskList() {
-    const orderedTaskIds = useAppSelector(selectTaskIds);
+export default function TaskList({ taskListId }: { taskListId: string }) {
+    const taskList = useAppSelector((state) => selectTaskListById(state, taskListId));
+    const orderedTaskIds = taskList.taskIds;
 
     return (
         <Stack gap={'xs'}>
-            {orderedTaskIds.map((taskId) => (
+            {orderedTaskIds?.map((taskId) => (
                 <TaskExcerpt key={taskId} taskId={taskId} />
             ))}
         </Stack>

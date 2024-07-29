@@ -1,6 +1,6 @@
-import { Entity } from "./Entity";
-
-export interface Task extends Entity {
+export interface Task {
+    id: string;
+    created: string;
     title: string;
     dueDate?: string;
     completed: boolean;

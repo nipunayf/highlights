@@ -3,6 +3,7 @@ import { aquireAccessToken } from "@/util/auth";
 import { Task } from "@/models/Task";
 import axios, { AxiosInstance } from "axios";
 import { Highlight } from "@/models/Highlight";
+import { AppUser } from "@/hooks/useAppUser";
 
 function getAxiosClient(route: string): AxiosInstance {
     const client = axios.create({
@@ -17,6 +18,16 @@ function getAxiosClient(route: string): AxiosInstance {
     });
 
     return client;
+}
+
+export async function getTaskLists(user: AppUser) {
+    const response = await getAxiosClient('taskLists').request({
+        method: 'GET',
+        params: {
+            sub: user.sub
+        }
+    });
+    return response.data;
 }
 
 export async function getTasks(): Promise<Task[]> {

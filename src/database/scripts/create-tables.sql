@@ -49,6 +49,13 @@ CREATE TABLE `t` (
   `name` varchar(255) NOT NULL
 );
 
+CREATE TABLE `dailytips` (
+  `id` integer PRIMARY KEY AUTO_INCREMENT,
+  `label` varchar(255) NOT NULL,
+  `tip` varchar(255) NOT NULL,
+  `date` date DEFAULT CURRENT_DATE
+);
+
 ALTER TABLE `highlights` ADD FOREIGN KEY (`event_id`) REFERENCES `events` (`id`);
 
 ALTER TABLE `highlight_tasks` ADD FOREIGN KEY (`highlight_id`) REFERENCES `highlights` (`id`);

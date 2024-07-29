@@ -7,7 +7,7 @@ import {
     rem,
     Space,
 } from '@mantine/core';
-import { IconBulb, IconUser, IconCheckbox, IconPlus, IconChartDots2, IconCalendarMonth, IconTie, IconAlarm, IconList } from '@tabler/icons-react';
+import { IconBulb, IconUser, IconCheckbox, IconPlus, IconChartDots2, IconCalendarMonth, IconTie, IconAlarm, IconList, IconBellRinging } from '@tabler/icons-react';
 import classes from './Navbar.module.css';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -24,6 +24,7 @@ const links = [
     { icon: IconChartDots2, label: 'Analytics', path: '/analytics' },
     { icon: IconUser, label: 'Profile', path: '/profile' },
     { icon: IconTie, label: 'Dailytips', path: '/dailytips' },
+    { icon: IconBellRinging, label: 'Projects', path: '/projects' },
 ];
 
 let taskListIds: string[] = [];

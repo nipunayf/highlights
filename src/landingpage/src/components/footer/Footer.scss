@@ -16,13 +16,17 @@
         margin-bottom: 1rem;
     }
 
+    p{
+        color: #ffffff;
+    }
+
     h3 {
         font-weight: 400;
         font-size: 1.3rem;
         margin-bottom: 0.8rem;
     }
 
-    &_col:not(:last-child) {
+    &_col{
         a {
             color: black;
             text-transform: uppercase;
@@ -32,7 +36,7 @@
             transition: all 0.3s ease;
 
             &:hover {
-                color: #ffffff;
+                color: var(--spanish-gray);
                 
             }
         }
@@ -45,5 +49,16 @@
             margin: 0;
         }
 
+    }
+
+    .logo_container{
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+
+        h3{
+            // align-items: center;
+            font-size: 1.5rem;
+        }
     }
 }

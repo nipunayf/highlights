@@ -301,15 +301,33 @@ const Timer = () => {
         });
       }
 
+      // const id = setInterval(() => {
+      //   setCount((prevCount) => {
+      //     if (prevCount === 59) {
+      //       setMinCount((prevMinCount) => prevMinCount - 1);
+      //       return 0;
+      //     }
+      //     return prevCount + 1;
+      //   });
+      // }, 1000);
+
+
+
+
       const id = setInterval(() => {
         setCount((prevCount) => {
-          if (prevCount === 59) {
+          if (prevCount === 0) {
+            if (minCount === 0) {
+              handleTimerEnd();
+              clearInterval(id); // Optional: Stop the timer if it's no longer needed
+              return 0;
+            }
             setMinCount((prevMinCount) => prevMinCount - 1);
-            return 0;
+            return 59;
           }
-          return prevCount + 1;
+          return prevCount - 1;
         });
-      }, 1000);
+      }, 1000); // Adjust interval as needed, e.g., 1000 ms for 1-second intervals
       setTimerId(id);
     }
   };

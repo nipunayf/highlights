@@ -37,10 +37,18 @@ const FocusSummary = () => {
     }, {} as Record<string, mTimeRecord[]>);
   };
 
+  const formatTime = (datetime: string) => {
+    // Extracts the time part from a datetime string
+    return new Date(datetime).toLocaleTimeString();
+  };
+
   const getPauseAndContinueTimes = (highlightId: number) => {
     return pauseDetails
       .filter((detail) => detail.highlight_id === highlightId)
-      .map((detail) => [detail.pause_time, detail.continue_time]);
+      .map((detail) => [
+        formatTime(detail.pause_time ?? ''), 
+        formatTime(detail.continue_time ?? '')
+      ]);
   };
 
   const groupedRecords = groupByDate(focusRecords);
@@ -72,23 +80,23 @@ const FocusSummary = () => {
         {Object.keys(groupedRecords).map((date) => (
           <div key={date} className={styles.dateGroup}>
             <div className={styles.date}>{date}</div>
-            {groupedRecords[date]
-              .sort((a, b) => a.highlight_id - b.highlight_id)
-              .map((record) => (
-                <div key={record.highlight_id} className={styles.record}>
-                  <div className={styles.timeRecord}>
-                    Highlight ID: {record.highlight_id}
-                    <span>
-                      {record.start_time.split(" ")[1]} - {record.end_time.split(" ")[1]}
+            <div className={styles.timeline}>
+              {groupedRecords[date]
+                .sort((a, b) => a.highlight_id - b.highlight_id)
+                .map((record) => (
+                  <div key={record.highlight_id} className={styles.timeRecord}>
+                    <span className={styles.mainRecord}>
+                      Highlight ID: {record.highlight_id} <br />
+                      {formatTime(record.start_time)} - {formatTime(record.end_time)}
                     </span>
+                    {getPauseAndContinueTimes(record.highlight_id).map((time, index) => (
+                      <div key={index} className={styles.pauseRecord}>
+                        <span>{time[0]} - {time[1]}</span>
+                      </div>
+                    ))}
                   </div>
-                  {getPauseAndContinueTimes(record.highlight_id).map((time, index) => (
-                    <div key={index} className={styles.timeRecord}>
-                      <span>{time[0]} - {time[1]}</span>
-                    </div>
-                  ))}
-                </div>
-              ))}
+                ))}
+            </div>
           </div>
         ))}
       </div>

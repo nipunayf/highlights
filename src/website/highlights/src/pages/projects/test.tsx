@@ -3,7 +3,7 @@ import axios from 'axios';
 import { 
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow, 
   TextField, Select, MenuItem, Button, Typography, Box, 
-  Paper, Chip, Grid
+  Paper, Chip, Grid, IconButton
 } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -20,7 +20,9 @@ interface RowData {
   priority: string;
   startDate: Dayjs | null;
   dueDate: Dayjs | null;
+  assignees: string[];
 }
+
 interface ProjectData {
   projectId: number;
   projectName: string;
@@ -59,8 +61,8 @@ const Test: React.FC<{ projectId: number }> = ({ projectId }) => {
     dueDate: null,
   });
   const [rows, setRows] = useState<RowData[]>([]);
-  const [assignees, setAssignees] = useState<string[]>([]);
-  const [newAssignee, setNewAssignee] = useState('');
+  const [newAssignee, setNewAssignee] = useState<string>('');
+  const [addingAssigneeIndex, setAddingAssigneeIndex] = useState<number | null>(null);
 
   const priorityColors = {
     low: '#4CAF50',
@@ -75,49 +77,49 @@ const Test: React.FC<{ projectId: number }> = ({ projectId }) => {
   };
 
   useEffect(() => {
-    axios.get(`http://localhost:8090/todo/project/${projectId}`)
-    .then(response => {
-      const project = response.data.value;
-      const fetchedProject: ProjectData = {
-        projectId: project.projectId,
-        projectName: project.projectName,
-        progress: project.progress,
-        priority: project.priority,
-        startDate: project.startDate ? dayjs(project.startDate) : null,
-        dueDate: project.dueDate ? dayjs(project.dueDate) : null,
-      };
-      setProjectDetails(fetchedProject);
-    })
-    .catch(error => console.error('Error fetching project:', error));
+    axios.get(`http://localhost:9091/project/${projectId}`)
+      .then(response => {
+        const project = response.data.value;
+        const fetchedProject: ProjectData = {
+          projectId: project.projectId,
+          projectName: project.projectName,
+          progress: project.progress,
+          priority: project.priority,
+          startDate: project.startDate ? dayjs(project.startDate) : null,
+          dueDate: project.dueDate ? dayjs(project.dueDate) : null,
+        };
+        setProjectDetails(fetchedProject);
+      })
+      .catch(error => console.error('Error fetching project:', error));
   }, [projectId]);
 
   useEffect(() => {
-    axios.get(`http://localhost:8090/todo/tasks/${projectId}`)
-        .then(response => {
-            const fetchedProjects = response.data.projects.map((project: any) => ({
-                projectId: project.projectId,
-                taskName: project.taskName,
-                progress: project.progress,
-                priority: project.priority,
-                startDate: project.startDate ? dayjs(project.startDate) : null,
-                dueDate: project.dueDate ? dayjs(project.dueDate) : null,
-            }));
-            setRows(fetchedProjects);
-        })
-        .catch(error => console.error('Error fetching projects:', error));
-}, []);
+    axios.get(`http://localhost:9091/tasks/${projectId}`)
+      .then(response => {
+        console.log(response);
+        const fetchedTasks = response.data.projects.map((task: any) => ({
+          projectId: task.projectId,
+          taskName: task.taskName,
+          progress: task.progress,
+          priority: task.priority,
+          startDate: task.startDate ? dayjs(task.startDate) : null,
+          dueDate: task.dueDate ? dayjs(task.dueDate) : null,
+          assignees: task.assignees || [],
+        }));
+        setRows(fetchedTasks);
+      })
+      .catch(error => console.error('Error fetching tasks:', error));
+  }, [projectId]);
 
-  const handleAddAssignee = () => {
+  const handleAddAssignee = (index: number) => {
     if (newAssignee.trim() !== '') {
-      setAssignees([...assignees, newAssignee.trim()]);
+      const updatedRows = [...rows];
+      updatedRows[index].assignees.push(newAssignee.trim());
+      setRows(updatedRows);
       setNewAssignee('');
+      setAddingAssigneeIndex(null);
+      updateRowInDB(updatedRows[index]);
     }
-  };
-
-  const toggleAssigneeDisplay = (index: number) => {
-    const updatedAssignees = [...assignees];
-    updatedAssignees[index] = updatedAssignees[index].startsWith('@') ? updatedAssignees[index].substring(1) : `@${updatedAssignees[index]}`;
-    setAssignees(updatedAssignees);
   };
 
   const handleProgressChange = (index: number, value: string) => {
@@ -135,46 +137,46 @@ const Test: React.FC<{ projectId: number }> = ({ projectId }) => {
   };
 
   const updateRowInDB = (row: RowData) => {
-    axios.put(`http://localhost:8090/todo/updateTask`, row)
+    axios.put(`http://localhost:9091/updateTask`, row)
       .then(response => console.log('Row updated:', response.data))
       .catch(error => console.error('Error updating row:', error));
   };
 
   const handleAddRow = () => {
     const newRow: RowData = {
-        projectId: projectId,
-        taskName: '',
-        progress: '',
-        priority: '',
-        startDate: null,
-        dueDate: null,
+      projectId: projectId,
+      taskName: '',
+      progress: '',
+      priority: '',
+      startDate:null,
+      dueDate: null,
+      assignees: [],
     };
 
-    axios.post('http://localhost:8090/todo/addTask', {
-        projectId: projectId,
-        taskName: 'New task',
-        progress: 'completed',
-        priority: 'low',
-        startDate: '2001-01-25',
-        dueDate: '2001-02-25',
-    })
-        .then(response => {
-            console.log('New row added:', response.data);
-            const newProjects = response.data.projects.map((project: any) => ({
-                projectId: project.projectId,
-                taskName: project.taskName,
-                progress: project.progress,
-                priority: project.priority,
-                startDate: null,
-                dueDate: null,
-            }));
-            setRows([...rows, ...newProjects]);
-            console.log("new projects", ...newProjects);
-            console.log("here are my existing projects", response.data.projects);
-            console.log("here are my existing rows", rows);
-        })
-        .catch(error => console.error('Error adding row:', error));
-};
+    axios.post('http://localhost:9091/addTask', 
+         { projectId: projectId,
+          taskName: '',
+          progress: '',
+          priority: '',
+          startDate: '2001-01-21',
+          dueDate: '2001-01-21',
+          assignees: []}
+    )
+      .then(response => {
+        const addedTask = response.data.task;
+        const formattedTask: RowData = {
+          projectId: addedTask.projectId,
+          taskName: addedTask.taskName,
+          progress: addedTask.progress,
+          priority: addedTask.priority,
+          startDate: addedTask.startDate ? dayjs(addedTask.startDate) : null,
+          dueDate: addedTask.dueDate ? dayjs(addedTask.dueDate) : null,
+          assignees: addedTask.assignees || [],
+        };
+        setRows([...rows, formattedTask]);
+      })
+      .catch(error => console.error('Error adding row:', error));
+  };
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -202,7 +204,7 @@ const Test: React.FC<{ projectId: number }> = ({ projectId }) => {
                   sx={{ backgroundColor: priorityColors[projectDetails.priority as keyof typeof priorityColors], color: 'white', marginLeft: 1 }}
                 />
               </Typography>
-              <Typography variant="subtitle1"><strong>Assignees:</strong> {assignees.join(', ')}</Typography>
+              <Typography variant="subtitle1"><strong>Assignees:</strong> {projectDetails.assignees?.join(', ')}</Typography>
             </Grid>
           </Grid>
         </Paper>
@@ -217,6 +219,7 @@ const Test: React.FC<{ projectId: number }> = ({ projectId }) => {
                   <StyledTableCell>Due Date</StyledTableCell>
                   <StyledTableCell>Progress</StyledTableCell>
                   <StyledTableCell>Priority</StyledTableCell>
+                  <StyledTableCell>Assignees</StyledTableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -233,7 +236,7 @@ const Test: React.FC<{ projectId: number }> = ({ projectId }) => {
                         }}
                         fullWidth
                         variant="outlined"
-                        placeholder="Enter project name"
+                        placeholder="Enter task name"
                       />
                     </StyledTableCell>
                     <StyledTableCell>
@@ -299,6 +302,40 @@ const Test: React.FC<{ projectId: number }> = ({ projectId }) => {
                         <MenuItem value="medium" style={{ color: '#FFC107' }}>Medium</MenuItem>
                         <MenuItem value="high" style={{ color: '#F44336' }}>High</MenuItem>
                       </Select>
+                    </StyledTableCell>
+                    <StyledTableCell>
+                      <Box display="flex" alignItems="center">
+                        <Box flexGrow={1}>
+                          {row.assignees.map((assignee, index) => (
+                            <Chip key={index} label={assignee} style={{ marginRight: 5 }} />
+                          ))}
+                        </Box>
+                        <IconButton
+                          color="primary"
+                          onClick={() => setAddingAssigneeIndex(rowIndex === addingAssigneeIndex ? null : rowIndex)}
+                        >
+                          <AddIcon />
+                        </IconButton>
+                      </Box>
+                      {addingAssigneeIndex === rowIndex && (
+                        <Box mt={2}>
+                          <TextField
+                            value={newAssignee}
+                            onChange={(e) => setNewAssignee(e.target.value)}
+                            placeholder="Enter assignee email"
+                            variant="outlined"
+                            fullWidth
+                          />
+                          <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={() => handleAddAssignee(rowIndex)}
+                            style={{ marginTop: 5 }}
+                          >
+                            Add Assignee
+                          </Button>
+                        </Box>
+                      )}
                     </StyledTableCell>
                   </StyledTableRow>
                 ))}

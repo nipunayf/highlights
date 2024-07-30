@@ -4,6 +4,8 @@ import ballerina/sql;
 import ballerina/time;
 import ballerinax/mysql;
 import ballerinax/mysql.driver as _;
+import ballerina/io;
+import ballerina/lang.'string as strings;
 
 type CreateUser record {|
     string sub;
@@ -98,7 +100,7 @@ configurable string azureAdAudience = ?;
         maxAge: 84900
     }
 }
-service / on new http:Listener(9090) {
+service / on new http:Listener(9091) {
 
     private final mysql:Client db;
 
@@ -147,9 +149,9 @@ service / on new http:Listener(9090) {
             select taskList;
     }
 
-    resource function get tasks() returns Task[] {
-        return tasks;
-    }
+    // resource function get tasks() returns Task[] {
+    //     return tasks;
+    // }
 
     resource function post tasks(Task task) returns Task {
         tasks.push({id: (tasks.length() + 1).toString(), title: task.title});
@@ -159,5 +161,305 @@ service / on new http:Listener(9090) {
 
     resource function get highlights() returns Highlight[] {
         return highlights;
+    }
+    resource function post addTask(http:Caller caller, http:Request req) returns error? {
+        json payload = check req.getJsonPayload();
+
+        string taskName= (check payload.taskName).toString();
+        string progress = (check payload.progress).toString();
+        string priority = (check payload.priority).toString();
+        // json assignees = check payload.assignees;
+        // string assigneesJson = assignees.toString();
+        string startDate = (check payload.startDate).toString();
+        string dueDate = (check payload.dueDate).toString();
+        int projectId= (check payload.projectId);
+
+        sql:ParameterizedQuery insertQuery = `INSERT INTO taskss (taskName,progress, priority, startDate, dueDate,projectId) VALUES (${taskName},${progress}, ${priority}, ${startDate}, ${dueDate},${projectId})`;
+        _ = check self.db->execute(insertQuery);
+
+        sql:ParameterizedQuery selectQuery = `SELECT taskName,progress, priority,  startDate, dueDate FROM taskss`;
+        stream<record {| anydata...; |}, sql:Error?> resultStream = self.db->query(selectQuery);
+
+        json[] resultJsonArray = [];
+        check from record {| anydata...; |} row in resultStream
+            do {
+                resultJsonArray.push(row.toJson());
+            };
+
+        json response = { projects: resultJsonArray};
+        http:Response res = new;
+        res.setPayload(response);
+        res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+        check caller->respond(res);
+
+        return;
+    }
+
+    // Handle preflight OPTIONS request for CORS
+    resource function options addTask(http:Caller caller, http:Request req) returns error? {
+        http:Response response = new;
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+        response.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+        check caller->respond(response);
+
+        return;
+    }
+
+    resource function post addProjects(http:Caller caller, http:Request req) returns error? {
+        json payload = check req.getJsonPayload();
+
+        string projectName= (check payload.projectName).toString();
+        string progress = (check payload.progress).toString();
+        string priority = (check payload.priority).toString();
+        // json assignees = check payload.assignees;
+        // string assigneesJson = assignees.toString();
+        string startDate = (check payload.startDate).toString();
+        string dueDate = (check payload.dueDate).toString();
+
+        sql:ParameterizedQuery insertQuery = `INSERT INTO projects (projectName,progress, priority, startDate, dueDate) VALUES (${projectName},${progress}, ${priority}, ${startDate}, ${dueDate})`;
+        _ = check self.db->execute(insertQuery);
+
+        sql:ParameterizedQuery selectQuery = `SELECT id,projectName,progress, priority,  startDate, dueDate FROM projects`;
+        stream<record {| anydata...; |}, sql:Error?> resultStream = self.db->query(selectQuery);
+
+        json[] resultJsonArray = [];
+        check from record {| anydata...; |} row in resultStream
+            do {
+                resultJsonArray.push(row.toJson());
+            };
+
+        json response = { projects: resultJsonArray};
+        http:Response res = new;
+        res.setPayload(response);
+        res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+        check caller->respond(res);
+
+        return;
+    }
+
+    // Handle preflight OPTIONS request for CORS
+    resource function options addProjects(http:Caller caller, http:Request req) returns error? {
+        http:Response response = new;
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+        response.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+        check caller->respond(response);
+
+        return;
+    }
+
+    /////////////////////////////////////////////////////////
+    resource function get projects(http:Caller caller, http:Request req) returns error? {
+        
+        sql:ParameterizedQuery selectQuery = `SELECT id,projectName,progress, priority,  startDate, dueDate FROM projects`;
+        stream<record {| anydata...; |}, sql:Error?> resultStream = self.db->query(selectQuery);
+
+        json[] resultJsonArray = [];
+        check from record {| anydata...; |} row in resultStream
+            do {
+                resultJsonArray.push(row.toJson());
+            };
+        io:println("totl projects",resultJsonArray);
+
+        json response = { projects: resultJsonArray};
+        http:Response res = new;
+        res.setPayload(response);
+        res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+        check caller->respond(res);
+
+        return;
+    }
+
+    // Handle preflight OPTIONS request for CORS
+    resource function options projects(http:Caller caller, http:Request req) returns error? {
+        http:Response response = new;
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+        response.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+        check caller->respond(response);
+
+        return;
+    }
+
+      // New resource function to update project details
+    resource function put updateProject(http:Caller caller, http:Request req) returns error? {
+        json payload = check req.getJsonPayload();
+
+        int projectId = check payload.id;
+        string projectName = (check payload.projectName).toString();
+        string progress = (check payload.progress).toString();
+        string priority = (check payload.priority).toString();
+        // time:Utc startDate = time:format(payload.startDate, "yyyy-MM-dd");
+        // time:Utc dueDate = (check payload.dueDate);
+        // string startDateStr = time:format(payload.startDate, "yyyy-MM-dd'T'HH:mm:ss'Z'");
+          int? indexOfT = strings:indexOf(check payload.startDate, "T");
+
+        // Extract the date part (before 'T')
+        string startDate = strings:substring(check payload.startDate, 0, <int>indexOfT);
+
+            int? indexOfT2 = strings:indexOf(check payload.dueDate, "T");
+
+        // Extract the date part (before 'T')
+        string dueDate = strings:substring(check payload.dueDate, 0, <int>indexOfT2);
+
+    
+
+        // string startDate =(check payload.startDate).toString();
+        // string dueDate =(check payload.startDate).toString();
+        io:println("Formatted Due Date: ", payload.startDate);
+        // time:Utc dateTime = check time:parse(dateTimeString, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        
+
+        sql:ParameterizedQuery updateQuery = `UPDATE projects SET projectName = ${projectName}, progress = ${progress}, priority = ${priority},startDate=${startDate},dueDate=${dueDate}   WHERE id = ${projectId}`;
+        _ = check self.db->execute(updateQuery);
+
+        json response = { message: "Project updated successfully" };
+        http:Response res = new;
+        res.setPayload(response);
+        res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+        check caller->respond(res);
+
+        return;
+    }
+
+    // Handle preflight OPTIONS request for CORS
+    resource function options updateProject(http:Caller caller, http:Request req) returns error? {
+        http:Response response = new;
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+        response.setHeader("Access-Control-Allow-Methods", "PUT, OPTIONS");
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+        check caller->respond(response);
+
+        return;
+    }
+
+    // New resource function to get details of a specific project based on project id
+    resource function get project/[int projectId](http:Caller caller, http:Request req) returns error? {
+        // Prepare the SQL query to select project details by ID
+        sql:ParameterizedQuery selectQuery = `SELECT id, projectName, progress, priority, startDate, dueDate FROM projects WHERE id = ${projectId}`;
+
+        // Execute the query and get the result stream
+        stream<record {| anydata...; |}, sql:Error?> resultStream =  self.db->query(selectQuery);
+
+        // Variables to hold project details and response
+        record {| anydata...; |}? projectDetails;
+        json response;
+
+        // Iterate through the result stream
+       
+        projectDetails = check resultStream.next();
+        // if (projectDetails is record {| anydata...; |}) {
+        //     response = resultStream.toJson();
+        //     break; // Found the project, exit the loop
+        // }
+        // json[] resultJsonArray = [];
+        // check from record {| anydata...; |} row in resultStream
+        //     do {
+        //        response.push(row.toJson());
+        //     };
+         response = projectDetails.toJson();
+
+        // If projectDetails is still empty, project not found
+        // if (projectDetails == ()) {
+        //     response.push( "Project not found" );
+        // }
+        io:println(resultStream);
+        io:println(response);
+        io:println(projectId);
+        io:println(projectDetails);
+
+        // Create and set HTTP response
+        http:Response res = new;
+        res.setPayload(response);
+        res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+        check caller->respond(res);
+
+        return;
+    }
+
+    // Handle preflight OPTIONS request for CORS
+    resource function options project/[int projectId](http:Caller caller, http:Request req) returns error? {
+        http:Response response = new;
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+        response.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+        check caller->respond(response);
+
+        return;
+    }
+
+    resource function put updateTask(http:Caller caller, http:Request req) returns error? {
+        json payload = check req.getJsonPayload();
+
+        int projectId = <int>check payload.projectId;
+        string taskName = (check payload.taskName).toString();
+        string progress = (check payload.progress).toString();
+        string priority = (check payload.priority).toString();
+
+          int? indexOfT = strings:indexOf(check payload.startDate, "T");
+
+        // Extract the date part (before 'T')
+        string startDate = strings:substring(check payload.startDate, 0, <int>indexOfT);
+
+            int? indexOfT2 = strings:indexOf(check payload.dueDate, "T");
+
+        // Extract the date part (before 'T')
+        string dueDate = strings:substring(check payload.dueDate, 0, <int>indexOfT2);
+
+        io:println("Formatted Due Date: ", payload.startDate);
+
+        sql:ParameterizedQuery updateQuery = `UPDATE taskss SET taskName = ${taskName}, progress = ${progress}, priority = ${priority},startDate=${startDate},dueDate=${dueDate}   WHERE taskName = ${taskName} AND projectId=${projectId}`;
+        _ = check self.db->execute(updateQuery);
+
+        json response = { message: "Task updated successfully" };
+        http:Response res = new;
+        res.setPayload(response);
+        res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+        check caller->respond(res);
+
+        return;
+    }
+
+    // Handle preflight OPTIONS request for CORS
+    resource function options updateTask(http:Caller caller, http:Request req) returns error? {
+        http:Response response = new;
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+        response.setHeader("Access-Control-Allow-Methods", "PUT, OPTIONS");
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+        check caller->respond(response);
+
+        return;
+    }
+        resource function get tasks/[int projectId](http:Caller caller, http:Request req) returns error? {
+        
+        sql:ParameterizedQuery selectQuery = `SELECT projectId,taskName,progress, priority,  startDate, dueDate FROM taskss WHERE projectId=${projectId}`;
+        stream<record {| anydata...; |}, sql:Error?> resultStream = self.db->query(selectQuery);
+
+        json[] resultJsonArray = [];
+        check from record {| anydata...; |} row in resultStream
+            do {
+                resultJsonArray.push(row.toJson());
+            };
+        io:println("totl projects",resultJsonArray);
+
+        json response = { projects: resultJsonArray};
+        http:Response res = new;
+        res.setPayload(response);
+        res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+        check caller->respond(res);
+
+        return;
+    }
+
+    // Handle preflight OPTIONS request for CORS
+    resource function options tasks/[int projectId](http:Caller caller, http:Request req) returns error? {
+        http:Response response = new;
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+        response.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+        check caller->respond(response);
+
+        return;
     }
 }

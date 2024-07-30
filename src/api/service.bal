@@ -25,7 +25,7 @@ type Task record {|
     time:Utc? dueDate = null;
 |};
 
-type Highlight record {|
+type h_Highlight record {|
     int highlight_id;
     string highlight_name;
     int user_id;
@@ -51,7 +51,7 @@ type HighlightPomoDetails record {
 };
 
 // Intermediate record type for deserialization
-type HighlightPomoDetailsTemp record {
+type h_HighlightPomoDetailsTemp record {
     int timer_id;
     int highlight_id;
     int user_id;
@@ -88,12 +88,13 @@ type ContinueDetailsTemp record {
     string continue_time;
 };
 
-type TimeRecord record {|
+type TimeRecord record {
     int highlight_id;
+    string highlight_name;
     string start_time;
     string end_time;
     string[][] pause_and_continue_times;
-|};
+};
 
 
 Task[] tasks = [
@@ -246,7 +247,7 @@ service / on new http:Listener(9090) {
     }
 
     // Function to get highlights from the database
-    resource function get highlights() returns Highlight[]|error {
+    resource function get highlights() returns h_Highlight[]|error {
 
         sql:ParameterizedQuery sqlQuery = `SELECT highlight_id, highlight_name, user_id FROM hilights_hasintha`;
 
@@ -257,7 +258,7 @@ service / on new http:Listener(9090) {
             int user_id;
         |}, sql:Error?> resultStream = self.db->query(sqlQuery);
 
-        Highlight[] highlightList = [];
+        h_Highlight[] highlightList = [];
 
         // Iterate over the results
         check from var highlight in resultStream
@@ -285,8 +286,8 @@ service / on new http:Listener(9090) {
             return;
         }
 
-        // Convert the payload to the HighlightPomoDetailsTemp record
-        HighlightPomoDetailsTemp tempDetails = check payload.cloneWithType(HighlightPomoDetailsTemp);
+        // Convert the payload to the h_HighlightPomoDetailsTemp record
+        h_HighlightPomoDetailsTemp tempDetails = check payload.cloneWithType(h_HighlightPomoDetailsTemp);
         io:println("Received highlightPomoDetails:", tempDetails);
 
         // Convert start_time and end_time strings to time:Utc
@@ -353,7 +354,7 @@ service / on new http:Listener(9090) {
             return;
         }
 
-        // Convert the payload to the HighlightPomoDetailsTemp record
+        // Convert the payload to the h_HighlightPomoDetailsTemp record
         PausesDetailsTemp tempDetails = check payload.cloneWithType(PausesDetailsTemp);
         io:println("Received highlightPomoDetails:", tempDetails);
 
@@ -407,7 +408,7 @@ service / on new http:Listener(9090) {
             return;
         }
 
-        // Convert the payload to the HighlightPomoDetailsTemp record
+        // Convert the payload to the h_HighlightPomoDetailsTemp record
         ContinueDetailsTemp tempDetails = check payload.cloneWithType(ContinueDetailsTemp);
         io:println("Received highlightContinuePomoDetails:", tempDetails);
 
@@ -452,55 +453,7 @@ service / on new http:Listener(9090) {
         check caller->respond(http:STATUS_OK);
     }
 
-    // resource function get focus_record/[int userId]() returns TimeRecord|http:InternalServerError|error {
-    //     HighlightPomoDetailsTemp highlightPomoDetail = {
-    //         highlight_id: -1,
-    //         start_time: "",
-    //         end_time: "",
-    //         user_id: 0,
-    //         timer_id: 0,
-    //         status: ""
-    //     };
-    //     string[][] pauseAndContinueTimes = [];
 
-    //     // Query to get highlight_id, start_time, and end_time from HighlightPomoDetails
-    //     sql:ParameterizedQuery highlightQuery = `SELECT highlight_id, start_time, end_time FROM HighlightPomoDetails WHERE user_id = ${userId}`;
-    //     stream<record {|int highlight_id; string start_time; string end_time;|}, sql:Error?> highlightStream = self.db->query(highlightQuery);
-
-    //     // Iterate over the result stream
-    //     var highlightResult = highlightStream.next();
-    //     if (highlightResult is record {|record {|int highlight_id; string start_time; string end_time;|} value;|}) {
-    //         highlightPomoDetail = {
-    //             highlight_id: highlightResult.value.highlight_id,
-    //             start_time: highlightResult.value.start_time,
-    //             end_time: highlightResult.value.end_time,
-    //             user_id: 0,
-    //             timer_id: 0,
-    //             status: ""
-    //         };
-    //     } else {
-    //         io:println("Highlight not found.");
-    //     }
-
-    //     // Query to get pause_time and continue_time from PausesPomoDetails
-    //     sql:ParameterizedQuery pausesQuery = `SELECT pause_time, continue_time FROM PausesPomoDetails WHERE highlight_id = ${highlightPomoDetail.highlight_id}`;
-    //     stream<record {|string pause_time; string continue_time;|}, sql:Error?> pausesStream = self.db->query(pausesQuery);
-
-    //     check from var pause in pausesStream
-    //         do {
-    //             pauseAndContinueTimes.push([pause.pause_time, pause.continue_time]);
-    //         };
-
-    //     TimeRecord timeRecord = {
-    //         highlight_id: highlightPomoDetail.highlight_id,
-    //         start_time: highlightPomoDetail.start_time,
-    //         end_time: highlightPomoDetail.end_time,
-    //         pause_and_continue_times: pauseAndContinueTimes
-    //     };
-    //     io:println(timeRecord);
-
-    //     return timeRecord;
-    // }
 
 
 
@@ -517,11 +470,9 @@ service / on new http:Listener(9090) {
 resource function get focus_record/[int userId]() returns TimeRecord[]|error {
     // Query to get all highlights for the given user
     sql:ParameterizedQuery highlightQuery = `SELECT highlight_id, start_time, end_time FROM HighlightPomoDetails WHERE user_id = ${userId}`;
-    stream<record {|int highlight_id; time:Utc start_time; time:Utc end_time;|}, sql:Error?> highlightStream = self.db->query(highlightQuery);
+    stream<record {| int highlight_id; time:Utc start_time; time:Utc end_time; |}, sql:Error?> highlightStream = self.db->query(highlightQuery);
 
     TimeRecord[] highlightTimeRecords = [];
-
-
 
     // Iterate over the highlight results
     check from var highlight in highlightStream
@@ -529,8 +480,8 @@ resource function get focus_record/[int userId]() returns TimeRecord[]|error {
             string[][] pauseAndContinueTimes = [];
 
             // Add the duration to start_time and end_time
-            time:Utc newStartTime = time:utcAddSeconds(highlight.start_time,  +(5 * 3600 + 30 * 60));
-            time:Utc newEndTime = time:utcAddSeconds(highlight.end_time,  +(5 * 3600 + 30 * 60));
+            time:Utc newStartTime = time:utcAddSeconds(highlight.start_time, +(5 * 3600 + 30 * 60));
+            time:Utc newEndTime = time:utcAddSeconds(highlight.end_time, +(5 * 3600 + 30 * 60));
 
             // Convert time:Utc to RFC 3339 strings
             string startTimeStr = time:utcToString(newStartTime);
@@ -540,8 +491,19 @@ resource function get focus_record/[int userId]() returns TimeRecord[]|error {
             string formattedStartTime = startTimeStr.substring(0, 10) + " " + startTimeStr.substring(11, 19);
             string formattedEndTime = endTimeStr.substring(0, 10) + " " + endTimeStr.substring(11, 19);
 
+            // Query to get the highlight name based on highlight_id
+            sql:ParameterizedQuery highlightNameQuery = `SELECT highlight_name FROM hilights_hasintha WHERE highlight_id = ${highlight.highlight_id}`;
+            stream<record {| string highlight_name; |}, sql:Error?> highlightNameStream = self.db->query(highlightNameQuery);
+            
+            string highlightName = "";
+            check from var result in highlightNameStream
+                do {
+                    highlightName = result.highlight_name;
+                };
+
             TimeRecord timeRecord = {
                 highlight_id: highlight.highlight_id,
+                highlight_name: highlightName,
                 start_time: formattedStartTime,
                 end_time: formattedEndTime,
                 pause_and_continue_times: pauseAndContinueTimes
@@ -552,73 +514,6 @@ resource function get focus_record/[int userId]() returns TimeRecord[]|error {
     io:println(highlightTimeRecords);
     return highlightTimeRecords;
 }
-
-
-// Resource function to get the pauses and continue times for a given user IDresource function get pauses_record/[int userId]() returns HighlightRecord[]|http:InternalServerError|error {
-// resource function get pauses_record/[int userId]() returns HighlightRecord[]|http:InternalServerError|error {
-//     HighlightRecord[] highlightRecords = [];
-
-//     // Query to get all highlights for the given user
-//     sql:ParameterizedQuery highlightQuery = `SELECT highlight_id, start_time, end_time FROM HighlightPomoDetails WHERE user_id = ${userId}`;
-//     stream<record {|int highlight_id; time:Utc start_time; time:Utc end_time;|}, sql:Error?> highlightStream = self.db->query(highlightQuery);
-
-//     // Check if highlightStream is not null
-//     if highlightStream is stream<record {|int highlight_id; time:Utc start_time; time:Utc end_time;|}, sql:Error?> {
-//         // Iterate over the highlight results
-//         check from var highlight in highlightStream
-//             do {
-//                 PauseContinueRecord[] pauseAndContinueTimes = [];
-
-//                 // Query to get pause and continue times for the current highlight
-//                 sql:ParameterizedQuery pauseQuery = `SELECT pause_time, continue_time FROM PausesPomoDetails WHERE highlight_id = ${highlight.highlight_id}`;
-//                 stream<record {|time:Utc pause_time; time:Utc continue_time?;|}, sql:Error?> pauseStream = self.db->query(pauseQuery);
-
-//                 // Check if pauseStream is not null
-//                 if pauseStream is stream<record {|time:Utc pause_time; time:Utc continue_time?;|}, sql:Error?> {
-//                     // Iterate over the pause and continue times results
-//                     check from var pauseRecord in pauseStream
-//                         do {
-//                             string pauseTimeStr = time:utcToString(pauseRecord.pause_time);
-//                             string continueTimeStr = pauseRecord.continue_time is time:Utc ? time:utcToString(<time:Utc>pauseRecord.continue_time) : "";
-
-//                             // Manual formatting from RFC 3339 to "yyyy-MM-dd HH:mm:ss"
-//                             string _ = pauseTimeStr.substring(0, 10) + " " + pauseTimeStr.substring(11, 19);
-//                             string _ = continueTimeStr != "" ? continueTimeStr.substring(0, 10) + " " + continueTimeStr.substring(11, 19) : "";
-
-//                             // PauseContinueRecord pauseContinueRecord = {
-//                             //     pause_time: formattedPauseTime,
-//                             //     continue_time: formattedContinueTime
-//                             // };
-
-//                             // pauseAndContinueTimes.push(pauseContinueRecord);
-//                         };
-//                 }
-
-//                 // Convert time:Utc to RFC 3339 strings
-//                 string startTimeStr = time:utcToString(highlight.start_time);
-//                 string endTimeStr = time:utcToString(highlight.end_time);
-
-//                 // Manual formatting from RFC 3339 to "yyyy-MM-dd HH:mm:ss"
-//                 string formattedStartTime = startTimeStr.substring(0, 10) + " " + startTimeStr.substring(11, 19);
-//                 string formattedEndTime = endTimeStr.substring(0, 10) + " " + endTimeStr.substring(11, 19);
-
-//                 HighlightRecord highlightRecord = {
-//                     highlight_id: highlight.highlight_id,
-//                     start_time: formattedStartTime,
-//                     end_time: formattedEndTime,
-//                     pause_and_continue_times: pauseAndContinueTimes
-//                 };
-
-//                 highlightRecords.push(highlightRecord);
-//             };
-//     }
-
-//     return highlightRecords;
-// // }
-// }
-
-
-
 
 
 

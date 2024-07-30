@@ -25,7 +25,7 @@ const SideDrawer: React.FC = () => {
 
     useEffect(() => {
         // Fetch project details from the API
-        axios.get('/api/project-details')
+        axios.get('http://localhost:9091/project-details')
             .then(response => {
                 setProjectDetails(response.data);
             })

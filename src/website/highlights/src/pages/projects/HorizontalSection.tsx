@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Select, MenuItem, Button, Typography, Drawer, Box } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Select, MenuItem, Button, Typography, Drawer, Box, Avatar } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import Autocomplete from '@mui/material/Autocomplete';
+import SideDrawer from './SideDrawer';
 import Test from './test';
 import dayjs, { Dayjs } from 'dayjs';
 
@@ -15,16 +16,16 @@ interface RowData {
     priority: string;
     startDate: Dayjs | null;
     dueDate: Dayjs | null;
-    assignees: string[]; // Add this line
 }
 
 const HorizontalSection: React.FC = () => {
     const [rows, setRows] = useState<RowData[]>([]);
+    const [newAssignee, setNewAssignee] = useState('');
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
 
     useEffect(() => {
-        axios.get('http://localhost:8090/todo/projects')
+        axios.get('http://localhost:9091/projects')
             .then(response => {
                 const fetchedProjects = response.data.projects.map((project: any) => ({
                     id: project.id,
@@ -33,7 +34,6 @@ const HorizontalSection: React.FC = () => {
                     priority: project.priority,
                     startDate: project.startDate ? dayjs(project.startDate) : null,
                     dueDate: project.dueDate ? dayjs(project.dueDate) : null,
-                    assignees: project.assignees || [], // Add this line
                 }));
                 setRows(fetchedProjects);
             })
@@ -71,17 +71,15 @@ const HorizontalSection: React.FC = () => {
             priority: '',
             startDate: null,
             dueDate: null,
-            assignees: [], // Add this line
         };
 
-        axios.post('http://localhost:8090/todo/addProjects', {
+        axios.post('http://localhost:9091/addProjects', {
             id: 10,
             projectName: 'New Project',
             progress: 'completed',
             priority: 'low',
             startDate: '2001-01-25',
             dueDate: '2001-02-25',
-            assignees: [], // Add this line
         })
             .then(response => {
                 console.log('New row added:', response.data);
@@ -92,7 +90,6 @@ const HorizontalSection: React.FC = () => {
                     priority: project.priority,
                     startDate: null,
                     dueDate: null,
-                    assignees: project.assignees || [], // Add this line
                 }));
                 setRows([...rows, ...newProjects]);
                 console.log("new projects", ...newProjects);
@@ -103,7 +100,7 @@ const HorizontalSection: React.FC = () => {
     };
 
     const updateRowInDB = (row: RowData) => {
-        axios.put(`http://localhost:8090/todo/updateProject`, row)
+        axios.put(`http://localhost:9091/updateProject`, row)
             .then(response => console.log('Row updated:', response.data))
             .catch(error => console.error('Error updating row:', error));
     };
@@ -117,7 +114,7 @@ const HorizontalSection: React.FC = () => {
                             <TableCell style={{ cursor: 'pointer', padding: '8px' }}>Project Name</TableCell>
                             <TableCell style={{ padding: '8px' }}>Start Date</TableCell>
                             <TableCell style={{ padding: '8px' }}>Due Date</TableCell>
-                            <TableCell style={{ padding: '8px' }}>Assignees</TableCell>
+                            {/* <TableCell style={{ padding: '8px' }}>Assignees</TableCell> */}
                             <TableCell style={{ padding: '8px' }}>Status</TableCell>
                             <TableCell style={{ padding: '8px' }}>Percent Completed</TableCell>
                             <TableCell style={{ padding: '8px' }}>Priority</TableCell>
@@ -153,7 +150,7 @@ const HorizontalSection: React.FC = () => {
                                         value={row.startDate}
                                         onChange={(date) => {
                                             const updatedRows = [...rows];
-                                            updatedRows[rowIndex].startDate = date;
+                                            updatedRows[rowIndex].startDate = date ;
                                             setRows(updatedRows);
                                             updateRowInDB(updatedRows[rowIndex]);
                                         }}
@@ -168,7 +165,7 @@ const HorizontalSection: React.FC = () => {
                                         value={row.dueDate}
                                         onChange={(date) => {
                                             const updatedRows = [...rows];
-                                            updatedRows[rowIndex].dueDate = date;
+                                            updatedRows[rowIndex].dueDate = date ;
                                             setRows(updatedRows);
                                             updateRowInDB(updatedRows[rowIndex]);
                                         }}
@@ -176,22 +173,6 @@ const HorizontalSection: React.FC = () => {
                                         renderInput={(params) => <TextField {...params} fullWidth />}
                                         placeholder="Pick due date"
                                         sx={{ width: '100%' }}
-                                    />
-                                </TableCell>
-                                <TableCell style={{ padding: '8px' }}>
-                                    <Autocomplete
-                                        multiple
-                                        options={[]} // Fetch options from your API or define a static list
-                                        value={row.assignees}
-                                        onChange={(event, newValue) => {
-                                            const updatedRows = [...rows];
-                                            updatedRows[rowIndex].assignees = newValue;
-                                            setRows(updatedRows);
-                                            updateRowInDB(updatedRows[rowIndex]);
-                                        }}
-                                        renderInput={(params) => (
-                                            <TextField {...params} variant="outlined" placeholder="Add assignees" />
-                                        )}
                                     />
                                 </TableCell>
                                 <TableCell style={{ padding: '8px' }}>
@@ -246,7 +227,7 @@ const HorizontalSection: React.FC = () => {
                 open={drawerOpen}
                 onClose={handleCloseDrawer}
             >
-                <Box sx={{ width: 750 }}>
+                 <Box sx={{ width: 750 }}>
                     <Typography variant="h6" gutterBottom>
                         Project Details (ID: {selectedProjectId})
                     </Typography>

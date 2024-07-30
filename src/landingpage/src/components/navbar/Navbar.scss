@@ -3,7 +3,7 @@
 .navbar {
     background-color: var(--black);
     padding-block: 0.6rem;
-    position: relative;
+    position: static;
 
     &_container {
         display: flex;
@@ -15,7 +15,17 @@
         width: 5rem;
         height:5rem;
     }
+    .logo_container{
+        display: flex;
+        flex-direction: row;
+        align-items: center;
 
+        h3{
+            // align-items: center;
+            font-size: 1.5rem;
+        }
+    }
+    
     ul {
         display: flex;
         align-items: center;

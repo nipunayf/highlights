@@ -1,12 +1,21 @@
-import React, { useState, useRef } from 'react';
-import { Modal, TextInput, Button, Textarea, Select, ActionIcon, rem, Text } from '@mantine/core';
-import { DatePicker, TimeInput } from '@mantine/dates';
-import { IconClock, IconX } from '@tabler/icons-react';
-import { createTask as createApiTask } from '@/services/api';
+import React, { useState, useRef } from "react";
+import {
+  Modal,
+  TextInput,
+  Button,
+  Textarea,
+  Select,
+  ActionIcon,
+  rem,
+  Text,
+} from "@mantine/core";
+import { DatePicker, TimeInput } from "@mantine/dates";
+import { IconClock, IconX } from "@tabler/icons-react";
+import { createTask as createApiTask } from "@/services/api";
 
 interface AddtaskPopupProps {
   open: boolean;
-  onClose: () => void;   
+  onClose: () => void;
   // addTask: (newTask: Task) => void;
 }
 
@@ -19,7 +28,6 @@ interface Task {
   label: string;
   reminder: string;
   priority: string;
-  
 }
 
 interface ApiTask {
@@ -31,26 +39,33 @@ interface ApiTask {
   label: string;
   reminder: string;
   priority: string;
- 
 }
 
 export default function AddtaskPopup({ open, onClose }: AddtaskPopupProps) {
+
+  const priorityColors = {
+    low: '#4CAF50',
+    medium: '#FFC107',
+    high: '#F44336',
+    none: 'F44336'
+  };
   // State hooks to manage form input values and other state
   const [formState, setFormState] = useState({
-    title: '',
-    description: '',
-    reminder: '',
-    priority: '',
-    label: '', 
+    title: "",
+    description: "",
+    reminder: "",
+    priority: "",
+    label: "",
   });
   const [dueDate, setDueDate] = useState<Date | null>(null);
-  const [startTime, setStartTime] = useState<string>('');
-  const [endTime, setEndTime] = useState<string>('');
+  const [startTime, setStartTime] = useState<string>("");
+  const [endTime, setEndTime] = useState<string>("");
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   // Refs for accessing the TimeInput components' methods
   const startRef = useRef<HTMLInputElement>(null);
   const endRef = useRef<HTMLInputElement>(null);
+  
 
   // Function to handle form submission
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -59,19 +74,26 @@ export default function AddtaskPopup({ open, onClose }: AddtaskPopupProps) {
     // Validation
     const newErrors: { [key: string]: string } = {};
 
-    if (!formState.title) newErrors.title = 'Title is required';
-    if (!formState.description) newErrors.description = 'Description is required';
-    if (!dueDate) newErrors.dueDate = 'Due date is required';
-    if (!startTime) newErrors.startTime = 'Start time is required';
-    if (!endTime) newErrors.endTime = 'End time is required';
-    if (startTime && endTime && new Date(`1970-01-01T${startTime}Z`).getTime() >= new Date(`1970-01-01T${endTime}Z`).getTime()) {
-      newErrors.time = 'Start time should be less than end time';
+    if (!formState.title) newErrors.title = "Title is required";
+    if (!formState.description)
+      newErrors.description = "Description is required";
+    if (!dueDate) newErrors.dueDate = "Due date is required";
+    if (!startTime) newErrors.startTime = "Start time is required";
+    if (!endTime) newErrors.endTime = "End time is required";
+    if (
+      startTime &&
+      endTime &&
+      new Date(`1970-01-01T${startTime}Z`).getTime() >=
+        new Date(`1970-01-01T${endTime}Z`).getTime()
+    ) {
+      newErrors.time = "Start time should be less than end time";
     }
-    if (dueDate && dueDate.getTime() < new Date().setHours(0, 0, 0, 0)) newErrors.dueDate = 'Due date should be today or a future date';
+    if (dueDate && dueDate.getTime() < new Date().setHours(0, 0, 0, 0))
+      newErrors.dueDate = "Due date should be today or a future date";
 
-    if (!formState.label) newErrors.label = 'Label is required';
-    if (!formState.reminder) newErrors.reminder = 'Reminder is required';
-    if (!formState.priority) newErrors.priority = 'Priority is required';
+    if (!formState.label) newErrors.label = "Label is required";
+    if (!formState.reminder) newErrors.reminder = "Reminder is required";
+    if (!formState.priority) newErrors.priority = "Priority is required";
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -79,7 +101,11 @@ export default function AddtaskPopup({ open, onClose }: AddtaskPopupProps) {
     }
 
     // Adjust dueDate to UTC
-    const adjustedDueDate = dueDate ? new Date(Date.UTC(dueDate.getFullYear(), dueDate.getMonth(), dueDate.getDate())) : null;
+    const adjustedDueDate = dueDate
+      ? new Date(
+          Date.UTC(dueDate.getFullYear(), dueDate.getMonth(), dueDate.getDate())
+        )
+      : null;
 
     // Constructing newTask object with form data
     const newTask: Task = {
@@ -109,45 +135,47 @@ export default function AddtaskPopup({ open, onClose }: AddtaskPopupProps) {
 
     try {
       // Calling API function to create task
-      await createApiTask(apiTask as any); 
+      await createApiTask(apiTask as any);
       // Casting to 'any' to bypass type error
       // Adding new task locally after successful API call
       // addTask(newTask);
-      
+
       // Resetting form state after successful submission
       setFormState({
-        title: '',
-        description: '',
-        reminder: '',
-        priority: '',
-        label: '', 
-        
-        
+        title: "",
+        description: "",
+        reminder: "",
+        priority: "",
+        label: "",
       });
       setDueDate(null);
-      setStartTime('');
-      setEndTime('');
+      setStartTime("");
+      setEndTime("");
       setErrors({});
-      
+
       // Closing the modal after successful submission
       onClose();
     } catch (error) {
-      console.error('Error submitting task:', error);
+      console.error("Error submitting task:", error);
     }
   };
 
   // Function to render clock icon and handle click event to show time picker
   const pickerControl = (ref: React.RefObject<HTMLInputElement>) => (
-    <ActionIcon variant="subtle" color="gray" onClick={() => ref.current?.showPicker()}>
+    <ActionIcon
+      variant="subtle"
+      color="gray"
+      onClick={() => ref.current?.showPicker()}
+    >
       <IconClock style={{ width: rem(16), height: rem(16) }} stroke={1.5} />
     </ActionIcon>
   );
 
   // Function to handle change in Select component for Reminder
   const handleSelectChange = (value: string | null) => {
-    setFormState(prevState => ({
+    setFormState((prevState) => ({
       ...prevState,
-      reminder: value || '',
+      reminder: value || "",
     }));
   };
 
@@ -156,7 +184,7 @@ export default function AddtaskPopup({ open, onClose }: AddtaskPopupProps) {
     <Modal
       opened={open}
       onClose={onClose}
-      title="Task Details"
+      title="Highlight Details"
       closeButtonProps={{
         icon: <IconX size={20} stroke={1.5} />,
       }}
@@ -169,32 +197,46 @@ export default function AddtaskPopup({ open, onClose }: AddtaskPopupProps) {
           label="Title"
           name="title"
           value={formState.title}
-          onChange={(e) => setFormState(prevState => ({
-            ...prevState,
-            title: e.target.value,
-          }))}
+          onChange={(e) =>
+            setFormState((prevState) => ({
+              ...prevState,
+              title: e.target.value,
+            }))
+          }
           error={errors.title}
         />
 
         {/* DatePicker component for Due Date */}
-        <div style={{ display: 'flex', justifyContent: 'center', margin: '16px 0' }}>
-          <DatePicker 
-            value={dueDate} 
-            onChange={setDueDate} 
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            margin: "16px 0",
+          }}
+        >
+          <DatePicker
+            value={dueDate}
+            onChange={setDueDate}
             minDate={new Date()} // Prevent selection of past dates
           />
           {errors.dueDate && <Text color="red">{errors.dueDate}</Text>}
         </div>
 
         {/* TimeInput components for Start Time and End Time */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: rem(10) }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            marginBottom: rem(10),
+          }}
+        >
           <TimeInput
             label="Start Time"
             value={startTime}
             onChange={(e) => setStartTime(e.currentTarget.value)}
             ref={startRef}
             rightSection={pickerControl(startRef)}
-            style={{ width: '180px' }}
+            style={{ width: "180px" }}
             error={errors.startTime}
           />
           <TimeInput
@@ -203,25 +245,26 @@ export default function AddtaskPopup({ open, onClose }: AddtaskPopupProps) {
             onChange={(e) => setEndTime(e.currentTarget.value)}
             ref={endRef}
             rightSection={pickerControl(endRef)}
-            style={{ width: '180px' }}
+            style={{ width: "180px" }}
             error={errors.endTime || errors.time}
           />
           {/* {errors.time && <Text color="red">{errors.time}</Text>} */}
         </div>
 
         <Select
-  label="Your favorite library"
-  placeholder="Pick value"
-  data={['React', 'Angular', 'Vue', 'Svelte']}
-  searchable
-  value={formState.label}
-  onChange={(value) => setFormState(prevState => ({
-    ...prevState,
-    label: value || '',
-  }))}
-  error={errors.label}
-/>
-
+          label="Enter the label"
+          placeholder="Pick value"
+          data={["Reading", "Writing", "Homework", "Schoolwork", "Shopping"]}
+          searchable
+          value={formState.label}
+          onChange={(value) =>
+            setFormState((prevState) => ({
+              ...prevState,
+              label: value || "",
+            }))
+          }
+          error={errors.label}
+        />
 
         {/* Select component for Reminder */}
         <Select
@@ -230,7 +273,12 @@ export default function AddtaskPopup({ open, onClose }: AddtaskPopupProps) {
           name="reminder"
           value={formState.reminder}
           onChange={handleSelectChange}
-          data={['Before 10 minutes', 'Before 15 minutes', 'Before 20 minutes', 'Before 30 minutes'].map(value => ({ value, label: value }))}
+          data={[
+            "Before 10 minutes",
+            "Before 15 minutes",
+            "Before 20 minutes",
+            "Before 30 minutes",
+          ].map((value) => ({ value, label: value }))}
           mb="md"
           error={errors.reminder}
         />
@@ -241,18 +289,20 @@ export default function AddtaskPopup({ open, onClose }: AddtaskPopupProps) {
           placeholder="Pick value"
           name="priority"
           value={formState.priority}
-          onChange={(value) => setFormState(prevState => ({
-            ...prevState,
-            priority: value || '',
-          }))}
+          onChange={(value) =>
+            setFormState((prevState) => ({
+              ...prevState,
+              priority: value || "",
+            }))
+          }
           data={[
-            { value: 'none', label: 'None' },
-            { value: 'low', label: 'Low' },
-            { value: 'medium', label: 'Medium' },
-            { value: 'high', label: 'High' },
+            { value: "none", label: "None" },
+            { value: "low", label: "Low" },
+            { value: "medium", label: "Medium" },
+            { value: "high", label: "High" },
           ]}
           mb="md"
-         error={errors.priority}
+          error={errors.priority}
         />
 
         {/* Textarea component for Description */}
@@ -261,10 +311,12 @@ export default function AddtaskPopup({ open, onClose }: AddtaskPopupProps) {
           label="Description"
           name="description"
           value={formState.description}
-          onChange={(e) => setFormState(prevState => ({
-            ...prevState,
-            description: e.target.value,
-          }))}
+          onChange={(e) =>
+            setFormState((prevState) => ({
+              ...prevState,
+              description: e.target.value,
+            }))
+          }
           mb="md"
           error={errors.description}
         />

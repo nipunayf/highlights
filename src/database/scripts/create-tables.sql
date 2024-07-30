@@ -26,7 +26,8 @@ CREATE TABLE `tasks` (
 
 CREATE TABLE `task_lists` (
   `id` integer PRIMARY KEY AUTO_INCREMENT,
-  `user_id` integer NOT NULL
+  `user_id` integer NOT NULL,
+  `title` varchar(255) NOT NULL
 );
 
 CREATE TABLE `events` (
@@ -41,6 +42,19 @@ CREATE TABLE `calendars` (
   `id` integer PRIMARY KEY AUTO_INCREMENT,
   `user_id` integer NOT NULL,
   `name` varchar(255) NOT NULL
+);
+
+CREATE TABLE `t` (
+  `id` integer PRIMARY KEY AUTO_INCREMENT,
+  `user_id` integer NOT NULL,
+  `name` varchar(255) NOT NULL
+);
+
+CREATE TABLE `dailytips` (
+  `id` integer PRIMARY KEY AUTO_INCREMENT,
+  `label` varchar(255) NOT NULL,
+  `tip` varchar(255) NOT NULL,
+  `date` date DEFAULT CURRENT_DATE
 );
 
 ALTER TABLE `highlights` ADD FOREIGN KEY (`event_id`) REFERENCES `events` (`id`);

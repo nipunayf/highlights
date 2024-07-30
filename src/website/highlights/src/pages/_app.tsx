@@ -1,14 +1,18 @@
 import '@mantine/core/styles.css';
+import '@mantine/charts/styles.css';
+import '@mantine/dates/styles.css';
 
 import type { AppProps } from 'next/app';
 import { createTheme, MantineProvider } from '@mantine/core';
-import { MsalProvider } from '@azure/msal-react';
-import { AuthenticationResult, EventType, PublicClientApplication } from '@azure/msal-browser';
+import { MsalAuthenticationTemplate, MsalProvider } from '@azure/msal-react';
+import { AuthenticationResult, EventType, InteractionType, PublicClientApplication } from '@azure/msal-browser';
 import { msalConfig } from '../authConfig';
 import { NextPage } from 'next';
-import { ReactElement, ReactNode } from 'react';
+import { ReactElement, ReactNode, StrictMode } from 'react';
+import { Provider } from 'react-redux';
+import { store } from '../store';
 
-const msalInstance = new PublicClientApplication(msalConfig);
+export const msalInstance = new PublicClientApplication(msalConfig);
 
 if (!msalInstance.getActiveAccount() && msalInstance.getAllAccounts().length > 0) {
     msalInstance.setActiveAccount(msalInstance.getAllAccounts()[0]);
@@ -43,13 +47,19 @@ type AppPropsWithLayout = AppProps & {
 }
 
 export default function App({ Component, pageProps }: AppPropsWithLayout) {
-    const getLayout = Component.getLayout ?? ((page) => page)
+    const getLayout = Component.getLayout ?? ((page) => page);
 
     return (
-        <MsalProvider instance={msalInstance}>
-            <MantineProvider theme={theme}>
-                {getLayout(<Component {...pageProps} />)}
-            </MantineProvider>
-        </MsalProvider>
+        <StrictMode>
+            <MsalProvider instance={msalInstance}>
+                <MsalAuthenticationTemplate interactionType={InteractionType.Redirect}>
+                    <MantineProvider theme={theme}>
+                        <Provider store={store}>
+                            {getLayout(<Component {...pageProps} />)}
+                        </Provider>
+                    </MantineProvider>
+                </MsalAuthenticationTemplate>
+            </MsalProvider>
+        </StrictMode>
     );
 }

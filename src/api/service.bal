@@ -103,7 +103,7 @@ configurable string azureAdAudience = ?;
         maxAge: 84900
     }
 }
-service / on new http:Listener(9090) {
+service / on new http:Listener(9092) {
 
     resource function get greeting(string? name) returns Greeting {
         string greetingStr = string `Hello, ${name == () ? "visitor" : name}!`;
@@ -366,8 +366,8 @@ function formatDateTime(string isodueDateTime) returns string {
 }
 function formatTime(string isoTime) returns string {
     // Construct a full RFC 3339 formatted string with a default date and seconds
-    string fullTime = "1970-01-01T" + isoTime + ":00Z";
-    
+    string fullTime = "1970-01-01T" + (isoTime.length() == 5 ? isoTime + ":00Z" : isoTime + "Z");
+
     // Parse the fullTime string into UTC time
     time:Utc|time:Error utc = time:utcFromString(fullTime);
     if (utc is error) {

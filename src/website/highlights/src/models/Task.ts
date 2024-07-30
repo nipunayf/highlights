@@ -1,7 +1,23 @@
-export interface Task {
-    id: string;
-    created: string;
+import { Entity } from "./Entity";
+
+export interface Task extends Entity {
+    completed: any;
+    dueDate: Date | null;
+    Date: string;
     title: string;
-    dueDate?: string;
-    completed: boolean;
+    description: string;
+    startTime: string;
+    endTime: string;
+    reminder: string;
+    priority: string;
+    label: string;
+    status: 'overdue' | 'pending' | 'completed';
 }
+
+// export interface Task {
+//     id: string;
+//     created: string;
+//     title: string;
+//     dueDate?: string;
+//     completed: boolean;
+// }

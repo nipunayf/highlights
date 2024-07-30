@@ -50,6 +50,35 @@ CREATE TABLE `t` (
   `name` varchar(255) NOT NULL
 );
 
+CREATE TABLE `hi` (
+  `id` INTEGER PRIMARY KEY AUTO_INCREMENT,
+  `title` VARCHAR(512),
+  `dueDate` DATE,
+  `startTime` TIME,
+  `endTime` TIME,
+  `label` VARCHAR(255),
+  `reminder` VARCHAR(255),
+  `priority` VARCHAR(255),
+  `description` TEXT,
+  `status` ENUM('pending', 'completed', 'overdue') DEFAULT 'pending'
+  -- `type` VARCHAR(255) DEFAULT 'MAIN TASK'
+);
+
+
+CREATE TABLE `his` (
+  `id` INTEGER PRIMARY KEY AUTO_INCREMENT,
+  `title` VARCHAR(512),
+  `dueDate` DATE,
+  `startTime` TIME,
+  `endTime` TIME,
+  `reminder` VARCHAR(255),
+  `priority` VARCHAR(255),
+  `description` TEXT,
+  `status` VARCHAR(1) DEFAULT '0',
+  `parentTaskId` INTEGER,
+  FOREIGN KEY (`parentTaskId`) REFERENCES `hi` (`id`)
+);
+
 CREATE TABLE `dailytips` (
   `id` integer PRIMARY KEY AUTO_INCREMENT,
   `label` varchar(255) NOT NULL,

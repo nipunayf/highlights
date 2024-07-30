@@ -1,15 +1,14 @@
 import React, { useState, useEffect, useRef, forwardRef } from 'react';
-import { Button, Modal, Group, TextInput, List, ThemeIcon, Text, Menu, UnstyledButton, Tabs, Avatar } from '@mantine/core';
-import { IconCircleCheck, IconInfoCircle, IconChevronRight ,IconCalendarDue} from '@tabler/icons-react';
-// import { showNotification } from '@mantine/notifications';
+import {Group, TextInput, List, ThemeIcon, Text, Menu, UnstyledButton, Tabs, Avatar } from '@mantine/core';
+import { IconInfoCircle, IconChevronRight, IconCalendarDue,IconHourglassHigh  } from '@tabler/icons-react';
+import { showNotification } from '@mantine/notifications';
 import styles from './Stopwatch.module.css';
+import { useHighlights } from "@/hooks/useHighlights";
+import { useTimers } from '@/hooks/useTimer';
+import { HighlightTask } from "@/models/HighlightTask";
+import { mTimer } from '@/models/Timer';
 
-const tasks = [
-  { title: 'Learning Ballerina ', time: '9:00am-1:00pm' },
-  { title: 'React Project', time: '2:00pm-5:00pm' },
-  { title: 'Exercise', time: '6:00pm-7:00pm' },
-  // Add more tasks as needed
-];
+
 
 interface UserButtonProps {
   image?: string;
@@ -42,12 +41,92 @@ const UserButton = forwardRef<HTMLButtonElement, UserButtonProps>(
   )
 );
 
+
+const HighlightMenu = ({ highlights, onHighlightSelect, closeMenu }: { highlights: HighlightTask[], onHighlightSelect: (index: number) => void, closeMenu: () => void }) => {
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredHighlights = highlights.filter((highlight) =>
+    highlight.highlight_name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const handleSelect = (index: number) => {
+    onHighlightSelect(index);
+    closeMenu();
+  };
+
+
+  return (
+    <Tabs.Panel value="Task">
+      <div className={styles.taskContainer}>
+        <TextInput
+          placeholder="search"
+          className={styles.searchInput}
+          value={searchQuery}
+          onChange={(event) => setSearchQuery(event.currentTarget.value)}
+        />
+        <div className={styles.taskHeader}>
+          <Text className={styles.today}> <IconCalendarDue />Today &gt;</Text>
+        </div>
+        <Menu>
+          {filteredHighlights.map((highlight, index) => (
+            <Menu.Item key={highlight.id} onClick={() => handleSelect(index)}>
+              {highlight.highlight_name}
+            </Menu.Item>
+          ))}
+        </Menu>
+      </div>
+    </Tabs.Panel>
+  );
+};
+
+const TimerMenu = ({ timer_details }: { timer_details: mTimer[] }) => {
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredTimers = timer_details.filter((timer) =>
+    timer.timer_name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  return (
+    <Tabs.Panel value="Timer">
+      <div className={styles.taskContainer}>
+        <TextInput
+          placeholder="search"
+          className={styles.searchInput}
+          value={searchQuery}
+          onChange={(event) => setSearchQuery(event.currentTarget.value)}
+        />
+        <div className={styles.taskHeader}>
+          <Text className={styles.today}> <IconHourglassHigh /> </Text>
+        </div>
+        <Menu>
+          {/* <Menu.Label>Select doing Task</Menu.Label> */}
+          {filteredTimers.map((timer) => (
+            <Menu.Item key={timer.timer_id}>{timer.timer_name}</Menu.Item>
+          ))}
+        </Menu>
+      </div>
+    </Tabs.Panel>
+  );
+};
+
+
+
+
+
+
+
 const Stopwatch: React.FC = () => {
   const [time, setTime] = useState(0);
   const [isActive, setIsActive] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [opened, setOpened] = useState(false);
   const intervalRef = useRef<number | null>(null);
+  const [selectedTask, setSelectedTask] = useState<number | null>(null); // State to track selected task
+  const { highlights, isHighlightsLoading, isHighlightsError } = useHighlights();
+  const { timer_details, istimer_detailsLoading, istimer_detailsError } = useTimers();
+  const [menuOpened, setMenuOpened] = useState(false);
+
+
 
   useEffect(() => {
     if (isActive && !isPaused) {
@@ -104,9 +183,7 @@ const Stopwatch: React.FC = () => {
     });
   };
 
-  const handleFocusClick = () => {
-    setOpened(true);
-  };
+
 
   const radius = 90;
   const circumference = 2 * Math.PI * radius;
@@ -117,18 +194,23 @@ const Stopwatch: React.FC = () => {
   const minutes = Math.floor(time / 60);
   const seconds = time % 60;
   const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  
+  const handleHighlightSelect = (index: number) => {
+    setSelectedTask(index);
+    setMenuOpened(false);
+  };
 
   return (
     <div className={styles.stopwatch}>
       <div>
         <div className={styles.focusLink}>
-          <Menu withArrow>
+        <Menu withArrow opened={menuOpened} onChange={setMenuOpened}>
             <Menu.Target>
-              <UserButton
-                label="Focus"
+            <UserButton
+                label={selectedTask !== null && highlights ? highlights[selectedTask]?.highlight_name : "Focus"}
                 styles={{
                   label: {
-                    fontSize: '14px', // Adjust font size
+                    fontSize: '14px',
                   },
                 }}
               />
@@ -139,38 +221,10 @@ const Stopwatch: React.FC = () => {
                   <Tabs.Tab value="Task">Task</Tabs.Tab>
                   <Tabs.Tab value="Timer">Timer</Tabs.Tab>
                 </Tabs.List>
-                <Tabs.Panel value="Task">
-                  <div className={styles.taskContainer}>
-                    <TextInput
-                      placeholder="search"
-                      className={styles.searchInput}
-                    />
-                    <div className={styles.taskHeader}>
-                    <IconCalendarDue />
-                    <Text>Today &gt;</Text>
-                    </div>
-                    <Menu.Label>Select doing Task</Menu.Label>
-                    {tasks.map((task, index) => (
-                      <Menu.Item key={index}>
-                        {task.title}
-                      </Menu.Item>
-                    ))}
-                  </div>
-                </Tabs.Panel>
-                <Tabs.Panel value="Timer">
-                  <div className={styles.taskContainer}>
-                    <TextInput
-                      placeholder="search"
-                      className={styles.searchInput}
-                    />
-                    <Menu.Label>Select a Timer</Menu.Label>
-                    {tasks.map((task, index) => (
-                      <Menu.Item key={index}>
-                        {task.title}
-                      </Menu.Item>
-                    ))}
-                  </div>
-                </Tabs.Panel>
+                {highlights ? <HighlightMenu highlights={highlights} onHighlightSelect={handleHighlightSelect} closeMenu={() => setMenuOpened(false)} /> : null}
+                {timer_details ? <TimerMenu timer_details={timer_details} /> : null}
+
+           
               </Tabs>
             </Menu.Dropdown>
           </Menu>
@@ -209,51 +263,6 @@ const Stopwatch: React.FC = () => {
           )}
         </div>
       </div>
-
-      <Modal
-        opened={opened}
-        onClose={() => setOpened(false)}
-        title="Focus"
-        centered
-        overlayProps={{ opacity: 0 }} // No overlay
-      >
-        <div className={styles.popupContent}>
-          <TextInput placeholder="Search" mb="sm" />
-          <Text size="lg" fw={500}>Today</Text>
-          <List
-            spacing="xs"
-            size="sm"
-            center
-            icon={
-              <ThemeIcon color="teal" size={24} radius="xl">
-                <IconCircleCheck size={16} />
-              </ThemeIcon>
-            }
-          >
-            <List.Item>
-              <Text size="md">Learning Baltics</Text>
-              <Text color="dimmed">9:00am - 1:00pm</Text>
-            </List.Item>
-            <List.Item>
-              <Text size="md">Learning Baltics</Text>
-              <Text color="dimmed">9:00am - 1:00pm</Text>
-            </List.Item>
-            <List.Item>
-              <Text size="md">Learning Baltics</Text>
-              <Text color="dimmed">9:00am - 1:00pm</Text>
-            </List.Item>
-            <List.Item>
-              <Text size="md">Learning Baltics</Text>
-              <Text color="dimmed">9:00am - 1:00pm</Text>
-            </List.Item>
-            <List.Item>
-              <Text size="md">Learning Baltics</Text>
-              <Text color="dimmed">9:00am - 1:00pm</Text>
-            </List.Item>
-            {/* Add more list items as needed */}
-          </List>
-        </div>
-      </Modal>
     </div>
   );
 };

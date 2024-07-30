@@ -1,39 +1,40 @@
 import { apiEndpoint } from "@/apiConfig";
 import { aquireAccessToken } from "@/util/auth";
 import { Task } from "@/models/Task";
+import { Tip } from "@/models/Tip";
 import axios, { AxiosInstance } from "axios";
+import { Highlight } from "@/models/Highlight";
+import { AppUser } from "@/hooks/useAppUser";
 
 function getAxiosClient(route: string): AxiosInstance {
-    console.log("d")
     const client = axios.create({
         baseURL: `${apiEndpoint}/${route}`
-        
     });
-    
 
     client.interceptors.request.use(async (config) => {
-        console.log("df")
         config.headers['Authorization'] = `Bearer ${await aquireAccessToken()}`;
-        console.log(config)
-        console.log("Sqqqqqqqqqq")
         return config;
 
     }, (error) => {
-        console.log("s")
         return Promise.reject(error);
     });
-    
-console.log("qw")
-console.log(client)
     return client;
 }
 
 export async function getTasks(): Promise<Task[]> {
-    console.log("Ssssssssssssssssssssssssssss")
     const response = await getAxiosClient('tasks').request<Task[]>({
         method: 'GET'
     });
+    return response.data;
+}
 
+export async function getTaskLists(user: AppUser) {
+    const response = await getAxiosClient('taskLists').request({
+        method: 'GET',
+        params: {
+            sub: user.sub
+        }
+    });
     return response.data;
 }
 
@@ -43,7 +44,6 @@ export async function createTask(task: Task): Promise<Task> {
         method: 'POST',
         data: task
     });
-    console.log("mbbbbbm")
 
     return response.data;
 }
@@ -65,7 +65,6 @@ export async function updateTask(task: Task): Promise<Task> {
     }
 }
 
-
 export async function deleteTask(taskId: number): Promise<void> {
     console.log("Deleting task with ID:", taskId);
     try {
@@ -81,14 +80,18 @@ export async function deleteTask(taskId: number): Promise<void> {
     }
 }
 
-
-// export async function addsubtask(task: Task): Promise<Task> {
-//     console.log(task)
-//     const response = await getAxiosClient('subtasks').request<Task>({
-//         method: 'POST',
-//         data: task
+// export async function getHighlights() {
+//     const response = await getAxiosClient('highlights').request<Highlight[]>({
+//         method: 'GET'
 //     });
-//     console.log("mbbbbbm")
 
-//     return response.data;
+//     return response;
 // }
+
+export async function addTip(tip: Tip): Promise<Tip> {
+    const response = await getAxiosClient('tips').request<Tip>({
+        method: 'POST',
+        data: tip
+    });
+    return response.data;
+}

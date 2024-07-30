@@ -18,7 +18,7 @@ import Detailspopup from "@/components/AddTask/Detailspopup";
 
 
 function ActionsGrid() {
-  const [selectedTask,setSelectedTask] = useState<Task | null>(null);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [taskDetailPopupOpen, setTaskDetailPopupOpen] = useState(false);
 
   const [popupOpen, setPopupOpen] = useState(false);
@@ -56,7 +56,7 @@ function ActionsGrid() {
     setTaskDetailPopupOpen(true);
   };
 
- 
+
   const handleCardClick = () => setPopupOpen(true);
   const handleClosePopup = () => {
     setPopupOpen(false);
@@ -179,11 +179,10 @@ function ActionsGrid() {
                     <div className={classes.taskContainer}>
                       <div className={classes.sqare}>
                         <div
-                          className={`flagIcon ${
-                            completedTask && completedTask.id === task.id
+                          className={`flagIcon ${completedTask && completedTask.id === task.id
                               ? "completed"
                               : ""
-                          }`}
+                            }`}
                           onClick={() => handleDialogOpen(task)}
                         >
                           <FontAwesomeIcon
@@ -196,7 +195,7 @@ function ActionsGrid() {
                         </div>
                       </div>
                       <div className={classes.taskname} onClick={() => handleTaskClick(task)}>
-                      <b>{task.title}</b>
+                        <b>{task.title}</b>
                       </div>
                       <div className={classes.taskstarttime}>
                         <b>{task.startTime} </b>
@@ -250,15 +249,14 @@ function ActionsGrid() {
                 {tasks.map((task) => (
                   <div key={task.id} className={classes.task}>
                     <div className={classes.taskContainer}>
-                    
+
 
                       <div className={classes.sqare}>
                         <div
-                          className={`flagIcon ${
-                            completedTask && completedTask.id === task.id
+                          className={`flagIcon ${completedTask && completedTask.id === task.id
                               ? "completed"
                               : ""
-                          }`}
+                            }`}
                           onClick={() => handleDialogOpen(task)}
                         >
                           <FontAwesomeIcon
@@ -270,18 +268,18 @@ function ActionsGrid() {
                           />
                         </div>
                       </div>
-                     
+
                       <div className={classes.taskname} onClick={() => handleTaskClick(task)}>
                         <b>{task.title}</b>
                       </div>
-                     
+
                       <div className={classes.taskstarttime}>
                         <b>{task.startTime}</b>
                       </div>
                       <div className={classes.taskendtime}>
                         <b>{task.endTime}</b>
                       </div>
-                   
+
                       <div className={classes.menu}>
                         <OptionsMenu
                           onUpdateClick={() => handleUpdateClick(task)}
@@ -325,11 +323,10 @@ function ActionsGrid() {
                     <div className={classes.taskContainer}>
                       <div className={classes.sqare}>
                         <div
-                          className={`flagIcon ${
-                            completedTask && completedTask.id === task.id
+                          className={`flagIcon ${completedTask && completedTask.id === task.id
                               ? "completed"
                               : ""
-                          }`}
+                            }`}
                           onClick={() => handleDialogOpen(task)}
                         >
                           <FontAwesomeIcon
@@ -342,7 +339,7 @@ function ActionsGrid() {
                         </div>
                       </div>
                       <div className={classes.taskname} onClick={() => handleTaskClick(task)}>
-                      <b>{task.title}</b>
+                        <b>{task.title}</b>
                       </div>
                       <div className={classes.taskstarttime}>
                         <b>{task.startTime}</b>
@@ -383,16 +380,16 @@ function ActionsGrid() {
         </div>
       )}
 
-{selectedTask && (
-          <Detailspopup
-            task={selectedTask}
-            opened={taskDetailPopupOpen}
-            onClose={() => {
-              setSelectedTask(null);
-              setTaskDetailPopupOpen(false);
-            }}
-          />
-        )}
+      {selectedTask && (
+        <Detailspopup
+          task={selectedTask}
+          opened={taskDetailPopupOpen}
+          onClose={() => {
+            setSelectedTask(null);
+            setTaskDetailPopupOpen(false);
+          }}
+        />
+      )}
       <AlertDialogSlide open={dialogOpen} handleClose={handleDialogClose} />
       {taskToUpdate && (
         <UpdateTaskPopup

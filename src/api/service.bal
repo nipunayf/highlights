@@ -1,15 +1,12 @@
 import ballerina/http;
+import ballerina/io;
 import ballerina/log;
 import ballerina/sql;
 import ballerina/time;
 import ballerinax/mysql;
 import ballerinax/mysql.driver as _;
-import ballerina/io;
-// import ballerina/io;
 
-type Greeting record {|
-    string greeting;
-|};
+// import ballerina/io;
 
 type CreateUser record {|
     string sub;
@@ -19,7 +16,6 @@ type User record {|
     int id;
     string sub;
 |};
-
 
 type Task record {
     int id;
@@ -34,19 +30,6 @@ type Task record {
     string status;
 };
 
-// type SubTask record {|
-//     int id;
-//     string title;
-//     string description;
-//     string? dueDate;
-//     string? startTime;
-//     string? endTime;
-//     string? reminder;
-//     string priority;
-//     int parentTaskId;
-// |};
-
-
 type CreateTask record {|
     string title;
     string description;
@@ -59,24 +42,29 @@ type CreateTask record {|
 
 |};
 
-// type CreateSubTask record {|
-//     string title;
-//     string description;
-//     string? dueDate;
-//     string? startTime;
-//     string? endTime;
-//     string? reminder;
-//     string priority;
-//     int parentTaskId;
-// |};
-
-
-
-
+type Highlight record {|
+    string id;
+    string created;
+    string title;
+    string date;
+    string startTime;
+    string endTime;
+    string notification;
+    string priority;
+    boolean completed;
+    string[] taskIds;
+|};
 
 Task[] tasks = [
-    
+
 ];
+
+type TaskList record {|
+    int id;
+    @sql:Column {name: "user_id"}
+    int userId;
+    string title;
+|};
 
 // listener http:Listener securedEP = new (9090);
 
@@ -103,13 +91,7 @@ configurable string azureAdAudience = ?;
         maxAge: 84900
     }
 }
-service / on new http:Listener(9092) {
-
-    resource function get greeting(string? name) returns Greeting {
-        string greetingStr = string `Hello, ${name == () ? "visitor" : name}!`;
-        Greeting greeting = {greeting: greetingStr};
-        return greeting;
-    }
+service / on new http:Listener(9090) {
 
     private final mysql:Client db;
 
@@ -143,23 +125,23 @@ service / on new http:Listener(9092) {
         return http:INTERNAL_SERVER_ERROR;
     }
 
-//  resource function get tasks() returns Task[]|error {
-//         sql:ParameterizedQuery query = `SELECT id,title, dueDate, startTime, endTime, label, reminder, priority, description , status FROM hi`;
-//         stream<Task, sql:Error?> resultStream = self.db->query(query);
-//         Task[] tasksList = [];
-//         error? e = resultStream.forEach(function(Task task) {
-//             tasksList.push(task);
-//         });
-//         if (e is error) {
-//             log:printError("Error occurred while fetching tasks: ", 'error = e);
-//             return e;
-//         }
-// // io:print(tasklist);
-// io:println(tasksList);
-//         return tasksList;
-//     }
+    //  resource function get tasks() returns Task[]|error {
+    //         sql:ParameterizedQuery query = `SELECT id,title, dueDate, startTime, endTime, label, reminder, priority, description , status FROM hi`;
+    //         stream<Task, sql:Error?> resultStream = self.db->query(query);
+    //         Task[] tasksList = [];
+    //         error? e = resultStream.forEach(function(Task task) {
+    //             tasksList.push(task);
+    //         });
+    //         if (e is error) {
+    //             log:printError("Error occurred while fetching tasks: ", 'error = e);
+    //             return e;
+    //         }
+    // // io:print(tasklist);
+    // io:println(tasksList);
+    //         return tasksList;
+    //     }
 
-   private function fetchTasksForToday() returns Task[]|error {
+    private function fetchTasksForToday() returns Task[]|error {
         sql:ParameterizedQuery query = `SELECT id, title, dueDate, startTime, endTime, label, reminder, priority, description, status
                                         FROM hi
                                         WHERE dueDate = CURRENT_DATE`;
@@ -179,54 +161,59 @@ service / on new http:Listener(9092) {
         return tasksList;
     }
 
+    resource function get taskLists(string sub) returns TaskList[]|error {
+        User|sql:Error result = self.db->queryRow(`SELECT * FROM users WHERE sub = ${sub}`);
+
+        if result is sql:NoRowsError {
+            return error("User not found");
+        }
+
+        stream<TaskList, sql:Error?> taskListStream = self.db->query(
+            `SELECT * FROM task_lists WHERE user_id=(SELECT u.id FROM users AS u WHERE u.sub=${sub});`
+        );
+
+        return from TaskList taskList in taskListStream
+            select taskList;
+    }
+
+    // resource function get tasks() returns Task[] {
+    //     return tasks;
+    // }
+
     resource function get tasks() returns Task[]|error {
         io:println("cbbbb");
         return self.fetchTasksForToday();
     }
 
+    resource function post tasks(http:Caller caller, http:Request req) returns error? {
+        json|http:ClientError payload = req.getJsonPayload();
+        if payload is http:ClientError {
+            log:printError("Error while parsing request payload", 'error = payload);
+            check caller->respond(http:STATUS_BAD_REQUEST);
+            return;
+        }
 
+        CreateTask|error task = payload.cloneWithType(CreateTask);
+        if task is error {
+            log:printError("Error while converting JSON to Task", 'error = task);
+            check caller->respond(http:STATUS_BAD_REQUEST);
+            return;
+        }
 
+        // Convert ISO 8601 date to MySQL compatible date format
+        string dueDate = task.dueDate != () ? formatDateTime(task.dueDate.toString()) : "";
+        string startTime = task.startTime != () ? formatTime(task.startTime.toString()) : "";
+        string endTime = task.endTime != () ? formatTime(task.endTime.toString()) : "";
 
-
-
-
-
-
-
-
-
-
-
-   
-   
- resource function post tasks(http:Caller caller, http:Request req) returns error? {
-    json|http:ClientError payload = req.getJsonPayload();
-    if payload is http:ClientError {
-        log:printError("Error while parsing request payload", 'error = payload);
-        check caller->respond(http:STATUS_BAD_REQUEST);
-        return;
-    }
-
-    CreateTask|error task = payload.cloneWithType(CreateTask);
-    if task is error {
-        log:printError("Error while converting JSON to Task", 'error = task);
-        check caller->respond(http:STATUS_BAD_REQUEST);
-        return;
-    }
-
-    // Convert ISO 8601 date to MySQL compatible date format
-    string dueDate = task.dueDate != () ? formatDateTime(task.dueDate.toString()) : "";
-    string startTime = task.startTime != () ? formatTime(task.startTime.toString()) : "";
-    string endTime = task.endTime != () ? formatTime(task.endTime.toString()) : "";
-
-    sql:ExecutionResult|sql:Error result = self.db->execute(`
+        sql:ExecutionResult|sql:Error result = self.db->execute(`
         INSERT INTO hi (title, dueDate, startTime, endTime, label, reminder, priority, description) 
         VALUES (${task.title}, ${dueDate}, ${startTime}, ${endTime}, ${task.label} ,${task.reminder}, ${task.priority}, ${task.description});
     `);
 
-    if result is sql:Error {
-        log:printError("Error occurred while inserting task", 'error = result);
-        check caller->respond(http:STATUS_INTERNAL_SERVER_ERROR);}
+        if result is sql:Error {
+            log:printError("Error occurred while inserting task", 'error = result);
+            check caller->respond(http:STATUS_INTERNAL_SERVER_ERROR);
+        }
 
         Task[]|error tasks = self.fetchTasksForToday();
         if (tasks is error) {
@@ -238,39 +225,37 @@ service / on new http:Listener(9092) {
         io:println(tasks);
 
         check caller->respond(tasks);
-    
 
-
-    // } else {
-    //     check caller->respond(http:STATUS_CREATED);
-    // }
-}
-
-resource function put tasks/[int taskId](http:Caller caller, http:Request req) returns error? {
-    // io:println("ss");
-    // io:println(Task);
-    
-    json|http:ClientError payload = req.getJsonPayload();
-    if payload is http:ClientError {
-        log:printError("Error while parsing request payload", 'error = payload);
-        io:println("xdd");
-        check caller->respond(http:STATUS_BAD_REQUEST);
-        return;
+        // } else {
+        //     check caller->respond(http:STATUS_CREATED);
+        // }
     }
 
-    Task|error task = payload.cloneWithType(Task);
-    if task is error {
-        log:printError("Error while converting JSON to Task", 'error = task);
-        check caller->respond(http:STATUS_BAD_REQUEST);
-        return;
-    }
+    resource function put tasks/[int taskId](http:Caller caller, http:Request req) returns error? {
+        // io:println("ss");
+        // io:println(Task);
 
-    // Convert ISO 8601 date to MySQL compatible date format
-    string dueDate = task.dueDate != () ? formatDateTime(task.dueDate.toString()) : "";
-    string startTime = task.startTime != () ? formatTime(task.startTime.toString()) : "";
-    string endTime = task.endTime != () ? formatTime(task.endTime.toString()) : "";
+        json|http:ClientError payload = req.getJsonPayload();
+        if payload is http:ClientError {
+            log:printError("Error while parsing request payload", 'error = payload);
+            io:println("xdd");
+            check caller->respond(http:STATUS_BAD_REQUEST);
+            return;
+        }
 
-    sql:ExecutionResult|sql:Error result = self.db->execute(`
+        Task|error task = payload.cloneWithType(Task);
+        if task is error {
+            log:printError("Error while converting JSON to Task", 'error = task);
+            check caller->respond(http:STATUS_BAD_REQUEST);
+            return;
+        }
+
+        // Convert ISO 8601 date to MySQL compatible date format
+        string dueDate = task.dueDate != () ? formatDateTime(task.dueDate.toString()) : "";
+        string startTime = task.startTime != () ? formatTime(task.startTime.toString()) : "";
+        string endTime = task.endTime != () ? formatTime(task.endTime.toString()) : "";
+
+        sql:ExecutionResult|sql:Error result = self.db->execute(`
         UPDATE hi SET title = ${task.title}, 
                       dueDate = ${dueDate}, 
                       startTime = ${startTime}, 
@@ -281,22 +266,24 @@ resource function put tasks/[int taskId](http:Caller caller, http:Request req) r
         WHERE id = ${taskId};
     `);
 
-    if result is sql:Error {
-        log:printError("Error occurred while updating task", 'error = result);
-        check caller->respond(http:STATUS_INTERNAL_SERVER_ERROR);
-    } else {
-        check caller->respond(http:STATUS_OK);
+        if result is sql:Error {
+            log:printError("Error occurred while updating task", 'error = result);
+            check caller->respond(http:STATUS_INTERNAL_SERVER_ERROR);
+        } else {
+            check caller->respond(http:STATUS_OK);
+        }
     }
-}
 
+    // resource function get highlights() returns Highlight[] {
+    //     return highlights;
+    // }
 
-
- resource function delete tasks/[int taskId](http:Caller caller) returns error? {
-    io:println("xdd");
+    resource function delete tasks/[int taskId](http:Caller caller) returns error? {
+        io:println("xdd");
         sql:ExecutionResult|sql:Error result = self.db->execute(`
             DELETE FROM hi WHERE id = ${taskId};
         `);
-   
+
         if result is sql:Error {
             log:printError("Error occurred while deleting task", result);
             check caller->respond(http:STATUS_INTERNAL_SERVER_ERROR);
@@ -304,66 +291,14 @@ resource function put tasks/[int taskId](http:Caller caller, http:Request req) r
             check caller->respond(http:STATUS_OK);
         }
     }
-
-
-//      resource function post subtasks(http:Caller caller, http:Request req) returns error? {
-//         json|http:ClientError payload = req.getJsonPayload();
-//         if payload is http:ClientError {
-//             log:printError("Error while parsing request payload", 'error = payload);
-//             check caller->respond(http:STATUS_BAD_REQUEST);
-//             return;
-//         }
-// io:println(payload);
-//         CreateSubTask|error subTask = payload.cloneWithType(CreateSubTask);
-//         if subTask is error {
-//             log:printError("Error while converting JSON to SubTask", 'error = subTask);
-//             check caller->respond(http:STATUS_BAD_REQUEST);
-//             return;
-//         }
-
-//         // Convert ISO 8601 date to MySQL compatible date format
-//         string Date = subTask.dueDate != () ? formatDateTime(subTask.dueDate.toString()) : "";
-//         string startTime = subTask.startTime != () ? formatTime(subTask.startTime.toString()) : "";
-//         string endTime = subTask.endTime != () ? formatTime(subTask.endTime.toString()) : "";
-
-//         sql:ExecutionResult|sql:Error result = self.db->execute(`
-//             INSERT INTO his (title, dueDate, startTime, endTime, reminder, priority, description, parentTaskId) 
-//             VALUES (${subTask.title}, ${Date}, ${startTime}, ${endTime}, ${subTask.reminder}, ${subTask.priority}, ${subTask.description}, ${subTask.parentTaskId});
-//         `);
-
-//         if result is sql:Error {
-//             log:printError("Error occurred while inserting subtask", 'error = result);
-//             check caller->respond(http:STATUS_INTERNAL_SERVER_ERROR);
-//         } else {
-//             check caller->respond(http:STATUS_CREATED);
-//         }
-//     }
-
-
-   
-    
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 function formatDateTime(string isodueDateTime) returns string {
     time:Utc utc = checkpanic time:utcFromString(isodueDateTime);
     time:Civil dt = time:utcToCivil(utc);
     return string `${dt.year}-${dt.month}-${dt.day}`;
 }
+
 function formatTime(string isoTime) returns string {
     // Construct a full RFC 3339 formatted string with a default date and seconds
     string fullTime = "1970-01-01T" + (isoTime.length() == 5 ? isoTime + ":00Z" : isoTime + "Z");
@@ -374,10 +309,10 @@ function formatTime(string isoTime) returns string {
         log:printError("Error parsing time string:", utc);
         return "";
     }
-    
+
     // Convert UTC time to civil time to get hours, minutes, and seconds
-    time:Civil dt = time:utcToCivil(<time:Utc> utc);
-    
+    time:Civil dt = time:utcToCivil(<time:Utc>utc);
+
     // Format the time components into HH:MM:SS format
     return string `${dt.hour}:${dt.minute}:${dt.second ?: 0}`;
 }

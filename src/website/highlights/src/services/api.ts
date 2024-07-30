@@ -1,8 +1,8 @@
-import { apiEndpoint } from "@/apiConfig";
+import { apiEndpoint,apiEndpoint_h } from "@/apiConfig";
 import { aquireAccessToken } from "@/util/auth";
 import { Task } from "@/models/Task";
 import { HighlightTask } from "@/models/HighlightTask";
-import { mTimer, mPomo_details, mPauses_details,mTimeRecord } from "@/models/Timer";
+import { mTimer, mPomo_details, mPauses_details,mTimeRecord,mPauseContinueDetails } from "@/models/Timer";
 import axios, { AxiosInstance } from "axios";
 
 // Function to create an Axios client with authorization
@@ -199,6 +199,24 @@ export async function getFocusRecord(userId: number): Promise<mTimeRecord[]> {
       throw error;
     }
   }
+
+
+
+  export async function getPauseDetails(userId: number): Promise<mPauseContinueDetails[]> {
+    try {
+
+        const response = await getAxiosClient('pause_details').request<mPauseContinueDetails[]>({
+            method: 'GET',
+            url: `/${userId}`
+          });
+
+        return response.data;
+        
+    } catch (error) {
+        console.error('Error fetching pause details:', error);
+        throw error;
+    }
+}
 
 
 

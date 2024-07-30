@@ -158,7 +158,7 @@ type PauseAndContinueTime record {
         maxAge: 84900
     }
 }
-service / on new http:Listener(9090) {
+service / on new http:Listener(9094) {
 
     resource function get greeting(string? name) returns Greeting {
         string greetingStr = string `Hello, ${name == () ? "visitor" : name}!`;

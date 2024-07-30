@@ -1,7 +1,10 @@
 import { apiEndpoint } from "@/apiConfig";
 import { aquireAccessToken } from "@/util/auth";
 import { Task } from "@/models/Task";
+import { Tip } from "@/models/Tip";
 import axios, { AxiosInstance } from "axios";
+import { Highlight } from "@/models/Highlight";
+import { AppUser } from "@/hooks/useAppUser";
 
 function getAxiosClient(route: string): AxiosInstance {
     console.log("d")

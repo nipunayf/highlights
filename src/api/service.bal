@@ -7,10 +7,6 @@ import ballerinax/mysql.driver as _;
 import ballerina/io;
 // import ballerina/io;
 
-type Greeting record {|
-    string greeting;
-|};
-
 type CreateUser record {|
     string sub;
 |};
@@ -95,6 +91,16 @@ configurable string azureAdAudience = ?;
     //         scopes: ["User.Read"]
     //     }
     // ],
+    // auth: [
+    //     {
+    //         jwtValidatorConfig: {
+    //             issuer: azureAdIssuer,
+    //             audience: azureAdAudience,
+    //             scopeKey: "scp"
+    //         },
+    //         scopes: ["User.Read"]
+    //     }
+    // ],
     cors: {
         allowOrigins: ["http://localhost:3000"],
         allowCredentials: false,
@@ -104,12 +110,6 @@ configurable string azureAdAudience = ?;
     }
 }
 service / on new http:Listener(9092) {
-
-    resource function get greeting(string? name) returns Greeting {
-        string greetingStr = string `Hello, ${name == () ? "visitor" : name}!`;
-        Greeting greeting = {greeting: greetingStr};
-        return greeting;
-    }
 
     private final mysql:Client db;
 

@@ -38,3 +38,16 @@ VALUES
 insert into users values(1, '6e4096d8-b99e-4b2d-a495-446cce5fcd7c');
 
 insert into task_lists(user_id, title) values(1, 'Shopping'),(1, 'Grocery'),(1, 'Work'),(1, 'Travel');
+
+INSERT INTO highlights.PausesPomoDetails (pauses_pomo_id, highlight_id, pause_time, continue_time)
+VALUES 
+(1, 9, '2024-07-31 11:27:07', '2024-07-31 11:27:08'),
+(2, 9, '2024-07-31 11:27:10', '2024-07-31 11:27:11'),
+(3, 9, '2024-07-31 11:27:12', '2024-07-31 11:27:14'),
+(4, 7, '2024-07-31 11:37:18', '2024-07-31 11:37:20');
+
+
+INSERT INTO highlights.HighlightPomoDetails (timer_id, highlight_id, user_id, start_time, end_time, status)
+VALUES (10, 9, 11, '2024-07-31 11:27:14', '2024-07-31 11:27:17', 'complete'),
+(8, 7, 11, '2024-07-31 11:37:23', '2024-07-31 11:37:26', 'complete');
+

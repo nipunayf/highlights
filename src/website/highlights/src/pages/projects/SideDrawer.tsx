@@ -6,6 +6,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import Autocomplete from '@mui/material/Autocomplete';
 import { Divider} from '@mantine/core';
+import { getProjectDetails } from '@/services/api'
 
 const SideDrawer: React.FC = () => {
     const [projectDetails, setProjectDetails] = useState({
@@ -25,7 +26,8 @@ const SideDrawer: React.FC = () => {
 
     useEffect(() => {
         // Fetch project details from the API
-        axios.get('http://localhost:9091/project-details')
+        // axios.get('http://localhost:9090/project-details')
+        getProjectDetails()
             .then(response => {
                 setProjectDetails(response.data);
             })

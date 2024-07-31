@@ -92,7 +92,7 @@ const HorizontalSection: React.FC = () => {
             dueDate: '2001-02-25',
         })
             .then(response => {
-                console.log('New row added:', response);
+                console.log('New row added:', response.projects);
                 const newProjects = response.projects.map((project: any) => ({
                     id: project.id,
                     projectName: project.projectName,
@@ -103,7 +103,7 @@ const HorizontalSection: React.FC = () => {
                 }));
                 setRows([...rows, ...newProjects]);
                 console.log("new projects", ...newProjects);
-                console.log("here are my existing projects", response.data.projects);
+                console.log("here are my existing projects", response.projects);
                 console.log("here are my existing rows", rows);
             })
             .catch(error => console.error('Error adding row:', error));

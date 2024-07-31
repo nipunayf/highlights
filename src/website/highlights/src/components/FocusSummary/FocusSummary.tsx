@@ -86,7 +86,7 @@ const FocusSummary = () => {
                 .map((record) => (
                   <div key={record.highlight_id} className={styles.timeRecord}>
                     <span className={styles.mainRecord}>
-                      Highlight ID: {record.highlight_id} <br />
+                      {record.highlight_name} { }  :   { }                      
                       {formatTime(record.start_time)} - {formatTime(record.end_time)}
                     </span>
                     {getPauseAndContinueTimes(record.highlight_id).map((time, index) => (

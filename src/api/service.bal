@@ -763,10 +763,54 @@ service / on new http:Listener(9090) {
 
 
 // for get the focus record without pauses
+// resource function get focus_record/[int userId]() returns TimeRecord[]|error {
+//     // Query to get all highlights for the given user
+//     sql:ParameterizedQuery highlightQuery = `SELECT highlight_id, start_time, end_time FROM HighlightPomoDetails WHERE user_id = ${userId}`;
+//     stream<record {| int highlight_id; time:Utc start_time; time:Utc end_time; |}, sql:Error?> highlightStream = self.db->query(highlightQuery);
+
+//     TimeRecord[] highlightTimeRecords = [];
+
+//     // Iterate over the highlight results
+//     check from var highlight in highlightStream
+//         do {
+//             string[][] pauseAndContinueTimes = [];
+
+//             // Add the duration to start_time and end_time
+//             time:Utc newStartTime = time:utcAddSeconds(highlight.start_time, +(5 * 3600 + 30 * 60));
+//             time:Utc newEndTime = time:utcAddSeconds(highlight.end_time, +(5 * 3600 + 30 * 60));
+
+//             // Convert time:Utc to RFC 3339 strings
+//             string startTimeStr = time:utcToString(newStartTime);
+//             string endTimeStr = time:utcToString(newEndTime);
+
+//             // Manual formatting from RFC 3339 to "yyyy-MM-dd HH:mm:ss"
+//             string formattedStartTime = startTimeStr.substring(0, 10) + " " + startTimeStr.substring(11, 19);
+//             string formattedEndTime = endTimeStr.substring(0, 10) + " " + endTimeStr.substring(11, 19);
+
+
+//             string highlightName = "Learning Ballerina";
+  
+
+//             TimeRecord timeRecord = {
+//                 highlight_id: highlight.highlight_id,
+//                 highlight_name: highlightName,
+//                 start_time: formattedStartTime,
+//                 end_time: formattedEndTime,
+//                 pause_and_continue_times: pauseAndContinueTimes
+//             };
+
+//             highlightTimeRecords.push(timeRecord);
+//         };
+//     io:println(highlightTimeRecords);
+//     return highlightTimeRecords;
+// }
 resource function get focus_record/[int userId]() returns TimeRecord[]|error {
-    // Query to get all highlights for the given user
-    sql:ParameterizedQuery highlightQuery = `SELECT highlight_id, start_time, end_time FROM HighlightPomoDetails WHERE user_id = ${userId}`;
-    stream<record {| int highlight_id; time:Utc start_time; time:Utc end_time; |}, sql:Error?> highlightStream = self.db->query(highlightQuery);
+    // Query to get all highlights and their names for the given user
+    sql:ParameterizedQuery highlightQuery = `SELECT hpd.highlight_id, hh.highlight_name, hpd.start_time, hpd.end_time 
+                                             FROM HighlightPomoDetails hpd
+                                             JOIN hilights_hasintha hh ON hpd.highlight_id = hh.highlight_id
+                                             WHERE hpd.user_id = ${userId}`;
+    stream<record {| int highlight_id; string highlight_name; time:Utc start_time; time:Utc end_time; |}, sql:Error?> highlightStream = self.db->query(highlightQuery);
 
     TimeRecord[] highlightTimeRecords = [];
 
@@ -787,19 +831,9 @@ resource function get focus_record/[int userId]() returns TimeRecord[]|error {
             string formattedStartTime = startTimeStr.substring(0, 10) + " " + startTimeStr.substring(11, 19);
             string formattedEndTime = endTimeStr.substring(0, 10) + " " + endTimeStr.substring(11, 19);
 
-            // Query to get the highlight name based on highlight_id
-            sql:ParameterizedQuery highlightNameQuery = `SELECT highlight_name FROM hilights_hasintha WHERE highlight_id = ${highlight.highlight_id}`;
-            stream<record {| string highlight_name; |}, sql:Error?> highlightNameStream = self.db->query(highlightNameQuery);
-            
-            string highlightName = "";
-            check from var result in highlightNameStream
-                do {
-                    highlightName = result.highlight_name;
-                };
-
             TimeRecord timeRecord = {
                 highlight_id: highlight.highlight_id,
-                highlight_name: highlightName,
+                highlight_name: highlight.highlight_name,
                 start_time: formattedStartTime,
                 end_time: formattedEndTime,
                 pause_and_continue_times: pauseAndContinueTimes
@@ -810,6 +844,7 @@ resource function get focus_record/[int userId]() returns TimeRecord[]|error {
     io:println(highlightTimeRecords);
     return highlightTimeRecords;
 }
+
 
 
 

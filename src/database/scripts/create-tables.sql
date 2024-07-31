@@ -57,7 +57,7 @@ CREATE TABLE `timer_details` (
 
 CREATE TABLE `hilights_hasintha` (
   `highlight_id` integer,
-  `highlight_name`VARCHAR(255) NOT NULL,
+  `highlight_name`varchar(255) NOT NULL,
   `user_id` INTEGER NOT NULL
 );
 

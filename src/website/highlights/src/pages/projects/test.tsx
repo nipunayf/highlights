@@ -12,7 +12,7 @@ import { styled } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import { tableCellClasses } from '@mui/material/TableCell';
 import dayjs, { Dayjs } from 'dayjs';
-import {addTask ,updateTask,tasks,project} from '@/services/api'
+import {addTask ,updateMyTask,tasks,project} from '@/services/api'
 
 interface RowData {
   projectId: number;
@@ -146,7 +146,7 @@ const Test: React.FC<{ projectId: number }> = ({ projectId }) => {
 
   const updateRowInDB = (row: RowData) => {
     // axios.put(`http://localhost:9090/updateTask`, row)
-    updateTask(row)
+    updateMyTask(row)
       .then(response => console.log('Row updated:', response.data))
       .catch(error => console.error('Error updating row:', error));
   };

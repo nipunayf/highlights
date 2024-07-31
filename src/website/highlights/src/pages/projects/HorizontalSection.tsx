@@ -92,8 +92,8 @@ const HorizontalSection: React.FC = () => {
             dueDate: '2001-02-25',
         })
             .then(response => {
-                console.log('New row added:', response.data);
-                const newProjects = response.data.projects.map((project: any) => ({
+                console.log('New row added:', response);
+                const newProjects = response.projects.map((project: any) => ({
                     id: project.id,
                     projectName: project.projectName,
                     progress: project.progress,
@@ -239,7 +239,7 @@ const HorizontalSection: React.FC = () => {
             >
                  <Box sx={{ width: 750 }}>
                     <Typography variant="h6" gutterBottom>
-                        Project Details (ID: {selectedProjectId})
+                        {/* Project Details (ID: {selectedProjectId}) */}
                     </Typography>
                     {selectedProjectId && <Test projectId={selectedProjectId} />}
                 </Box>

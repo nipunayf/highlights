@@ -12,25 +12,25 @@ function getAxiosClient(route: string): AxiosInstance {
         baseURL: `${apiEndpoint}/${route}`
     });
 
-    // client.interceptors.request.use(async (config) => {
-    //     config.headers['Authorization'] = `Bearer ${await aquireAccessToken()}`;
-    //     return config;
-    // }, (error) => {
-    //     return Promise.reject(error);
-    // });
+    client.interceptors.request.use(async (config) => {
+        config.headers['Authorization'] = `Bearer ${await aquireAccessToken()}`;
+        return config;
+    }, (error) => {
+        return Promise.reject(error);
+    });
 
     return client;
 }
 
-// export async function getTaskLists(user: AppUser) {
-//     const response = await getAxiosClient('taskLists').request({
-//         method: 'GET',
-//         params: {
-//             sub: user.sub
-//         }
-//     });
-//     return response.data;
-// }
+export async function getTaskLists(user: AppUser) {
+    const response = await getAxiosClient('taskLists').request({
+        method: 'GET',
+        params: {
+            sub: user.sub
+        }
+    });
+    return response.data;
+}
 
 export async function getTasks(): Promise<Task[]> {
     const response = await getAxiosClient('tasks').request<Task[]>({
@@ -73,16 +73,16 @@ export async function getProjects() {
 
     return response;
 }
-export async function addProjects(tip: any){
+export async function addProjects(tip: any) {
     console.log("cc")
     const response = await getAxiosClient('addProjects')({
         method: 'POST',
         data: tip
     });
-    console.log("Hello",response.data);
+    console.log("Hello", response.data);
     return response.data;
 }
-export async function updateProject(row: any){
+export async function updateProject(row: any) {
     // console.log("cc")
     const response = await getAxiosClient('updateProject')({
         method: 'PUT',
@@ -98,7 +98,7 @@ export async function getProjectDetails() {
 
     return response;
 }
-export async function addTask(row: any){
+export async function addTask(row: any) {
     // console.log("cc")
     const response = await getAxiosClient('addTask')({
         method: 'POST',
@@ -108,7 +108,7 @@ export async function addTask(row: any){
     // console.log("Hello");
     return response.data;
 }
-export async function updateTask(row: any){
+export async function updateTask(row: any) {
     // console.log("cc")
     const response = await getAxiosClient('updateTask')({
         method: 'PUT',
@@ -117,7 +117,7 @@ export async function updateTask(row: any){
     // console.log("Hello");
     return response.data;
 }
-export async function tasks(projectId:any) {
+export async function tasks(projectId: any) {
     const response = await getAxiosClient(`tasks/${projectId}`).request({
         method: 'GET'
         // params: {
@@ -127,7 +127,7 @@ export async function tasks(projectId:any) {
     console.log("jagaht");
     return response.data;
 }
-export async function project(projectId:any) {
+export async function project(projectId: any) {
     const response = await getAxiosClient(`project/${projectId}`).request({
         method: 'GET'
         // params: {

@@ -1,8 +1,7 @@
-import React, { useState, useRef } from 'react';
-import { Menu, Button, rem } from '@mantine/core';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEllipsis } from '@fortawesome/free-solid-svg-icons';
-import Swal from 'sweetalert2';
+import React, { useState, useRef } from "react";
+import { Menu, Button } from "@mantine/core";
+import { IconDotsVertical } from "@tabler/icons-react";
+import Swal from "sweetalert2";
 
 interface SubMenuProps {
   opened: boolean;
@@ -15,29 +14,31 @@ const SubMenu: React.FC<SubMenuProps> = ({ opened, onClose }) => (
       <div />
     </Menu.Target>
     <Menu.Dropdown>
-      <Menu.Item onClick={onClose}>
-        Start Pomodoro
-      </Menu.Item>
-      <Menu.Item onClick={onClose}>
-        Start Stopwatch
-      </Menu.Item>
+      <Menu.Item onClick={onClose}>Start Pomodoro</Menu.Item>
+      <Menu.Item onClick={onClose}>Start Stopwatch</Menu.Item>
     </Menu.Dropdown>
   </Menu>
 );
 
 interface OptionsMenuProps {
-  onOpenPopup: () => void;
+  // onOpenPopup: () => void;
+  onUpdateClick: () => void;
+  onDelete: () => void;
 }
 
-const OptionsMenu: React.FC<OptionsMenuProps> = ({ onOpenPopup }) => {
+const OptionsMenu: React.FC<OptionsMenuProps> = ({
+  // onOpenPopup,
+  onUpdateClick,
+  onDelete,
+}) => {
   const [opened, setOpened] = useState(false);
   const [submenuOpened, setSubmenuOpened] = useState(false);
-  const buttonRef = useRef<HTMLButtonElement>(null); // Define ref type explicitly
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   const handleClose = (action?: string) => {
     setOpened(false);
     setSubmenuOpened(false);
-    if (action === 'delete') {
+    if (action === "delete") {
       Swal.fire({
         title: "Are you sure?",
         text: "You won't be able to revert this!",
@@ -45,13 +46,14 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({ onOpenPopup }) => {
         showCancelButton: true,
         confirmButtonColor: "#3085d6",
         cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, delete it!"
+        confirmButtonText: "Yes, delete it!",
       }).then((result) => {
         if (result.isConfirmed) {
+          onDelete();
           Swal.fire({
             title: "Deleted!",
             text: "Your file has been deleted.",
-            icon: "success"
+            icon: "success",
           });
         }
       });
@@ -59,19 +61,16 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({ onOpenPopup }) => {
   };
 
   return (
-    <Menu
-      shadow="md"
-      width={200}
-      opened={opened}
-      onClose={() => handleClose()}
-    >
+    <Menu shadow="md" width={200} opened={opened} onClose={() => handleClose()}>
       <Menu.Target>
         <Button
-          color="#F0F4F5"
+          color="rgb(253, 253, 253)"
+          // margin-right= "(-500%)"
+
           onClick={() => setOpened((o) => !o)}
-          ref={buttonRef} // Assign the ref here
+          ref={buttonRef}
         >
-          <FontAwesomeIcon icon={faEllipsis} style={{ color: 'black' }} /> {/* Set icon color to black */}
+          <IconDotsVertical stroke={2} style={{ color: "black" }} />
         </Button>
       </Menu.Target>
 
@@ -79,23 +78,20 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({ onOpenPopup }) => {
         <Menu.Item
           onClick={() => {
             handleClose();
-            onOpenPopup();
+            onUpdateClick();
           }}
         >
           Update
         </Menu.Item>
-        <Menu.Item
+        {/* <Menu.Item
           onClick={() => {
             handleClose();
             onOpenPopup();
           }}
         >
           Add Subtask
-        </Menu.Item>
-        <Menu.Item
-          color="red"
-          onClick={() => handleClose('delete')}
-        >
+        </Menu.Item> */}
+        <Menu.Item color="red" onClick={() => handleClose("delete")}>
           Delete
         </Menu.Item>
         <Menu.Item
@@ -104,7 +100,10 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({ onOpenPopup }) => {
         >
           Focus
           {submenuOpened && (
-            <SubMenu opened={submenuOpened} onClose={() => setSubmenuOpened(false)} />
+            <SubMenu
+              opened={submenuOpened}
+              onClose={() => setSubmenuOpened(false)}
+            />
           )}
         </Menu.Item>
       </Menu.Dropdown>

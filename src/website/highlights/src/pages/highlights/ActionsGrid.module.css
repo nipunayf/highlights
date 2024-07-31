@@ -1,122 +1,165 @@
-.card {
-    background-color: #D9D9D9;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    cursor: pointer;
-    
-  }
-  
-  .title {
+.title {
     font-family:
       Greycliff CF,
       var(--mantine-font-family);
-    font-weight: 700;
-    font-size: 55px;
-    margin-top: 10%;
-    margin-left: 8%;
-    color: #746f6f;
+    font-weight: 900;
+    font-size: 36px;
+    margin-top: -40%;
+    margin-left: 40%;
+    color:#349CF3;
    
   }
   .card {
-    width: 35%;
-    height: 700px;
-    background-color: #D9D9D9;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border: 1px solid transparent; /* Initial border color */
-    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for the hover effect */
-    border-radius: 10px; /* Add border radius for rounded corners */
+    cursor: pointer;
+    width: 100%;
+    height: 200px;
+    box-shadow: 0 4px 8px rgba(4, 108, 244, 0.1);
+    border: 1px solid transparent; 
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; 
+    border-radius: 10px; 
+    margin-right: 3%;
+    margin-left: 2%;
+    margin-top: 6%;
   }
   
   .card:hover {
-    transform: scale(1.05); /* Slightly scale up the card */
-    border-color: #aca9a9; /* Change border color on hover */
-    box-shadow: 0 8px 16px rgba(175, 172, 172, 0.2); /* Increase shadow on hover for "pop" effect */
+    transform: scale(1.05); 
+    border-color: #aca9a9; 
+    box-shadow: 0 8px 16px rgba(175, 172, 172, 0.2);
   }
   
   
-  
   .icon {
-    margin-left: 35%;
-    margin-top: 35%;
-    width: 150px;  /* Adjust width as needed */
-    height: 150px; /* Adjust height as needed */
+    margin-left: 0%;
+    margin-top: 0%;
+    width: 150px;  
+    height: 150px; 
   }
 
 
   .separator {
     margin-left: 2%;
     width: 4px;
-    /* height: ;  */
-    background-color: #d6d2d2; /* Color of the vertical line */
+    background-color: #349CF3; 
+    margin-top: 2%;
   }
 
   .highlight_card{
     display: flex;
   }
-/* ##F0F4F5; */
+
   .task{
-    cursor: pointer;
-    margin-left: 5%;
-    width:500px;
-    background-color:#F0F4F5;
-    
-    border-radius: 10px;
-    height: 50px;
-  }
-
-  .subTask {
-  
-  margin-left: 5%;
-  margin-top: 2%;
-    
-  }
- 
-
- 
-
-  .flag_icon{
-    margin-top: -16%;
-    padding-top: 19%;
-    padding-left: 4%;
-  }
-
-  .task_name{
-    margin-top: -2%;
-    padding-bottom: 2000px;
-
     margin-left: 10%;
-    display: flex;
-    
-
+    box-shadow: 0 4px 8px rgba(4, 108, 244, 0.1);
+    width: 600px;
+    border: 1px solid transparent; 
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for the hover effect */
+    border-radius: 10px; 
   }
-
-.task_date p{
-  /* background-color: aqua; */
-  margin-left: 100px;
-  /* padding-left: 800%; */
-  /* margin-right: -50px; */
-  /* padding-right: -2000px; */
-  padding-top: 4%;
+.labelname{
+  margin-left: 10%;
+  font-size: 20px;
+ 
 }
 
-
-  .task{
-    display: flex;
-  }
-
-  .bars_icon{
-    margin-top: -17.5%;
-    padding-top: 19%;
-    margin-left: 1%;
-    cursor: pointer;
-  }
-.d{
-    display: flex;
-   
+.button{
+ margin-top: 3%;
+ margin-left: 15%;
 }
+ 
+.taskname{
+  margin-left: -70%;
+  /* margin-right: 50px; */
   
+}
 
 
 
+.sqare{
+  margin-left: -3%;
+  cursor: pointer;
+ 
+}
+ 
+ .taskContainer{
+  margin-top: 3%;
+  margin-left: 12.6%;
+  display: flex;
+  justify-content: space-between;
+  display: flex;
+ 
+  background-color: rgb(253, 253, 253);
+  gap: 10px;
+  
+  
+ } 
+ .taskstarttime{
+  margin-right: -25%;
+ }
+ .taskendtime{
+  margin-right: -28%;
+  cursor: pointer;
+  /* padding-right: 25%; */
+  /* background-color: aqua; */
+ 
+ }
+ .taskname{
+cursor: pointer;
+margin-left: -20%;
+ }
+
+/* .sqarex{
+  display: flex;
+  margin-right: 120%;
+} */
+
+  .overduetitle {
+    font-size: 24px; 
+    font-weight: bold; 
+    color: red; 
+    text-align: center; 
+    margin: 20px 0; 
+    text-transform: uppercase; 
+    letter-spacing: 1px; 
+  }
+  .overdue{
+    margin-left: 0%;
+    box-shadow: 0 4px 8px rgba(255, 0, 0, 0.1);
+    width: 600px;
+    border: 1px solid transparent; 
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for the hover effect */
+    border-radius: 10px; 
+  }
+
+.Pendingtitle{
+  font-size: 24px; 
+    font-weight: bold; 
+    color: #349CF3; 
+    text-align: center; 
+    margin: 20px 0; 
+    text-transform: uppercase; 
+    letter-spacing: 1px;
+}
+
+.completetitle{
+  font-size: 24px; 
+    font-weight: bold; 
+    color: #c4bb0f; 
+    text-align: center; 
+    margin: 20px 0; 
+    text-transform: uppercase; 
+    letter-spacing: 1px;
+}
+
+.completedtask{
+  margin-left: 10%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 600px;
+  border: 1px solid transparent; 
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for the hover effect */
+  border-radius: 10px; 
+
+}
 
 
 

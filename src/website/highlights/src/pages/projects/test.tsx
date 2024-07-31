@@ -12,6 +12,7 @@ import { styled } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import { tableCellClasses } from '@mui/material/TableCell';
 import dayjs, { Dayjs } from 'dayjs';
+import {addTask ,updateTask,tasks,project} from '@/services/api'
 
 interface RowData {
   projectId: number;
@@ -77,9 +78,11 @@ const Test: React.FC<{ projectId: number }> = ({ projectId }) => {
   };
 
   useEffect(() => {
-    axios.get(`http://localhost:9091/project/${projectId}`)
+    // axios.get(`http://localhost:9090/project/${projectId}`)
+    project(projectId)
       .then(response => {
-        const project = response.data.value;
+        console.log(response);
+        const project = response.value;
         const fetchedProject: ProjectData = {
           projectId: project.projectId,
           projectName: project.projectName,
@@ -94,17 +97,19 @@ const Test: React.FC<{ projectId: number }> = ({ projectId }) => {
   }, [projectId]);
 
   useEffect(() => {
-    axios.get(`http://localhost:9091/tasks/${projectId}`)
+    // axios.get(`http://localhost:9090/tasks/${projectId}`)
+    tasks(projectId)
       .then(response => {
         console.log(response);
-        const fetchedTasks = response.data.projects.map((task: any) => ({
+        console.log("here are my tasks",response);
+        const fetchedTasks = response.projects.map((task: any) => ({
           projectId: task.projectId,
           taskName: task.taskName,
           progress: task.progress,
           priority: task.priority,
           startDate: task.startDate ? dayjs(task.startDate) : null,
           dueDate: task.dueDate ? dayjs(task.dueDate) : null,
-          assignees: task.assignees || [],
+         // assignees: task.assignees || []
         }));
         setRows(fetchedTasks);
       })
@@ -118,7 +123,7 @@ const Test: React.FC<{ projectId: number }> = ({ projectId }) => {
       setRows(updatedRows);
       setNewAssignee('');
       setAddingAssigneeIndex(null);
-      updateRowInDB(updatedRows[index]);
+      //updateRowInDB(updatedRows[index]);
     }
   };
 
@@ -137,7 +142,8 @@ const Test: React.FC<{ projectId: number }> = ({ projectId }) => {
   };
 
   const updateRowInDB = (row: RowData) => {
-    axios.put(`http://localhost:9091/updateTask`, row)
+    // axios.put(`http://localhost:9090/updateTask`, row)
+    updateTask(row)
       .then(response => console.log('Row updated:', response.data))
       .catch(error => console.error('Error updating row:', error));
   };
@@ -153,17 +159,27 @@ const Test: React.FC<{ projectId: number }> = ({ projectId }) => {
       assignees: [],
     };
 
-    axios.post('http://localhost:9091/addTask', 
-         { projectId: projectId,
-          taskName: '',
-          progress: '',
-          priority: '',
-          startDate: '2001-01-21',
-          dueDate: '2001-01-21',
-          assignees: []}
-    )
+    // axios.post('http://localhost:9090/addTask', 
+    //      { projectId: projectId,
+    //       taskName: '',
+    //       progress: '',
+    //       priority: '',
+    //       startDate: '2001-01-21',
+    //       dueDate: '2001-01-21',
+    //       assignees: []}
+    // )
+    addTask(
+      { 
+      projectId: projectId,
+      taskName: '',
+      progress: '',
+      priority: '',
+      startDate: '2001-01-21',
+      dueDate: '2001-01-21',
+      assignees: []})
       .then(response => {
-        const addedTask = response.data.task;
+        console.log(response);
+        const addedTask = response;
         const formattedTask: RowData = {
           projectId: addedTask.projectId,
           taskName: addedTask.taskName,
@@ -306,9 +322,9 @@ const Test: React.FC<{ projectId: number }> = ({ projectId }) => {
                     <StyledTableCell>
                       <Box display="flex" alignItems="center">
                         <Box flexGrow={1}>
-                          {row.assignees.map((assignee, index) => (
+                          {/* {row.assignees.map((assignee, index) => (
                             <Chip key={index} label={assignee} style={{ marginRight: 5 }} />
-                          ))}
+                          ))} */}
                         </Box>
                         <IconButton
                           color="primary"

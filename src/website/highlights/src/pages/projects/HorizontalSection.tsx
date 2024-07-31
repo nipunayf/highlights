@@ -8,6 +8,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 import SideDrawer from './SideDrawer';
 import Test from './test';
 import dayjs, { Dayjs } from 'dayjs';
+import { getProjects,addProjects,updateProject } from '@/services/api'
 
 interface RowData {
     id: number;
@@ -25,7 +26,8 @@ const HorizontalSection: React.FC = () => {
     const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
 
     useEffect(() => {
-        axios.get('http://localhost:9091/projects')
+        getProjects()
+        // axios.get('http://localhost:9090/projects')
             .then(response => {
                 const fetchedProjects = response.data.projects.map((project: any) => ({
                     id: project.id,
@@ -73,7 +75,15 @@ const HorizontalSection: React.FC = () => {
             dueDate: null,
         };
 
-        axios.post('http://localhost:9091/addProjects', {
+        // axios.post('http://localhost:9090/addProjects', {
+        //     id: 10,
+        //     projectName: 'New Project',
+        //     progress: 'completed',
+        //     priority: 'low',
+        //     startDate: '2001-01-25',
+        //     dueDate: '2001-02-25',
+        // })
+        addProjects({
             id: 10,
             projectName: 'New Project',
             progress: 'completed',
@@ -98,9 +108,9 @@ const HorizontalSection: React.FC = () => {
             })
             .catch(error => console.error('Error adding row:', error));
     };
-
     const updateRowInDB = (row: RowData) => {
-        axios.put(`http://localhost:9091/updateProject`, row)
+        updateProject(row)
+        // axios.put(`http://localhost:9090/updateProject`, row)
             .then(response => console.log('Row updated:', response.data))
             .catch(error => console.error('Error updating row:', error));
     };

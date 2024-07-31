@@ -134,20 +134,20 @@ service / on new http:Listener(9091) {
         return http:INTERNAL_SERVER_ERROR;
     }
 
-    resource function get taskLists(string sub) returns TaskList[]|error {
-        User|sql:Error result = self.db->queryRow(`SELECT * FROM users WHERE sub = ${sub}`);
+    // resource function get taskLists(string sub) returns TaskList[]|error {
+    //     User|sql:Error result = self.db->queryRow(`SELECT * FROM users WHERE sub = ${sub}`);
 
-        if result is sql:NoRowsError {
-            return error("User not found");
-        }
+    //     if result is sql:NoRowsError {
+    //         return error("User not found");
+    //     }
 
-        stream<TaskList, sql:Error?> taskListStream = self.db->query(
-            `SELECT * FROM task_lists WHERE user_id=(SELECT u.id FROM users AS u WHERE u.sub=${sub});`
-        );
+    //     stream<TaskList, sql:Error?> taskListStream = self.db->query(
+    //         `SELECT * FROM task_lists WHERE user_id=(SELECT u.id FROM users AS u WHERE u.sub=${sub});`
+    //     );
 
-        return from TaskList taskList in taskListStream
-            select taskList;
-    }
+    //     return from TaskList taskList in taskListStream
+    //         select taskList;
+    // }
 
     // resource function get tasks() returns Task[] {
     //     return tasks;
@@ -207,6 +207,8 @@ service / on new http:Listener(9091) {
     }
 
     resource function post addProjects(http:Caller caller, http:Request req) returns error? {
+
+        io:println("ccc");
         json payload = check req.getJsonPayload();
 
         string projectName= (check payload.projectName).toString();

@@ -44,10 +44,70 @@ CREATE TABLE `calendars` (
   `name` varchar(255) NOT NULL
 );
 
-CREATE TABLE `t` (
-  `id` integer PRIMARY KEY AUTO_INCREMENT,
-  `user_id` integer NOT NULL,
-  `name` varchar(255) NOT NULL
+
+CREATE TABLE `timer_details` (
+  `timer_id` integer PRIMARY KEY AUTO_INCREMENT,
+    `timer_name` VARCHAR(255) NOT NULL,
+  `pomo_duration` TIME,
+  `short_break_duration` TIME,
+  `long_break_duration` TIME,
+  `pomos_per_long_break` INT NOT NULL,
+  `user_id` INTEGER NOT NULL
+);
+
+CREATE TABLE `hilights_hasintha` (
+  `highlight_id` integer,
+  `highlight_name`varchar(255) NOT NULL,
+  `user_id` INTEGER NOT NULL
+);
+
+CREATE TABLE `HighlightPomoDetails` (
+  `timer_id` INTEGER,
+  `highlight_id` INT ,
+  `user_id` INTEGER NOT NULL,
+  `start_time` DATETIME,
+  `end_time` DATETIME,
+  `status` ENUM('complete', 'uncomplete') DEFAULT 'uncomplete'
+);
+
+
+CREATE TABLE `PausesPomoDetails` (
+  `pauses_pomo_id` INT AUTO_INCREMENT PRIMARY KEY,
+  `highlight_id` INT ,
+  `pause_time` DATETIME NOT NULL,
+  `continue_time` DATETIME 
+  
+);
+
+
+
+CREATE TABLE `hi` (
+  `id` INTEGER PRIMARY KEY AUTO_INCREMENT,
+  `title` VARCHAR(512),
+  `dueDate` DATE,
+  `startTime` TIME,
+  `endTime` TIME,
+  `label` VARCHAR(255),
+  `reminder` VARCHAR(255),
+  `priority` VARCHAR(255),
+  `description` TEXT,
+  `status` ENUM('pending', 'completed', 'overdue') DEFAULT 'pending'
+  -- `type` VARCHAR(255) DEFAULT 'MAIN TASK'
+);
+
+
+CREATE TABLE `his` (
+  `id` INTEGER PRIMARY KEY AUTO_INCREMENT,
+  `title` VARCHAR(512),
+  `dueDate` DATE,
+  `startTime` TIME,
+  `endTime` TIME,
+  `reminder` VARCHAR(255),
+  `priority` VARCHAR(255),
+  `description` TEXT,
+  `status` VARCHAR(1) DEFAULT '0',
+  `parentTaskId` INTEGER,
+  FOREIGN KEY (`parentTaskId`) REFERENCES `hi` (`id`)
 );
 
 
@@ -77,6 +137,13 @@ CREATE TABLE `taskss` (
   `taskId` integer PRIMARY KEY AUTO_INCREMENT
 );
 
+CREATE TABLE `dailytips` (
+  `id` integer PRIMARY KEY AUTO_INCREMENT,
+  `label` varchar(255) NOT NULL,
+  `tip` varchar(255) NOT NULL,
+  `date` DATE
+);
+
 ALTER TABLE `highlights` ADD FOREIGN KEY (`event_id`) REFERENCES `events` (`id`);
 
 ALTER TABLE `highlight_tasks` ADD FOREIGN KEY (`highlight_id`) REFERENCES `highlights` (`id`);
@@ -90,3 +157,6 @@ ALTER TABLE `task_lists` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 ALTER TABLE `events` ADD FOREIGN KEY (`calendar_id`) REFERENCES `calendars` (`id`);
 
 ALTER TABLE `calendars` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+
+-- ALTER TABLE `timer_details` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+

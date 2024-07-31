@@ -97,6 +97,12 @@
         .focusLink a:hover {
           text-decoration: underline;
         }
+        .taskContainer {
+          padding: 20px;
+        }
+        .today{
+          padding: 10%;
+        }
         
         /* Mobile responsiveness */
         @media (max-width: 600px) {

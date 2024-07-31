@@ -79,7 +79,7 @@ export async function addProjects(tip: any){
         method: 'POST',
         data: tip
     });
-    // console.log("Hello");
+    console.log("Hello",response.data);
     return response.data;
 }
 export async function updateProject(row: any){

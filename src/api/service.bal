@@ -411,24 +411,25 @@ service / on new http:Listener(9090) {
         json response = {projects: resultJsonArray};
         http:Response res = new;
         res.setPayload(response);
-        res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+        // res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
         check caller->respond(res);
 
         return;
     }
 
     // Handle preflight OPTIONS request for CORS
-    resource function options addTask(http:Caller caller, http:Request req) returns error? {
-        http:Response response = new;
-        response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
-        response.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-        response.setHeader("Access-Control-Allow-Headers", "Content-Type");
-        check caller->respond(response);
+    // resource function options addTask(http:Caller caller, http:Request req) returns error? {
+    //     http:Response response = new;
+    //     response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+    //     response.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+    //     response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    //     check caller->respond(response);
 
-        return;
-    }
+    //     return;
+    // }
 
     resource function post addProjects(http:Caller caller, http:Request req) returns error? {
+        io:print("this inside add project");
         json payload = check req.getJsonPayload();
 
         string projectName = (check payload.projectName).toString();
@@ -454,22 +455,22 @@ service / on new http:Listener(9090) {
         json response = {projects: resultJsonArray};
         http:Response res = new;
         res.setPayload(response);
-        res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+        // res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
         check caller->respond(res);
 
         return;
     }
 
     // Handle preflight OPTIONS request for CORS
-    resource function options addProjects(http:Caller caller, http:Request req) returns error? {
-        http:Response response = new;
-        response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
-        response.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-        response.setHeader("Access-Control-Allow-Headers", "Content-Type");
-        check caller->respond(response);
+    // resource function options addProjects(http:Caller caller, http:Request req) returns error? {
+    //     http:Response response = new;
+    //     response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+    //     response.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+    //     response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    //     check caller->respond(response);
 
-        return;
-    }
+    //     return;
+    // }
 
     /////////////////////////////////////////////////////////
     resource function get projects(http:Caller caller, http:Request req) returns error? {
@@ -487,22 +488,22 @@ service / on new http:Listener(9090) {
         json response = {projects: resultJsonArray};
         http:Response res = new;
         res.setPayload(response);
-        res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+        // res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
         check caller->respond(res);
 
         return;
     }
 
     // Handle preflight OPTIONS request for CORS
-    resource function options projects(http:Caller caller, http:Request req) returns error? {
-        http:Response response = new;
-        response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
-        response.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-        response.setHeader("Access-Control-Allow-Headers", "Content-Type");
-        check caller->respond(response);
+    // resource function options projects(http:Caller caller, http:Request req) returns error? {
+    //     http:Response response = new;
+    //     response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+    //     response.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+    //     response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    //     check caller->respond(response);
 
-        return;
-    }
+    //     return;
+    // }
 
     // New resource function to update project details
     resource function put updateProject(http:Caller caller, http:Request req) returns error? {
@@ -536,22 +537,22 @@ service / on new http:Listener(9090) {
         json response = {message: "Project updated successfully"};
         http:Response res = new;
         res.setPayload(response);
-        res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+        // res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
         check caller->respond(res);
 
         return;
     }
 
     // Handle preflight OPTIONS request for CORS
-    resource function options updateProject(http:Caller caller, http:Request req) returns error? {
-        http:Response response = new;
-        response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
-        response.setHeader("Access-Control-Allow-Methods", "PUT, OPTIONS");
-        response.setHeader("Access-Control-Allow-Headers", "Content-Type");
-        check caller->respond(response);
+    // resource function options updateProject(http:Caller caller, http:Request req) returns error? {
+    //     http:Response response = new;
+    //     response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+    //     response.setHeader("Access-Control-Allow-Methods", "PUT, OPTIONS");
+    //     response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    //     check caller->respond(response);
 
-        return;
-    }
+    //     return;
+    // }
 
     // New resource function to get details of a specific project based on project id
     resource function get project/[int projectId](http:Caller caller, http:Request req) returns error? {
@@ -591,22 +592,22 @@ service / on new http:Listener(9090) {
         // Create and set HTTP response
         http:Response res = new;
         res.setPayload(response);
-        res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+        // res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
         check caller->respond(res);
 
         return;
     }
 
     // Handle preflight OPTIONS request for CORS
-    resource function options project/[int projectId](http:Caller caller, http:Request req) returns error? {
-        http:Response response = new;
-        response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
-        response.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
-        response.setHeader("Access-Control-Allow-Headers", "Content-Type");
-        check caller->respond(response);
+    // resource function options project/[int projectId](http:Caller caller, http:Request req) returns error? {
+    //     http:Response response = new;
+    //     response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+    //     response.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+    //     response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    //     check caller->respond(response);
 
-        return;
-    }
+    //     return;
+    // }
 
     resource function put updateTask(http:Caller caller, http:Request req) returns error? {
         json payload = check req.getJsonPayload();
@@ -634,22 +635,22 @@ service / on new http:Listener(9090) {
         json response = {message: "Task updated successfully"};
         http:Response res = new;
         res.setPayload(response);
-        res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+        // res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
         check caller->respond(res);
 
         return;
     }
 
-    // Handle preflight OPTIONS request for CORS
-    resource function options updateTask(http:Caller caller, http:Request req) returns error? {
-        http:Response response = new;
-        response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
-        response.setHeader("Access-Control-Allow-Methods", "PUT, OPTIONS");
-        response.setHeader("Access-Control-Allow-Headers", "Content-Type");
-        check caller->respond(response);
+    // // Handle preflight OPTIONS request for CORS
+    // resource function options updateTask(http:Caller caller, http:Request req) returns error? {
+    //     http:Response response = new;
+    //     response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+    //     response.setHeader("Access-Control-Allow-Methods", "PUT, OPTIONS");
+    //     response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    //     check caller->respond(response);
 
-        return;
-    }
+    //     return;
+    // }
 
     resource function get tasks/[int projectId](http:Caller caller, http:Request req) returns error? {
 
@@ -666,22 +667,22 @@ service / on new http:Listener(9090) {
         json response = {projects: resultJsonArray};
         http:Response res = new;
         res.setPayload(response);
-        res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+        // res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
         check caller->respond(res);
 
         return;
     }
 
     // Handle preflight OPTIONS request for CORS
-    resource function options tasks/[int projectId](http:Caller caller, http:Request req) returns error? {
-        http:Response response = new;
-        response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
-        response.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-        response.setHeader("Access-Control-Allow-Headers", "Content-Type");
-        check caller->respond(response);
+    // resource function options tasks/[int projectId](http:Caller caller, http:Request req) returns error? {
+    //     http:Response response = new;
+    //     response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+    //     response.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+    //     response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    //     check caller->respond(response);
 
-        return;
-    }
+    //     return;
+    // }
 
     // resource function get highlights() returns Highlight[] {
     //     return highlights;

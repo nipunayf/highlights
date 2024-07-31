@@ -1,10 +1,10 @@
 import Link from 'next/link';
-import { HomeIcon, UserGroupIcon, Cog6ToothIcon, FlagIcon, PencilIcon, ExclamationCircleIcon } from '@heroicons/react/24/outline'; // Import new icons
+import { HomeIcon, UserGroupIcon, Cog6ToothIcon, FlagIcon, PencilIcon, ExclamationCircleIcon } from '@heroicons/react/24/outline';
 import { useRouter } from 'next/router';
 
 interface SidebarItemProps {
   href: string;
-  icon: 'home' | 'user-group' | 'cog' | 'flag' | 'pencil' | 'exclamation-circle'; // Update type to include new icons
+  icon: 'home' | 'user-group' | 'cog' | 'flag' | 'pencil' | 'exclamation-circle';
   text: string;
 }
 
@@ -25,12 +25,15 @@ const SidebarItem = ({ href, icon, text }: SidebarItemProps) => {
     <li>
       <Link
         href={href}
-        className={`flex items-center py-3 px-4 rounded-lg transition-colors duration-200 ${
-          isActive ? 'bg-gray-900 text-white' : 'hover:bg-gray-700 text-gray-300'
-        }`}
-      >
-        {iconMap[icon]}
-        <span className="ml-3">{text}</span>
+        legacyBehavior>
+        <a
+          className={`flex items-center py-3 px-4 rounded-lg transition-colors duration-200 ${
+            isActive ? 'bg-gray-900 text-white' : 'hover:bg-gray-700 text-gray-300'
+          }`}
+        >
+          {iconMap[icon]}
+          <span className="ml-3">{text}</span>
+        </a>
       </Link>
     </li>
   );

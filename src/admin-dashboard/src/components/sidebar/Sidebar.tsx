@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Image from 'next/image';
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'; // Ensure correct imports
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import SidebarItem from './SidebarItem';
 
 const Sidebar = ({ toggleSidebar, isOpen }: { toggleSidebar: () => void; isOpen: boolean }) => {
@@ -29,7 +29,8 @@ const Sidebar = ({ toggleSidebar, isOpen }: { toggleSidebar: () => void; isOpen:
             <SidebarItem href="/users" icon="user-group" text="Users" />
             <SidebarItem href="/settings" icon="cog" text="Settings" />
             <SidebarItem href="/updatedailytips" icon="pencil" text="Daily Tips" />
-            <SidebarItem href="/issues" icon="exclamation-circle" text="Issues" />
+            <SidebarItem href="/reported-issues" icon="exclamation-circle" text="Reported Issues" />
+            
           </ul>
         </nav>
       </aside>

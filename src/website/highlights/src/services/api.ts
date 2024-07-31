@@ -32,15 +32,15 @@ export async function getTasks(): Promise<Task[]> {
     return response.data;
 }
 
-export async function getTaskLists(user: AppUser) {
-    const response = await getAxiosClient('taskLists').request({
-        method: 'GET',
-        params: {
-            sub: user.sub
-        }
-    });
-    return response.data;
-}
+// export async function getTaskLists(user: AppUser) {
+//     const response = await getAxiosClient('taskLists').request({
+//         method: 'GET',
+//         params: {
+//             sub: user.sub
+//         }
+//     });
+//     return response.data;
+// }
 
 export async function createTask(task: Task): Promise<Task> {
     console.log(task)
@@ -304,7 +304,7 @@ export async function getProjects() {
     return response;
 }
 export async function addProjects(tip: any) {
-    console.log("cc")
+    console.log("add projects");
     const response = await getAxiosClient('addProjects')({
         method: 'POST',
         data: tip
@@ -338,7 +338,7 @@ export async function addTask(row: any) {
     // console.log("Hello");
     return response.data;
 }
-export async function updateTask(row: any) {
+export async function updateMyTask(row: any) {
     // console.log("cc")
     const response = await getAxiosClient('updateTask')({
         method: 'PUT',

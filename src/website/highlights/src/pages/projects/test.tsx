@@ -25,6 +25,7 @@ interface RowData {
 }
 
 interface ProjectData {
+  assignees: any;
   projectId: number;
   projectName: string;
   progress: string;
@@ -60,6 +61,7 @@ const Test: React.FC<{ projectId: number }> = ({ projectId }) => {
     priority: '',
     startDate: null,
     dueDate: null,
+    assignees:null
   });
   const [rows, setRows] = useState<RowData[]>([]);
   const [newAssignee, setNewAssignee] = useState<string>('');
@@ -90,6 +92,7 @@ const Test: React.FC<{ projectId: number }> = ({ projectId }) => {
           priority: project.priority,
           startDate: project.startDate ? dayjs(project.startDate) : null,
           dueDate: project.dueDate ? dayjs(project.dueDate) : null,
+          assignees:null
         };
         setProjectDetails(fetchedProject);
       })
@@ -109,7 +112,7 @@ const Test: React.FC<{ projectId: number }> = ({ projectId }) => {
           priority: task.priority,
           startDate: task.startDate ? dayjs(task.startDate) : null,
           dueDate: task.dueDate ? dayjs(task.dueDate) : null,
-         // assignees: task.assignees || []
+          assignees: task.assignees || []
         }));
         setRows(fetchedTasks);
       })
@@ -123,7 +126,7 @@ const Test: React.FC<{ projectId: number }> = ({ projectId }) => {
       setRows(updatedRows);
       setNewAssignee('');
       setAddingAssigneeIndex(null);
-      //updateRowInDB(updatedRows[index]);
+      updateRowInDB(updatedRows[index]);
     }
   };
 
@@ -220,7 +223,7 @@ const Test: React.FC<{ projectId: number }> = ({ projectId }) => {
                   sx={{ backgroundColor: priorityColors[projectDetails.priority as keyof typeof priorityColors], color: 'white', marginLeft: 1 }}
                 />
               </Typography>
-              <Typography variant="subtitle1"><strong>Assignees:</strong> {projectDetails.assignees?.join(', ')}</Typography>
+              {/* <Typography variant="subtitle1"><strong>Assignees:</strong> {projectDetails.assignees?.join(', ')}</Typography> */}
             </Grid>
           </Grid>
         </Paper>

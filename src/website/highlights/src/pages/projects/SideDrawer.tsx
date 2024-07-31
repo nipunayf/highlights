@@ -75,7 +75,7 @@ const SideDrawer: React.FC = () => {
                     {/* <Typography variant="h6">Project Details</Typography> */}
                     <Typography variant="subtitle1"><strong>Project Name:</strong> {projectDetails.projectName}</Typography>
                     <Typography variant="subtitle1"><strong>Project Description:</strong> {projectDetails.projectDescription}</Typography>
-                    <Typography variant="subtitle1"><strong>Assignees:</strong> {projectDetails.assignees}</Typography>
+                    {/* <Typography variant="subtitle1"><strong>Assignees:</strong> {projectDetails.assignees}</Typography> */}
                     <Typography variant="subtitle1"><strong>Start Date:</strong> {projectDetails.startDate}</Typography>
                     <Typography variant="subtitle1"><strong>Due Date:</strong> {projectDetails.dueDate}</Typography>
                     <Typography variant="subtitle1"><strong>Status:</strong> {projectDetails.status}</Typography>

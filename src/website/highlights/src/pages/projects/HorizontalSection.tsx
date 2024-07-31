@@ -237,7 +237,7 @@ const HorizontalSection: React.FC = () => {
                 open={drawerOpen}
                 onClose={handleCloseDrawer}
             >
-                 <Box sx={{ width: 750 }}>
+                 <Box sx={{ width: 920}}>
                     <Typography variant="h6" gutterBottom>
                         {/* Project Details (ID: {selectedProjectId}) */}
                     </Typography>

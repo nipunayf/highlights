@@ -171,7 +171,7 @@ const Timer = () => {
     const pause_time = new Date();
     const pauseDetails = {
       // timer_id: currentTimerId,
-      highlight_id: selectedTask !== null ? selectedTask : -1,
+      highlight_id: selectedTask !== null ? selectedTask : 1,
       // user_id: 11, // Replace with actual user ID
       pause_time: pause_time.toISOString(),
       // status: "paused"
@@ -473,7 +473,7 @@ const Timer = () => {
   }, [totalSeconds, started]);
 
   const handleHighlightSelect = (index: number) => {
-    setSelectedTask(index);
+    setSelectedTask(index+1);
     setMenuOpened(false);
   };
 

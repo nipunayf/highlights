@@ -28,6 +28,7 @@ export interface mPauses_details {
 
 export interface mTimeRecord {
     highlight_id: number;
+    highlight_name: string;
     start_time: string;
     end_time: string;
     pause_and_continue_times: string[][];

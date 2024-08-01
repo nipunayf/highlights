@@ -11,23 +11,23 @@ import { msalConfig } from '../authConfig';
 export const msalInstance = new PublicClientApplication(msalConfig);
 
 if (!msalInstance.getActiveAccount() && msalInstance.getAllAccounts().length > 0) {
-    msalInstance.setActiveAccount(msalInstance.getAllAccounts()[0]);
+  msalInstance.setActiveAccount(msalInstance.getAllAccounts()[0]);
 }
 
 msalInstance.enableAccountStorageEvents();
 
 msalInstance.addEventCallback((event) => {
-    if (event.eventType === EventType.LOGIN_SUCCESS
-        ||
-        event.eventType === EventType.ACQUIRE_TOKEN_SUCCESS
-        ||
-        event.eventType === EventType.SSO_SILENT_SUCCESS
-    ) {
-        const account = (event.payload as AuthenticationResult)?.account;
-        if (account) {
-            msalInstance.setActiveAccount(account);
-        }
+  if (event.eventType === EventType.LOGIN_SUCCESS
+    ||
+    event.eventType === EventType.ACQUIRE_TOKEN_SUCCESS
+    ||
+    event.eventType === EventType.SSO_SILENT_SUCCESS
+  ) {
+    const account = (event.payload as AuthenticationResult)?.account;
+    if (account) {
+      msalInstance.setActiveAccount(account);
     }
+  }
 });
 
 function MyApp({ Component, pageProps }: AppProps) {

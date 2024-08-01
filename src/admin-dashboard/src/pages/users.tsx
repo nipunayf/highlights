@@ -1,142 +1,110 @@
-import { useState } from 'react';
-import { MagnifyingGlassIcon, PlusIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
+import React, { useState } from 'react';
+import {
+  MagnifyingGlassIcon,
+  PencilIcon,
+  TrashIcon,
+} from '@heroicons/react/24/outline';
 
 interface User {
   id: number;
   name: string;
   email: string;
-  status: 'Active' | 'Inactive'; // Correct type for status
+  status: 'Active' | 'Inactive';
 }
 
-const sampleUsers: User[] = [
-  { id: 1, name: 'John Doe', email: 'john@example.com', status: 'Active' },
-  { id: 2, name: 'Jane Smith', email: 'jane@example.com', status: 'Inactive' },
-  { id: 3, name: 'Alice Johnson', email: 'alice@example.com', status: 'Active' },
-];
+const sampleUsers: User[] = Array.from({ length: 1234 }, (_, i) => ({
+  id: i + 1,
+  name: `User ${i + 1}`,
+  email: `user${i + 1}@example.com`,
+  status: i % 2 === 0 ? 'Active' : 'Inactive',
+}));
 
 const Users = () => {
-  const [users, setUsers] = useState<User[]>(sampleUsers);
-  const [newUser, setNewUser] = useState<{ name: string; email: string; status: 'Active' | 'Inactive' }>({
-    name: '',
-    email: '',
-    status: 'Active',
-  });
-  const [editUserId, setEditUserId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const usersPerPage = 20;
 
-  const handleAddUser = () => {
-    if (newUser.name.trim() && newUser.email.trim()) {
-      setUsers([
-        ...users,
-        { id: Date.now(), ...newUser },
-      ]);
-      setNewUser({ name: '', email: '', status: 'Active' });
-    }
-  };
-
-  const handleUpdateUser = () => {
-    if (editUserId !== null) {
-      setUsers(
-        users.map(user =>
-          user.id === editUserId ? { ...user, ...newUser } : user
-        )
-      );
-      setNewUser({ name: '', email: '', status: 'Active' });
-      setEditUserId(null);
-    }
-  };
-
-  const handleEditUser = (id: number, user: Omit<User, 'id'>) => {
-    setEditUserId(id);
-    setNewUser(user);
-  };
-
-  const handleDeleteUser = (id: number) => {
-    setUsers(users.filter(user => user.id !== id));
-  };
-
-  const filteredUsers = users.filter(user =>
-    user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredUsers = sampleUsers.filter(user =>
+    user.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const paginatedUsers = filteredUsers.slice(
+    (currentPage - 1) * usersPerPage,
+    currentPage * usersPerPage
+  );
+
+  const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
+
+  const handlePageChange = (page: number) => {
+    if (page > 0 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
 
   return (
     <div className="p-6 space-y-6">
-      {/* Search Box */}
-      <div className="flex items-center mb-4">
-        <MagnifyingGlassIcon className="w-6 h-6 text-gray-500 mr-2" />
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search users..."
-          className="p-2 border border-gray-300 rounded"
-        />
+      {/* Search Bar */}
+      <div className="flex items-center mb-6">
+        <div className="relative flex-1">
+          <input
+            type="text"
+            placeholder="Search users..."
+            className="w-full p-3 border border-gray-300 rounded-md shadow-sm"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <MagnifyingGlassIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500" />
+        </div>
       </div>
 
-      {/* Add/Update User */}
-      <div className="bg-white p-4 rounded-lg shadow-md mb-6">
-        <h2 className="text-xl font-semibold mb-4">{editUserId ? 'Update User' : 'Add New User'}</h2>
-        <input
-          type="text"
-          value={newUser.name}
-          onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
-          placeholder="Name"
-          className="w-full p-2 border border-gray-300 rounded mb-2"
-        />
-        <input
-          type="email"
-          value={newUser.email}
-          onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
-          placeholder="Email"
-          className="w-full p-2 border border-gray-300 rounded mb-2"
-        />
-        <select
-          value={newUser.status}
-          onChange={(e) => setNewUser({ ...newUser, status: e.target.value as 'Active' | 'Inactive' })}
-          className="w-full p-2 border border-gray-300 rounded mb-2"
-        >
-          <option value="Active">Active</option>
-          <option value="Inactive">Inactive</option>
-        </select>
-        <button
-          onClick={editUserId ? handleUpdateUser : handleAddUser}
-          className="bg-blue-500 text-white py-2 px-4 rounded"
-        >
-          {editUserId ? 'Update User' : 'Add User'}
-        </button>
-      </div>
-
-      {/* Users List */}
-      <div className="bg-white p-4 rounded-lg shadow-md">
-        <h2 className="text-xl font-semibold mb-4">User List</h2>
-        <ul>
-          {filteredUsers.map(user => (
-            <li key={user.id} className="flex items-center justify-between p-2 border-b border-gray-200">
-              <div className="flex flex-col">
-                <span className="font-semibold">{user.name}</span>
-                <span className="text-gray-600">{user.email}</span>
-                <span className={`text-sm ${user.status === 'Active' ? 'text-green-500' : 'text-red-500'}`}>
-                  {user.status}
-                </span>
-              </div>
-              <div className="flex space-x-2">
-                <button
-                  onClick={() => handleEditUser(user.id, { name: user.name, email: user.email, status: user.status })}
-                  className="text-yellow-500 hover:text-yellow-700"
-                >
-                  <PencilIcon className="w-6 h-6" />
+      {/* User List */}
+      <table className="w-full bg-white border border-gray-200 rounded-md shadow-sm">
+        <thead className="bg-gray-100">
+          <tr>
+            <th className="p-4 text-left">Name</th>
+            <th className="p-4 text-left">Email</th>
+            <th className="p-4 text-left">Status</th>
+            <th className="p-4 text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {paginatedUsers.map(user => (
+            <tr key={user.id} className="border-b border-gray-200 hover:bg-gray-100">
+              <td className="p-4">{user.name}</td>
+              <td className="p-4">{user.email}</td>
+              <td className="p-4">{user.status}</td>
+              <td className="p-4 text-center">
+                <button className="p-2 text-blue-500 hover:text-blue-700">
+                  <PencilIcon className="w-5 h-5" />
                 </button>
-                <button
-                  onClick={() => handleDeleteUser(user.id)}
-                  className="text-red-500 hover:text-red-700"
-                >
-                  <TrashIcon className="w-6 h-6" />
+                <button className="p-2 text-red-500 hover:text-red-700">
+                  <TrashIcon className="w-5 h-5" />
                 </button>
-              </div>
-            </li>
+              </td>
+            </tr>
           ))}
-        </ul>
+        </tbody>
+      </table>
+
+      {/* Pagination */}
+      <div className="flex justify-between items-center mt-6">
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="px-4 py-2 bg-gray-200 rounded-md text-gray-600 hover:bg-gray-300 disabled:opacity-50"
+        >
+          Previous
+        </button>
+        <span className="text-gray-600">
+          Page {currentPage} of {totalPages}
+        </span>
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className="px-4 py-2 bg-gray-200 rounded-md text-gray-600 hover:bg-gray-300 disabled:opacity-50"
+        >
+          Next
+        </button>
       </div>
     </div>
   );

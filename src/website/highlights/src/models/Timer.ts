@@ -35,6 +35,7 @@ export interface mTimeRecord {
 }
 
 export interface mPauseContinueDetails {
+    start_time: string;
     highlight_id: number;
     pause_time: string;
     continue_time?: string;

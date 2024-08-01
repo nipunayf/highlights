@@ -110,6 +110,33 @@ CREATE TABLE `his` (
   FOREIGN KEY (`parentTaskId`) REFERENCES `hi` (`id`)
 );
 
+
+
+CREATE TABLE `projects` (
+  `id` integer PRIMARY KEY AUTO_INCREMENT,
+  `projectName` varchar(255) NOT NULL,
+  `progress` varchar(255) NOT NULL,
+  `startDate` date ,
+  `dueDate` date,
+  `priority` varchar(255) NOT NULL
+);
+
+CREATE TABLE `tm` (
+  `id` integer PRIMARY KEY AUTO_INCREMENT,
+  `user_id` integer NOT NULL,
+  `name` varchar(255) NOT NULL
+);
+
+CREATE TABLE `taskss` (
+  `projectId` integer,
+  `taskName` varchar(255) NOT NULL,
+  `progress` varchar(255) NOT NULL,
+  `priority` varchar(255) NOT NULL,
+  `startDate` date ,
+  `dueDate` date,
+  `taskId` integer PRIMARY KEY AUTO_INCREMENT
+);
+
 CREATE TABLE `dailytips` (
   `id` integer PRIMARY KEY AUTO_INCREMENT,
   `label` varchar(255) NOT NULL,

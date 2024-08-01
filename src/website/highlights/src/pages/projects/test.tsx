@@ -2,19 +2,37 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { 
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow, 
-  TextField, Select, MenuItem, Button, Typography, Box, Avatar, 
-  Paper, Chip, IconButton, Tooltip, LinearProgress, Grid
+  TextField, Select, MenuItem, Button, Typography, Box, 
+  Paper, Chip, Grid, IconButton
 } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import Autocomplete from '@mui/material/Autocomplete';
-import { Divider } from '@mantine/core';
 import { styled } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
 import { tableCellClasses } from '@mui/material/TableCell';
+import dayjs, { Dayjs } from 'dayjs';
+import {addTask ,updateMyTask,tasks,project} from '@/services/api'
+
+interface RowData {
+  projectId: number;
+  taskName: string;
+  progress: string;
+  priority: string;
+  startDate: Dayjs | null;
+  dueDate: Dayjs | null;
+  assignees: string[];
+}
+
+interface ProjectData {
+  assignees: any;
+  projectId: number;
+  projectName: string;
+  progress: string;
+  priority: string;
+  startDate: Dayjs | null;
+  dueDate: Dayjs | null;
+}
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -35,21 +53,19 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-const Test: React.FC = () => {
-  const [projectDetails, setProjectDetails] = useState({
+const Test: React.FC<{ projectId: number }> = ({ projectId }) => {
+  const [projectDetails, setProjectDetails] = useState<ProjectData>({
+    projectId: projectId,
     projectName: '',
-    projectDescription: '',
-    startDate: '',
-    dueDate: '',
-    assignees: '',
-    status: '',
-    priority: ''
+    progress: '',
+    priority: '',
+    startDate: null,
+    dueDate: null,
+    assignees:null
   });
-  const [progress, setProgress] = useState('');
-  const [assignees, setAssignees] = useState<string[]>([]);
-  const [newAssignee, setNewAssignee] = useState('');
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [tableRows, setTableRows] = useState<number[]>([0]);
+  const [rows, setRows] = useState<RowData[]>([]);
+  const [newAssignee, setNewAssignee] = useState<string>('');
+  const [addingAssigneeIndex, setAddingAssigneeIndex] = useState<number | null>(null);
 
   const priorityColors = {
     low: '#4CAF50',
@@ -64,42 +80,121 @@ const Test: React.FC = () => {
   };
 
   useEffect(() => {
-    axios.get('/api/project-details')
+    // axios.get(`http://localhost:9090/project/${projectId}`)
+    project(projectId)
       .then(response => {
-        setProjectDetails(response.data);
+        console.log(response);
+        const project = response.value;
+        const fetchedProject: ProjectData = {
+          projectId: project.projectId,
+          projectName: project.projectName,
+          progress: project.progress,
+          priority: project.priority,
+          startDate: project.startDate ? dayjs(project.startDate) : null,
+          dueDate: project.dueDate ? dayjs(project.dueDate) : null,
+          assignees:null
+        };
+        setProjectDetails(fetchedProject);
       })
-      .catch(error => {
-        console.error('Error fetching project details:', error);
-      });
-  }, []);
+      .catch(error => console.error('Error fetching project:', error));
+  }, [projectId]);
 
-  const handleProgressChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    setProgress(event.target.value as string);
-  };
+  useEffect(() => {
+    // axios.get(`http://localhost:9090/tasks/${projectId}`)
+    tasks(projectId)
+      .then(response => {
+        console.log(response);
+        console.log("here are my tasks",response);
+        const fetchedTasks = response.projects.map((task: any) => ({
+          projectId: task.projectId,
+          taskName: task.taskName,
+          progress: task.progress,
+          priority: task.priority,
+          startDate: task.startDate ? dayjs(task.startDate) : null,
+          dueDate: task.dueDate ? dayjs(task.dueDate) : null,
+          assignees: task.assignees || []
+        }));
+        setRows(fetchedTasks);
+      })
+      .catch(error => console.error('Error fetching tasks:', error));
+  }, [projectId]);
 
-  const handleAddAssignee = () => {
+  const handleAddAssignee = (index: number) => {
     if (newAssignee.trim() !== '') {
-      setAssignees([...assignees, newAssignee.trim()]);
+      const updatedRows = [...rows];
+      updatedRows[index].assignees.push(newAssignee.trim());
+      setRows(updatedRows);
       setNewAssignee('');
+      setAddingAssigneeIndex(null);
+      updateRowInDB(updatedRows[index]);
     }
   };
 
-  const toggleAssigneeDisplay = (index: number) => {
-    const updatedAssignees = [...assignees];
-    updatedAssignees[index] = updatedAssignees[index].startsWith('@') ? updatedAssignees[index].substring(1) : `@${updatedAssignees[index]}`;
-    setAssignees(updatedAssignees);
+  const handleProgressChange = (index: number, value: string) => {
+    const updatedRows = [...rows];
+    updatedRows[index].progress = value;
+    setRows(updatedRows);
+    updateRowInDB(updatedRows[index]);
   };
 
-  const handleProjectNameClick = () => {
-    setDrawerOpen(true);
+  const handlePriorityChange = (index: number, value: string) => {
+    const updatedRows = [...rows];
+    updatedRows[index].priority = value;
+    setRows(updatedRows);
+    updateRowInDB(updatedRows[index]);
   };
 
-  const handleCloseDrawer = () => {
-    setDrawerOpen(false);
+  const updateRowInDB = (row: RowData) => {
+    // axios.put(`http://localhost:9090/updateTask`, row)
+    updateMyTask(row)
+      .then(response => console.log('Row updated:', response.data))
+      .catch(error => console.error('Error updating row:', error));
   };
 
   const handleAddRow = () => {
-    setTableRows([...tableRows, tableRows.length]);
+    const newRow: RowData = {
+      projectId: projectId,
+      taskName: '',
+      progress: '',
+      priority: '',
+      startDate:null,
+      dueDate: null,
+      assignees: [],
+    };
+
+    // axios.post('http://localhost:9090/addTask', 
+    //      { projectId: projectId,
+    //       taskName: '',
+    //       progress: '',
+    //       priority: '',
+    //       startDate: '2001-01-21',
+    //       dueDate: '2001-01-21',
+    //       assignees: []}
+    // )
+    addTask(
+      { 
+      projectId: projectId,
+      taskName: '',
+      progress: '',
+      priority: '',
+      startDate: '2001-01-21',
+      dueDate: '2001-01-21',
+      assignees: []})
+      .then(response => {
+        console.log(response);
+        const addedTask = response;
+        const formattedTask: RowData = {
+          projectId: addedTask.projectId,
+          taskName: addedTask.taskName,
+          progress: addedTask.progress,
+          priority: addedTask.priority,
+          startDate: addedTask.startDate ? dayjs(addedTask.startDate) : null,
+          dueDate: addedTask.dueDate ? dayjs(addedTask.dueDate) : null,
+          assignees: addedTask.assignees || [],
+        };
+        setRows([...rows, formattedTask]);
+      })
+      .catch(error => console.error('Error adding row:', error));
   };
 
   return (
@@ -110,17 +205,17 @@ const Test: React.FC = () => {
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
               <Typography variant="subtitle1"><strong>Project Name:</strong> {projectDetails.projectName}</Typography>
-              <Typography variant="subtitle1"><strong>Start Date:</strong> {projectDetails.startDate}</Typography>
+              <Typography variant="subtitle1"><strong>Start Date:</strong> {projectDetails.startDate ? projectDetails.startDate.format('DD/MM/YYYY') : ''}</Typography>
               <Typography variant="subtitle1">
                 <strong>Status:</strong> 
                 <Chip 
-                  label={projectDetails.status} 
-                  sx={{ backgroundColor: statusColors[projectDetails.status as keyof typeof statusColors], color: 'white', marginLeft: 1 }}
+                  label={projectDetails.progress} 
+                  sx={{ backgroundColor: statusColors[projectDetails.progress as keyof typeof statusColors], color: 'white', marginLeft: 1 }}
                 />
               </Typography>
             </Grid>
             <Grid item xs={12} sm={6}>
-              <Typography variant="subtitle1"><strong>Due Date:</strong> {projectDetails.dueDate}</Typography>
+              <Typography variant="subtitle1"><strong>Due Date:</strong> {projectDetails.dueDate ? projectDetails.dueDate.format('DD/MM/YYYY') : ''}</Typography>
               <Typography variant="subtitle1">
                 <strong>Priority:</strong> 
                 <Chip 
@@ -128,130 +223,144 @@ const Test: React.FC = () => {
                   sx={{ backgroundColor: priorityColors[projectDetails.priority as keyof typeof priorityColors], color: 'white', marginLeft: 1 }}
                 />
               </Typography>
-              <Typography variant="subtitle1"><strong>Assignees:</strong> {projectDetails.assignees}</Typography>
+              {/* <Typography variant="subtitle1"><strong>Assignees:</strong> {projectDetails.assignees?.join(', ')}</Typography> */}
             </Grid>
           </Grid>
-          <Typography variant="subtitle1" sx={{ marginTop: 2 }}><strong>Description:</strong> {projectDetails.projectDescription}</Typography>
         </Paper>
-
         <Paper elevation={3} sx={{ padding: 3 }}>
           <Typography variant="h5" gutterBottom>Tasks</Typography>
           <TableContainer component={Box} sx={{ maxHeight: '400px', overflowX: 'auto' }}>
-            <Table stickyHeader>
+            <Table sx={{ minWidth: 650 }}>
               <TableHead>
-                <StyledTableRow>
-                  <StyledTableCell>Project Name</StyledTableCell>
+                <TableRow>
+                  <StyledTableCell>Task Name</StyledTableCell>
                   <StyledTableCell>Start Date</StyledTableCell>
                   <StyledTableCell>Due Date</StyledTableCell>
-                  <StyledTableCell>Assignees</StyledTableCell>
-                  <StyledTableCell>Status</StyledTableCell>
                   <StyledTableCell>Progress</StyledTableCell>
                   <StyledTableCell>Priority</StyledTableCell>
-                  <StyledTableCell>Actions</StyledTableCell>
-                </StyledTableRow>
+                  <StyledTableCell>Assignees</StyledTableCell>
+                </TableRow>
               </TableHead>
               <TableBody>
-                {tableRows.map((rowIndex) => (
-                  <StyledTableRow key={rowIndex}>
+                {rows.map((row, rowIndex) => (
+                  <StyledTableRow key={row.taskName}>
                     <StyledTableCell>
-                      <Autocomplete
-                        freeSolo
-                        options={['Project A', 'Project B', 'Project C']}
-                        renderInput={(params) => (
-                          <TextField {...params} onClick={handleProjectNameClick} variant="outlined" size="small" />
-                        )}
+                      <TextField
+                        value={row.taskName}
+                        onChange={(event) => {
+                          const updatedRows = [...rows];
+                          updatedRows[rowIndex].taskName = event.target.value;
+                          setRows(updatedRows);
+                          updateRowInDB(updatedRows[rowIndex]);
+                        }}
+                        fullWidth
+                        variant="outlined"
+                        placeholder="Enter task name"
                       />
                     </StyledTableCell>
                     <StyledTableCell>
                       <DatePicker
-                        value={null}
-                        onChange={() => {}}
-                        renderInput={(params) => <TextField {...params} size="small" />}
+                        value={row.startDate}
+                        onChange={(date) => {
+                          const updatedRows = [...rows];
+                          updatedRows[rowIndex].startDate = date;
+                          setRows(updatedRows);
+                          updateRowInDB(updatedRows[rowIndex]);
+                        }}
+                        format="DD/MM/YYYY"
+                        renderInput={(params) => <TextField {...params} fullWidth />}
+                        placeholder="Pick start date"
                       />
                     </StyledTableCell>
                     <StyledTableCell>
                       <DatePicker
-                        value={null}
-                        onChange={() => {}}
-                        renderInput={(params) => <TextField {...params} size="small" />}
+                        value={row.dueDate}
+                        onChange={(date) => {
+                          const updatedRows = [...rows];
+                          updatedRows[rowIndex].dueDate = date;
+                          setRows(updatedRows);
+                          updateRowInDB(updatedRows[rowIndex]);
+                        }}
+                        format="DD/MM/YYYY"
+                        renderInput={(params) => <TextField {...params} fullWidth />}
+                        placeholder="Pick due date"
                       />
                     </StyledTableCell>
                     <StyledTableCell>
-                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                        {assignees.map((assignee, index) => (
-                          <Tooltip title={assignee} key={index}>
-                            <Chip
-                              avatar={<Avatar>{assignee.charAt(0).toUpperCase()}</Avatar>}
-                              label={assignee.split('@')[0]}
-                              onClick={() => toggleAssigneeDisplay(index)}
-                              variant="outlined"
-                            />
-                          </Tooltip>
-                        ))}
-                        <Tooltip title="Add Assignee">
-                          <IconButton size="small" onClick={() => setNewAssignee('')}>
-                            <AddIcon />
-                          </IconButton>
-                        </Tooltip>
+                      <Select
+                        fullWidth
+                        value={row.progress}
+                        onChange={(event) => handleProgressChange(rowIndex, event.target.value as string)}
+                        MenuProps={{
+                          PaperProps: {
+                            style: {
+                              maxHeight: 300,
+                            },
+                          },
+                        }}
+                      >
+                        <MenuItem value="not_started" style={{ color: '#F44336' }}>Not Started</MenuItem>
+                        <MenuItem value="in_progress" style={{ color: '#FFC107' }}>In Progress</MenuItem>
+                        <MenuItem value="completed" style={{ color: '#4CAF50' }}>Completed</MenuItem>
+                      </Select>
+                    </StyledTableCell>
+                    <StyledTableCell>
+                      <Select
+                        fullWidth
+                        value={row.priority}
+                        onChange={(event) => handlePriorityChange(rowIndex, event.target.value as string)}
+                        MenuProps={{
+                          PaperProps: {
+                            style: {
+                              maxHeight: 300,
+                            },
+                          },
+                        }}
+                      >
+                        <MenuItem value="low" style={{ color: '#4CAF50' }}>Low</MenuItem>
+                        <MenuItem value="medium" style={{ color: '#FFC107' }}>Medium</MenuItem>
+                        <MenuItem value="high" style={{ color: '#F44336' }}>High</MenuItem>
+                      </Select>
+                    </StyledTableCell>
+                    <StyledTableCell>
+                      <Box display="flex" alignItems="center">
+                        <Box flexGrow={1}>
+                          {/* {row.assignees.map((assignee, index) => (
+                            <Chip key={index} label={assignee} style={{ marginRight: 5 }} />
+                          ))} */}
+                        </Box>
+                        <IconButton
+                          color="primary"
+                          onClick={() => setAddingAssigneeIndex(rowIndex === addingAssigneeIndex ? null : rowIndex)}
+                        >
+                          <AddIcon />
+                        </IconButton>
                       </Box>
-                    </StyledTableCell>
-                    <StyledTableCell>
-                      <Select
-                        value={progress}
-                        onChange={handleProgressChange}
-                        size="small"
-                        fullWidth
-                      >
-                        <MenuItem value="not_started">
-                          <Chip label="Not Started" size="small" sx={{ backgroundColor: statusColors.not_started, color: 'white' }} />
-                        </MenuItem>
-                        <MenuItem value="in_progress">
-                          <Chip label="In Progress" size="small" sx={{ backgroundColor: statusColors.in_progress, color: 'white' }} />
-                        </MenuItem>
-                        <MenuItem value="completed">
-                          <Chip label="Completed" size="small" sx={{ backgroundColor: statusColors.completed, color: 'white' }} />
-                        </MenuItem>
-                      </Select>
-                    </StyledTableCell>
-                    <StyledTableCell>
-                      <LinearProgress variant="determinate" value={50} />
-                    </StyledTableCell>
-                    <StyledTableCell>
-                      <Select
-                        value={progress}
-                        onChange={handleProgressChange}
-                        size="small"
-                        fullWidth
-                      >
-                        <MenuItem value="low">
-                          <Chip label="Low" size="small" sx={{ backgroundColor: priorityColors.low, color: 'white' }} />
-                        </MenuItem>
-                        <MenuItem value="medium">
-                          <Chip label="Medium" size="small" sx={{ backgroundColor: priorityColors.medium, color: 'white' }} />
-                        </MenuItem>
-                        <MenuItem value="high">
-                          <Chip label="High" size="small" sx={{ backgroundColor: priorityColors.high, color: 'white' }} />
-                        </MenuItem>
-                      </Select>
-                    </StyledTableCell>
-                    <StyledTableCell>
-                      <Tooltip title="Edit">
-                        <IconButton size="small">
-                          <EditIcon />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Delete">
-                        <IconButton size="small">
-                          <DeleteIcon />
-                        </IconButton>
-                      </Tooltip>
+                      {addingAssigneeIndex === rowIndex && (
+                        <Box mt={2}>
+                          <TextField
+                            value={newAssignee}
+                            onChange={(e) => setNewAssignee(e.target.value)}
+                            placeholder="Enter assignee email"
+                            variant="outlined"
+                            fullWidth
+                          />
+                          <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={() => handleAddAssignee(rowIndex)}
+                            style={{ marginTop: 5 }}
+                          >
+                            Add Assignee
+                          </Button>
+                        </Box>
+                      )}
                     </StyledTableCell>
                   </StyledTableRow>
                 ))}
               </TableBody>
             </Table>
           </TableContainer>
-
           <Box mt={2} textAlign="center">
             <Button variant="contained" startIcon={<AddIcon />} onClick={handleAddRow}>
               Add Task

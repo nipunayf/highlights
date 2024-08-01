@@ -32,15 +32,15 @@ export async function getTasks(): Promise<Task[]> {
     return response.data;
 }
 
-export async function getTaskLists(user: AppUser) {
-    const response = await getAxiosClient('taskLists').request({
-        method: 'GET',
-        params: {
-            sub: user.sub
-        }
-    });
-    return response.data;
-}
+// export async function getTaskLists(user: AppUser) {
+//     const response = await getAxiosClient('taskLists').request({
+//         method: 'GET',
+//         params: {
+//             sub: user.sub
+//         }
+//     });
+//     return response.data;
+// }
 
 export async function createTask(task: Task): Promise<Task> {
     console.log(task)
@@ -294,5 +294,76 @@ export async function addTip(tip: Tip): Promise<Tip> {
         method: 'POST',
         data: tip
     });
+    return response.data;
+}
+export async function getProjects() {
+    const response = await getAxiosClient('projects').request({
+        method: 'GET'
+    });
+
+    return response;
+}
+export async function addProjects(tip: any) {
+    console.log("add projects");
+    const response = await getAxiosClient('addProjects')({
+        method: 'POST',
+        data: tip
+    });
+    console.log("Hello", response.data);
+    return response.data;
+}
+export async function updateProject(row: any) {
+    // console.log("cc")
+    const response = await getAxiosClient('updateProject')({
+        method: 'PUT',
+        data: row
+    });
+    // console.log("Hello");
+    return response.data;
+}
+export async function getProjectDetails() {
+    const response = await getAxiosClient('project-details').request({
+        method: 'GET'
+    });
+
+    return response;
+}
+export async function addTask(row: any) {
+    // console.log("cc")
+    const response = await getAxiosClient('addTask')({
+        method: 'POST',
+        data: row
+    });
+    // console.log(response);
+    // console.log("Hello");
+    return response.data;
+}
+export async function updateMyTask(row: any) {
+    // console.log("cc")
+    const response = await getAxiosClient('updateTask')({
+        method: 'PUT',
+        data: row
+    });
+    // console.log("Hello");
+    return response.data;
+}
+export async function tasks(projectId: any) {
+    const response = await getAxiosClient(`tasks/${projectId}`).request({
+        method: 'GET'
+        // params: {
+        //     projectId: projectId
+        // }
+    });
+    console.log("jagaht");
+    return response.data;
+}
+export async function project(projectId: any) {
+    const response = await getAxiosClient(`project/${projectId}`).request({
+        method: 'GET'
+        // params: {
+        //     projectId: projectId
+        // }
+    });
+    // console.log(response);
     return response.data;
 }

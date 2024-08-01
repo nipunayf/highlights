@@ -2,7 +2,7 @@ import { apiEndpoint } from "@/apiConfig";
 import { aquireAccessToken } from "@/util/auth";
 import { Task } from "@/models/Task";
 import { HighlightTask } from "@/models/HighlightTask";
-import { mTimer, mPomo_details, mPauses_details,mTimeRecord,mPauseContinueDetails } from "@/models/Timer";
+import { mTimer, mPomo_details, mPauses_details, mTimeRecord, mPauseContinueDetails } from "@/models/Timer";
 import { Tip } from "@/models/Tip";
 import axios, { AxiosInstance } from "axios";
 import { Highlight } from "@/models/Highlight";
@@ -32,15 +32,15 @@ export async function getTasks(): Promise<Task[]> {
     return response.data;
 }
 
-// export async function getTaskLists(user: AppUser) {
-//     const response = await getAxiosClient('taskLists').request({
-//         method: 'GET',
-//         params: {
-//             sub: user.sub
-//         }
-//     });
-//     return response.data;
-// }
+export async function getTaskLists(user: AppUser) {
+    const response = await getAxiosClient('taskLists').request({
+        method: 'GET',
+        params: {
+            sub: user.sub
+        }
+    });
+    return response.data;
+}
 
 export async function createTask(task: Task): Promise<Task> {
     console.log(task)
@@ -197,33 +197,33 @@ export async function sendContinueData(continueDetails: {
 
 export async function getFocusRecord(userId: number): Promise<mTimeRecord[]> {
     try {
-      const response = await getAxiosClient('focus_record').request<mTimeRecord[]>({
-        method: 'GET',
-        url: `/${userId}`
-      });
-  
-      // Log the response data to the console
-      console.log('Data sent to the backend:----------------------------------------------------------', response.data);
-  
-      return response.data;
+        const response = await getAxiosClient('focus_record').request<mTimeRecord[]>({
+            method: 'GET',
+            url: `/${userId}`
+        });
+
+        // Log the response data to the console
+        console.log('Data sent to the backend:----------------------------------------------------------', response.data);
+
+        return response.data;
     } catch (error) {
-      console.error('Error fetching focus record:', error);
-      throw error;
+        console.error('Error fetching focus record:', error);
+        throw error;
     }
-  }
+}
 
 
 
-  export async function getPauseDetails(userId: number): Promise<mPauseContinueDetails[]> {
+export async function getPauseDetails(userId: number): Promise<mPauseContinueDetails[]> {
     try {
 
         const response = await getAxiosClient('pause_details').request<mPauseContinueDetails[]>({
             method: 'GET',
             url: `/${userId}`
-          });
+        });
 
         return response.data;
-        
+
     } catch (error) {
         console.error('Error fetching pause details:', error);
         throw error;

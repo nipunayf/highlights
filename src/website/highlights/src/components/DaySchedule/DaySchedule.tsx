@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
 import { Menu, MenuItem } from '@mui/material';
 import styles from './DaySchedule.module.css';
@@ -109,10 +109,27 @@ const DaySchedule: React.FC = () => {
     handleMenuClose();
   };
 
+  const [currentDate, setCurrentDate] = useState<string>('');
+  const [currentDay, setCurrentDay] = useState<string>('');
+
+  useEffect(() => {
+    const date = new Date();
+    const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: '2-digit', day: '2-digit' };
+    const formattedDate = date.toLocaleDateString('en-CA', options);
+    const day = date.toLocaleDateString('en-US', { weekday: 'long' });
+    setCurrentDate(formattedDate);
+    setCurrentDay(day);
+  }, []);
+
     return (
       <DragDropContext onDragEnd={handleDragEnd}>
         <div className={styles.calendarContainer}>
-          <h1 className={styles.titleCaption}>Today Schedule</h1>
+         <h1>
+       
+          <div className={styles.dateContainer}>
+          <span>{currentDate}</span>
+          <span>{currentDay}</span><br />
+    </div></h1>
           <div className={styles.container}>
             <div className={styles.tasks}>
               {tasks.map((task) => (

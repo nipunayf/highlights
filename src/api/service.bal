@@ -173,13 +173,13 @@ type DailyTip record {
     int id;
     string label;
     string tip;
-    time:Date date;
+    // time:Date date;
 };
 
 type CreateDailyTip record {|
     string label;
     string tip;
-    time:Date date;
+    // time:Date date;
 |};
 
 // listener http:Listener securedEP = new (9090);
@@ -703,9 +703,10 @@ service / on new http:Listener(9090) {
     }
 
     // Create a new daily tip
-    private function createDailyTip(CreateDailyTip dailyTip) returns error? {
+    private function tipps(CreateDailyTip dailyTip) returns error? {
+        io:println("cc");
         sql:ExecutionResult|sql:Error result = self.db->execute(`
-            INSERT INTO dailytips (label, tip, date) VALUES (${dailyTip.label}, ${dailyTip.tip},  ${dailyTip.date});
+            INSERT INTO dailytips (label, tip) VALUES (${dailyTip.label}, ${dailyTip.tip});
         `);
 
         if (result is sql:ApplicationError) {
@@ -717,7 +718,7 @@ service / on new http:Listener(9090) {
 
     // Fetch daily tips
     private function fetchDailyTips() returns DailyTip[]|error {
-        sql:ParameterizedQuery query = `SELECT id, label, tip, date FROM dailytips`;
+        sql:ParameterizedQuery query = `SELECT id, label, tip FROM dailytips`;
         stream<DailyTip, sql:Error?> resultStream = self.db->query(query);
         DailyTip[] dailyTipList = [];
         error? e = resultStream.forEach(function(DailyTip dailyTip) {
@@ -734,9 +735,9 @@ service / on new http:Listener(9090) {
     }
 
     // Update a dailytip by ID
-    private function updateDailyTip(int tipId, string label, string tip, time:Date date) returns error? {
+    private function updateDailyTip(int tipId, string label, string tip) returns error? {
         sql:ExecutionResult|sql:Error result = self.db->execute(`
-            UPDATE dailytips SET label = ${label}, tip = ${tip},  date = ${date} WHERE id = ${tipId};
+            UPDATE dailytips SET label = ${label}, tip = ${tip} WHERE id = ${tipId};
         `);
 
         if (result is sql:Error) {
@@ -748,14 +749,14 @@ service / on new http:Listener(9090) {
     }
 
     // Endpoint to create a new daily tip
-    resource function post submit(http:Caller caller, http:Request req) returns error? {
+    resource function POST tips(http:Caller caller, http:Request req) returns error? {
+        io:println("ccmmm");
         json|http:ClientError payload = req.getJsonPayload();
         if (payload is http:ClientError) {
             log:printError("Error while parsing request payload", 'error = payload);
             check caller->respond(http:STATUS_BAD_REQUEST);
             return;
         }
-
         CreateDailyTip|error dailyTip = payload.cloneWithType(CreateDailyTip);
         if (dailyTip is error) {
             log:printError("Error while converting JSON to CreateDailyTip", 'error = dailyTip);
@@ -763,7 +764,7 @@ service / on new http:Listener(9090) {
             return;
         }
 
-        error? result = self.createDailyTip(dailyTip);
+        error? result = self.tipps(dailyTip);
         if (result is error) {
             check caller->respond(http:STATUS_INTERNAL_SERVER_ERROR);
             return;
@@ -773,7 +774,7 @@ service / on new http:Listener(9090) {
     }
 
     // Endpoint to fetch daily tips
-    resource function get all() returns DailyTip[]|error {
+    resource function GET all() returns DailyTip[]|error {
         return self.fetchDailyTips();
     }
 
@@ -794,7 +795,7 @@ service / on new http:Listener(9090) {
             return;
         }
 
-        error? result = self.updateDailyTip(tipId, dailyTip.tip, dailyTip.label, dailyTip.date);
+        error? result = self.updateDailyTip(tipId, dailyTip.tip, dailyTip.label);
         if (result is error) {
             check caller->respond(http:STATUS_INTERNAL_SERVER_ERROR);
             return;

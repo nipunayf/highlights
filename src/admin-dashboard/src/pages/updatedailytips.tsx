@@ -1,58 +1,134 @@
-import { useState } from 'react';
-import { MagnifyingGlassIcon, PlusIcon, TrashIcon, PencilIcon } from '@heroicons/react/24/outline';
+import React, { useState, useEffect } from 'react';
+import { Tip } from '@/models/Tip';
+import { addTip, fetchDailyTips } from '@/services/api';
 
-interface Tip {
-  id: number;
-  text: string;
-}
+const AddDailyTipPopup = ({ open, onClose }: { open: boolean, onClose: () => void }) => {
+  const [formState, setFormState] = useState({ label: '', tip: '' });
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
-const sampleTips: Tip[] = [
-  { id: 1, text: 'Tip 1: Stay hydrated throughout the day.' },
-  { id: 2, text: 'Tip 2: Regular exercise improves productivity.' },
-  { id: 3, text: 'Tip 3: Prioritize your tasks for the day.' },
-];
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const newErrors: { [key: string]: string } = {};
+    if (!formState.label) newErrors.label = 'Label is required';
+    if (!formState.tip) newErrors.tip = 'Tip is required';
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    const newTip = {
+      label: formState.label,
+      tip: formState.tip,
+    };
+
+    try {
+      await addTip(newTip);
+      setFormState({ label: '', tip: '' });
+      setErrors({});
+      onClose();
+    } catch (error) {
+      console.error('Error submitting tip:', error);
+    }
+  };
+
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="bg-white p-6 rounded shadow-lg">
+        <h2 className="text-xl font-bold mb-4">Add New Tip</h2>
+        <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <input
+              type="text"
+              value={formState.label}
+              onChange={(e) => setFormState({ ...formState, label: e.target.value })}
+              placeholder="Enter tip label"
+              className="w-full p-2 border border-gray-300 rounded"
+            />
+            {errors.label && <p className="text-red-500 text-sm">{errors.label}</p>}
+          </div>
+          <div className="mb-4">
+            <textarea
+              value={formState.tip}
+              onChange={(e) => setFormState({ ...formState, tip: e.target.value })}
+              placeholder="Add a new tip"
+              className="w-full p-2 border border-gray-300 rounded"
+            />
+            {errors.tip && <p className="text-red-500 text-sm">{errors.tip}</p>}
+          </div>
+          <div className="flex justify-end space-x-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="bg-gray-500 text-white py-2 px-4 rounded"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="bg-blue-500 text-white py-2 px-4 rounded"
+            >
+              Add Tip
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
 
 const UpdateDailyTips = () => {
-  const [tips, setTips] = useState<Tip[]>(sampleTips);
-  const [newTip, setNewTip] = useState('');
-  const [editTipId, setEditTipId] = useState<number | null>(null);
+  const [tips, setTips] = useState<Tip[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showPopup, setShowPopup] = useState(false);
 
-  const handleAddTip = () => {
-    if (newTip.trim()) {
-      setTips([...tips, { id: Date.now(), text: newTip }]);
-      setNewTip('');
-    }
-  };
+  useEffect(() => {
+    // Fetch tips from the database
+    const loadTips = async () => {
+      try {
+        const data = await fetchDailyTips();
+        setTips(data);
+      } catch (error) {
+        console.error("Error fetching tips:", error);
+      }
+    };
 
-  const handleUpdateTip = () => {
-    if (editTipId !== null) {
-      setTips(tips.map(tip => tip.id === editTipId ? { ...tip, text: newTip } : tip));
-      setNewTip('');
-      setEditTipId(null);
-    }
-  };
-
-  const handleEditTip = (id: number, text: string) => {
-    setEditTipId(id);
-    setNewTip(text);
-  };
-
-  const handleDeleteTip = (id: number) => {
-    setTips(tips.filter(tip => tip.id !== id));
-  };
+    loadTips();
+  }, []);
 
   const filteredTips = tips.filter(tip =>
-    tip.text.toLowerCase().includes(searchQuery.toLowerCase())
+    tip.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    tip.tip.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const handleOpenPopup = () => {
+    setShowPopup(true);
+  };
+
+  const handleClosePopup = () => {
+    setShowPopup(false);
+  };
+
+  const handleUpdate = (tip: Tip) => {
+    // Logic to handle update
+    console.log('Update Tip:', tip);
+  };
+
+  const handleDelete = (tip: Tip) => {
+    // Logic to handle delete
+    console.log('Delete Tip with ID:', tip);
+  };
+
 
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Manage Daily Tips</h1>
-      
+
       {/* Search Box */}
       <div className="flex items-center mb-4">
-        <MagnifyingGlassIcon className="w-6 h-6 text-gray-500 mr-2" />
         <input
           type="text"
           value={searchQuery}
@@ -62,44 +138,55 @@ const UpdateDailyTips = () => {
         />
       </div>
 
-      {/* Add/Update Tip */}
+      {/* Button to Open Popup */}
       <div className="mb-6">
-        <textarea
-          value={newTip}
-          onChange={(e) => setNewTip(e.target.value)}
-          placeholder={editTipId ? 'Update your tip' : 'Add a new tip'}
-          className="w-full p-2 border border-gray-300 rounded mb-2"
-        />
         <button
-          onClick={editTipId ? handleUpdateTip : handleAddTip}
+          onClick={handleOpenPopup}
           className="bg-blue-500 text-white py-2 px-4 rounded"
         >
-          {editTipId ? 'Update Tip' : 'Add Tip'}
+          Add Tip
         </button>
       </div>
 
-      {/* Tips List */}
-      <ul>
-        {filteredTips.map(tip => (
-          <li key={tip.id} className="flex items-center justify-between p-2 border-b border-gray-200">
-            <span>{tip.text}</span>
-            <div className="flex space-x-2">
-              <button
-                onClick={() => handleEditTip(tip.id, tip.text)}
-                className="text-yellow-500 hover:text-yellow-700"
-              >
-                <PencilIcon className="w-6 h-6" />
-              </button>
-              <button
-                onClick={() => handleDeleteTip(tip.id)}
-                className="text-red-500 hover:text-red-700"
-              >
-                <TrashIcon className="w-6 h-6" />
-              </button>
-            </div>
-          </li>
-        ))}
-      </ul>
+      {/* Tips Table */}
+      <table className="min-w-full divide-y divide-gray-200">
+        <thead className="bg-gray-200">
+          <tr>
+            <th className="px-6 py-3 text-left text-sm font-bold text-black-600 uppercase tracking-wider">Id</th>
+            <th className="px-6 py-3 text-left text-sm font-bold text-black-600 uppercase tracking-wider">Label</th>
+            <th className="px-6 py-3 text-left text-sm font-bold text-black-600 uppercase tracking-wider">Tip</th>
+            <th className="px-6 py-3 text-left text-sm font-bold text-black-600 uppercase tracking-wider">Options</th>
+          </tr>
+        </thead>
+        <tbody className="bg-white divide-y divide-gray-200">
+          {filteredTips.map(tip => (
+            <tr key={tip.id}>
+              <td className="px-6 py-4 whitespace-nowrap">{tip.id}</td>
+              <td className="px-6 py-4 whitespace-nowrap">{tip.label}</td>
+              <td className="px-6 py-4 whitespace-nowrap">{tip.tip}</td>
+              <td className="px-6 py-4 whitespace-nowrap">
+                <button
+                  onClick={() => handleUpdate(tip)}
+                  className="bg-green-500 text-white py-1 px-3 rounded mr-2"
+                >
+                  Update
+                </button>
+                <button
+                  onClick={() => handleDelete(tip)}
+                  className="bg-red-500 text-white py-1 px-3 rounded"
+                >
+                  Delete
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      {/* Popup Form */}
+      {showPopup && (
+        <AddDailyTipPopup open={showPopup} onClose={handleClosePopup} />
+      )}
     </div>
   );
 };

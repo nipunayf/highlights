@@ -140,8 +140,7 @@ CREATE TABLE `taskss` (
 CREATE TABLE `dailytips` (
   `id` integer PRIMARY KEY AUTO_INCREMENT,
   `label` varchar(255) NOT NULL,
-  `tip` varchar(255) NOT NULL,
-  `date` DATE
+  `tip` varchar(255) NOT NULL  
 );
 
 ALTER TABLE `highlights` ADD FOREIGN KEY (`event_id`) REFERENCES `events` (`id`);

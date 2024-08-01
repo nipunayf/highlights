@@ -1,6 +1,6 @@
 [package]
 org = "ashen"
-name = "api"
+name = "webapp.backend"
 version = "0.1.0"
 distribution = "2201.9.0"
 

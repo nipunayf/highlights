@@ -4,10 +4,10 @@ import ballerina/lang.'string as strings;
 import ballerina/log;
 import ballerina/sql;
 import ballerina/time;
-import ballerinax/mysql;
 import ballerinax/mysql.driver as _;
-
-// import ballerina/io;
+import webapp.backend.http_listener;
+import webapp.backend.database;
+import webapp.backend.lists as _;
 
 type CreateUser record {|
     string sub;
@@ -201,23 +201,14 @@ type PauseAndContinueTime record {
         maxAge: 84900
     }
 }
-service / on new http:Listener(9090) {
-
-    private final mysql:Client db;
-
-    function init() returns error? {
-        // Initiate the mysql client at the start of the service. This will be used
-        // throughout the lifetime of the service.
-        self.db = check new ("localhost", "root", "root", "highlights", 3306);
-    }
-
+service / on http_listener:Listener {
     resource function post users(CreateUser createUser) returns http:Created|http:Conflict|http:InternalServerError {
 
-        User|sql:Error result = self.db->queryRow(`SELECT * FROM users WHERE sub = ${createUser.sub}`);
+        User|sql:Error result = database:Client->queryRow(`SELECT * FROM users WHERE sub = ${createUser.sub}`);
 
         if result is sql:NoRowsError {
             do {
-                _ = check self.db->execute(`
+                _ = check database:Client->execute(`
                         INSERT INTO users (sub)
                         VALUES (${createUser.sub});`);
             } on fail var e {
@@ -237,7 +228,7 @@ service / on new http:Listener(9090) {
 
     //  resource function get tasks() returns Task[]|error {
     //         sql:ParameterizedQuery query = `SELECT id,title, dueDate, startTime, endTime, label, reminder, priority, description , status FROM hi`;
-    //         stream<Task, sql:Error?> resultStream = self.db->query(query);
+    //         stream<Task, sql:Error?> resultStream = database:Client->query(query);
     //         Task[] tasksList = [];
     //         error? e = resultStream.forEach(function(Task task) {
     //             tasksList.push(task);
@@ -256,7 +247,7 @@ service / on new http:Listener(9090) {
                                         FROM hi
                                         WHERE dueDate = CURRENT_DATE`;
 
-        stream<Task, sql:Error?> resultStream = self.db->query(query);
+        stream<Task, sql:Error?> resultStream = database:Client->query(query);
         Task[] tasksList = [];
         error? e = resultStream.forEach(function(Task task) {
             tasksList.push(task);
@@ -272,13 +263,13 @@ service / on new http:Listener(9090) {
     }
 
     resource function get taskLists(string sub) returns TaskList[]|error {
-        User|sql:Error result = self.db->queryRow(`SELECT * FROM users WHERE sub = ${sub}`);
+        User|sql:Error result = database:Client->queryRow(`SELECT * FROM users WHERE sub = ${sub}`);
 
         if result is sql:NoRowsError {
             return error("User not found");
         }
 
-        stream<TaskList, sql:Error?> taskListStream = self.db->query(
+        stream<TaskList, sql:Error?> taskListStream = database:Client->query(
             `SELECT * FROM task_lists WHERE user_id=(SELECT u.id FROM users AS u WHERE u.sub=${sub});`
         );
 
@@ -315,7 +306,7 @@ service / on new http:Listener(9090) {
         string startTime = task.startTime != () ? formatTime(task.startTime.toString()) : "";
         string endTime = task.endTime != () ? formatTime(task.endTime.toString()) : "";
 
-        sql:ExecutionResult|sql:Error result = self.db->execute(`
+        sql:ExecutionResult|sql:Error result = database:Client->execute(`
         INSERT INTO hi (title, dueDate, startTime, endTime, label, reminder, priority, description) 
         VALUES (${task.title}, ${dueDate}, ${startTime}, ${endTime}, ${task.label} ,${task.reminder}, ${task.priority}, ${task.description});
     `);
@@ -365,7 +356,7 @@ service / on new http:Listener(9090) {
         string startTime = task.startTime != () ? formatTime(task.startTime.toString()) : "";
         string endTime = task.endTime != () ? formatTime(task.endTime.toString()) : "";
 
-        sql:ExecutionResult|sql:Error result = self.db->execute(`
+        sql:ExecutionResult|sql:Error result = database:Client->execute(`
         UPDATE hi SET title = ${task.title}, 
                       dueDate = ${dueDate}, 
                       startTime = ${startTime}, 
@@ -397,10 +388,10 @@ service / on new http:Listener(9090) {
         int projectId = (check payload.projectId);
 
         sql:ParameterizedQuery insertQuery = `INSERT INTO taskss (taskName,progress, priority, startDate, dueDate,projectId) VALUES (${taskName},${progress}, ${priority}, ${startDate}, ${dueDate},${projectId})`;
-        _ = check self.db->execute(insertQuery);
+        _ = check database:Client->execute(insertQuery);
 
         sql:ParameterizedQuery selectQuery = `SELECT taskName,progress, priority,  startDate, dueDate FROM taskss`;
-        stream<record {|anydata...;|}, sql:Error?> resultStream = self.db->query(selectQuery);
+        stream<record {|anydata...;|}, sql:Error?> resultStream = database:Client->query(selectQuery);
 
         json[] resultJsonArray = [];
         check from record {|anydata...;|} row in resultStream
@@ -441,10 +432,10 @@ service / on new http:Listener(9090) {
         string dueDate = (check payload.dueDate).toString();
 
         sql:ParameterizedQuery insertQuery = `INSERT INTO projects (projectName,progress, priority, startDate, dueDate) VALUES (${projectName},${progress}, ${priority}, ${startDate}, ${dueDate})`;
-        _ = check self.db->execute(insertQuery);
+        _ = check database:Client->execute(insertQuery);
 
         sql:ParameterizedQuery selectQuery = `SELECT id,projectName,progress, priority,  startDate, dueDate FROM projects`;
-        stream<record {|anydata...;|}, sql:Error?> resultStream = self.db->query(selectQuery);
+        stream<record {|anydata...;|}, sql:Error?> resultStream = database:Client->query(selectQuery);
 
         json[] resultJsonArray = [];
         check from record {|anydata...;|} row in resultStream
@@ -476,7 +467,7 @@ service / on new http:Listener(9090) {
     resource function get projects(http:Caller caller, http:Request req) returns error? {
 
         sql:ParameterizedQuery selectQuery = `SELECT id,projectName,progress, priority,  startDate, dueDate FROM projects`;
-        stream<record {|anydata...;|}, sql:Error?> resultStream = self.db->query(selectQuery);
+        stream<record {|anydata...;|}, sql:Error?> resultStream = database:Client->query(selectQuery);
 
         json[] resultJsonArray = [];
         check from record {|anydata...;|} row in resultStream
@@ -532,7 +523,7 @@ service / on new http:Listener(9090) {
         // time:Utc dateTime = check time:parse(dateTimeString, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
         sql:ParameterizedQuery updateQuery = `UPDATE projects SET projectName = ${projectName}, progress = ${progress}, priority = ${priority},startDate=${startDate},dueDate=${dueDate}   WHERE id = ${projectId}`;
-        _ = check self.db->execute(updateQuery);
+        _ = check database:Client->execute(updateQuery);
 
         json response = {message: "Project updated successfully"};
         http:Response res = new;
@@ -560,7 +551,7 @@ service / on new http:Listener(9090) {
         sql:ParameterizedQuery selectQuery = `SELECT id, projectName, progress, priority, startDate, dueDate FROM projects WHERE id = ${projectId}`;
 
         // Execute the query and get the result stream
-        stream<record {|anydata...;|}, sql:Error?> resultStream = self.db->query(selectQuery);
+        stream<record {|anydata...;|}, sql:Error?> resultStream = database:Client->query(selectQuery);
 
         // Variables to hold project details and response
         record {|anydata...;|}? projectDetails;
@@ -630,7 +621,7 @@ service / on new http:Listener(9090) {
         io:println("Formatted Due Date: ", payload.startDate);
 
         sql:ParameterizedQuery updateQuery = `UPDATE taskss SET taskName = ${taskName}, progress = ${progress}, priority = ${priority},startDate=${startDate},dueDate=${dueDate}   WHERE taskName = ${taskName} AND projectId=${projectId}`;
-        _ = check self.db->execute(updateQuery);
+        _ = check database:Client->execute(updateQuery);
 
         json response = {message: "Task updated successfully"};
         http:Response res = new;
@@ -655,7 +646,7 @@ service / on new http:Listener(9090) {
     resource function get tasks/[int projectId](http:Caller caller, http:Request req) returns error? {
 
         sql:ParameterizedQuery selectQuery = `SELECT projectId,taskName,progress, priority,  startDate, dueDate FROM taskss WHERE projectId=${projectId}`;
-        stream<record {|anydata...;|}, sql:Error?> resultStream = self.db->query(selectQuery);
+        stream<record {|anydata...;|}, sql:Error?> resultStream = database:Client->query(selectQuery);
 
         json[] resultJsonArray = [];
         check from record {|anydata...;|} row in resultStream
@@ -690,7 +681,7 @@ service / on new http:Listener(9090) {
 
     resource function delete tasks/[int taskId](http:Caller caller) returns error? {
         io:println("xdd");
-        sql:ExecutionResult|sql:Error result = self.db->execute(`
+        sql:ExecutionResult|sql:Error result = database:Client->execute(`
             DELETE FROM hi WHERE id = ${taskId};
         `);
 
@@ -705,7 +696,7 @@ service / on new http:Listener(9090) {
     // Create a new daily tip
     private function tipps(CreateDailyTip dailyTip) returns error? {
         io:println("cc");
-        sql:ExecutionResult|sql:Error result = self.db->execute(`
+        sql:ExecutionResult|sql:Error result = database:Client->execute(`
             INSERT INTO dailytips (label, tip) VALUES (${dailyTip.label}, ${dailyTip.tip});
         `);
 
@@ -719,7 +710,7 @@ service / on new http:Listener(9090) {
     // Fetch daily tips
     private function fetchDailyTips() returns DailyTip[]|error {
         sql:ParameterizedQuery query = `SELECT id, label, tip FROM dailytips`;
-        stream<DailyTip, sql:Error?> resultStream = self.db->query(query);
+        stream<DailyTip, sql:Error?> resultStream = database:Client->query(query);
         DailyTip[] dailyTipList = [];
         error? e = resultStream.forEach(function(DailyTip dailyTip) {
             dailyTipList.push(dailyTip);
@@ -736,7 +727,7 @@ service / on new http:Listener(9090) {
 
     // Update a dailytip by ID
     private function updateDailyTip(int tipId, string label, string tip) returns error? {
-        sql:ExecutionResult|sql:Error result = self.db->execute(`
+        sql:ExecutionResult|sql:Error result = database:Client->execute(`
             UPDATE dailytips SET label = ${label}, tip = ${tip} WHERE id = ${tipId};
         `);
 
@@ -817,7 +808,7 @@ service / on new http:Listener(9090) {
             time:TimeOfDay? long_break_duration;
             int pomos_per_long_break;
             int user_id;
-        |}, sql:Error?> resultStream = self.db->query(sqlQuery);
+        |}, sql:Error?> resultStream = database:Client->query(sqlQuery);
 
         h_TimerDetails[] h_timerDetailsList = [];
 
@@ -851,7 +842,7 @@ service / on new http:Listener(9090) {
             int highlight_id;
             string highlight_name;
             int user_id;
-        |}, sql:Error?> resultStream = self.db->query(sqlQuery);
+        |}, sql:Error?> resultStream = database:Client->query(sqlQuery);
 
         h_Highlight[] highlightList = [];
 
@@ -924,7 +915,7 @@ service / on new http:Listener(9090) {
         string formattedEndTime = endTimeStr.substring(0, 10) + " " + endTimeStr.substring(11, 19);
 
         // Insert data into database
-        sql:ExecutionResult|sql:Error result = self.db->execute(`
+        sql:ExecutionResult|sql:Error result = database:Client->execute(`
             INSERT INTO HighlightPomoDetails (timer_id, highlight_id, user_id, start_time, end_time, status) 
             VALUES (${highlightPomoDetails.timer_id}, ${highlightPomoDetails.highlight_id}, ${highlightPomoDetails.user_id}, ${formattedStartTime}, ${formattedEndTime}, ${highlightPomoDetails.status});
         `);
@@ -978,7 +969,7 @@ service / on new http:Listener(9090) {
         };
 
         // Insert data into database
-        sql:ExecutionResult|sql:Error result = self.db->execute(`
+        sql:ExecutionResult|sql:Error result = database:Client->execute(`
         INSERT INTO PausesPomoDetails (highlight_id, pause_time) 
         VALUES (${pausesDetails.highlight_id}, ${pausesDetails.pause_time});
     `);
@@ -1031,7 +1022,7 @@ service / on new http:Listener(9090) {
             continue_time: formattedContinueTime
         };
 
-        sql:ExecutionResult|sql:Error result = self.db->execute(`
+        sql:ExecutionResult|sql:Error result = database:Client->execute(`
         UPDATE PausesPomoDetails 
         SET continue_time = ${continueDetails.continue_time} 
         WHERE highlight_id = ${continueDetails.highlight_id} 
@@ -1052,7 +1043,7 @@ service / on new http:Listener(9090) {
     // resource function get focus_record/[int userId]() returns TimeRecord[]|error {
     //     // Query to get all highlights for the given user
     //     sql:ParameterizedQuery highlightQuery = `SELECT highlight_id, start_time, end_time FROM HighlightPomoDetails WHERE user_id = ${userId}`;
-    //     stream<record {| int highlight_id; time:Utc start_time; time:Utc end_time; |}, sql:Error?> highlightStream = self.db->query(highlightQuery);
+    //     stream<record {| int highlight_id; time:Utc start_time; time:Utc end_time; |}, sql:Error?> highlightStream = database:Client->query(highlightQuery);
 
     //     TimeRecord[] highlightTimeRecords = [];
 
@@ -1094,7 +1085,7 @@ service / on new http:Listener(9090) {
                                              FROM HighlightPomoDetails hpd
                                              JOIN hilights_hasintha hh ON hpd.highlight_id = hh.highlight_id
                                              WHERE hpd.user_id = ${userId}`;
-        stream<record {|int highlight_id; string highlight_name; time:Utc start_time; time:Utc end_time;|}, sql:Error?> highlightStream = self.db->query(highlightQuery);
+        stream<record {|int highlight_id; string highlight_name; time:Utc start_time; time:Utc end_time;|}, sql:Error?> highlightStream = database:Client->query(highlightQuery);
 
         TimeRecord[] highlightTimeRecords = [];
 
@@ -1149,7 +1140,7 @@ service / on new http:Listener(9090) {
             int highlight_id;
             time:Utc pause_time;
             time:Utc? continue_time;
-        |}, sql:Error?> resultStream = self.db->query(sqlQuery);
+        |}, sql:Error?> resultStream = database:Client->query(sqlQuery);
 
         h_PauseContinueDetails[] pauseContinueDetails = [];
 

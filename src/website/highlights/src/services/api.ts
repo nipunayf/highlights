@@ -2,7 +2,7 @@ import { apiEndpoint } from "@/apiConfig";
 import { aquireAccessToken } from "@/util/auth";
 import { Task } from "@/models/Task";
 import { HighlightTask } from "@/models/HighlightTask";
-import { mTimer, mPomo_details, mPauses_details,mTimeRecord,mPauseContinueDetails } from "@/models/Timer";
+import { mTimer, mPomo_details, mPauses_details, mTimeRecord, mPauseContinueDetails } from "@/models/Timer";
 import { Tip } from "@/models/Tip";
 import axios, { AxiosInstance } from "axios";
 import { Highlight } from "@/models/Highlight";
@@ -197,33 +197,33 @@ export async function sendContinueData(continueDetails: {
 
 export async function getFocusRecord(userId: number): Promise<mTimeRecord[]> {
     try {
-      const response = await getAxiosClient('focus_record').request<mTimeRecord[]>({
-        method: 'GET',
-        url: `/${userId}`
-      });
-  
-      // Log the response data to the console
-      console.log('Data sent to the backend:----------------------------------------------------------', response.data);
-  
-      return response.data;
+        const response = await getAxiosClient('focus_record').request<mTimeRecord[]>({
+            method: 'GET',
+            url: `/${userId}`
+        });
+
+        // Log the response data to the console
+        console.log('Data sent to the backend:----------------------------------------------------------', response.data);
+
+        return response.data;
     } catch (error) {
-      console.error('Error fetching focus record:', error);
-      throw error;
+        console.error('Error fetching focus record:', error);
+        throw error;
     }
-  }
+}
 
 
 
-  export async function getPauseDetails(userId: number): Promise<mPauseContinueDetails[]> {
+export async function getPauseDetails(userId: number): Promise<mPauseContinueDetails[]> {
     try {
 
         const response = await getAxiosClient('pause_details').request<mPauseContinueDetails[]>({
             method: 'GET',
             url: `/${userId}`
-          });
+        });
 
         return response.data;
-        
+
     } catch (error) {
         console.error('Error fetching pause details:', error);
         throw error;
@@ -294,5 +294,76 @@ export async function addTip(tip: Tip): Promise<Tip> {
         method: 'POST',
         data: tip
     });
+    return response.data;
+}
+export async function getProjects() {
+    const response = await getAxiosClient('projects').request({
+        method: 'GET'
+    });
+
+    return response;
+}
+export async function addProjects(tip: any) {
+    console.log("add projects");
+    const response = await getAxiosClient('addProjects')({
+        method: 'POST',
+        data: tip
+    });
+    console.log("Hello", response.data);
+    return response.data;
+}
+export async function updateProject(row: any) {
+    // console.log("cc")
+    const response = await getAxiosClient('updateProject')({
+        method: 'PUT',
+        data: row
+    });
+    // console.log("Hello");
+    return response.data;
+}
+export async function getProjectDetails() {
+    const response = await getAxiosClient('project-details').request({
+        method: 'GET'
+    });
+
+    return response;
+}
+export async function addTask(row: any) {
+    // console.log("cc")
+    const response = await getAxiosClient('addTask')({
+        method: 'POST',
+        data: row
+    });
+    // console.log(response);
+    // console.log("Hello");
+    return response.data;
+}
+export async function updateMyTask(row: any) {
+    // console.log("cc")
+    const response = await getAxiosClient('updateTask')({
+        method: 'PUT',
+        data: row
+    });
+    // console.log("Hello");
+    return response.data;
+}
+export async function tasks(projectId: any) {
+    const response = await getAxiosClient(`tasks/${projectId}`).request({
+        method: 'GET'
+        // params: {
+        //     projectId: projectId
+        // }
+    });
+    console.log("jagaht");
+    return response.data;
+}
+export async function project(projectId: any) {
+    const response = await getAxiosClient(`project/${projectId}`).request({
+        method: 'GET'
+        // params: {
+        //     projectId: projectId
+        // }
+    });
+    // console.log(response);
     return response.data;
 }

@@ -3,3 +3,9 @@ export interface Entity {
     created?: Date;
     updated?: Date
 }
+
+// export interface Entity {
+//     id: string;
+//     created?: string;
+//     updated?: string
+// }

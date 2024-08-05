@@ -6,6 +6,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import Autocomplete from '@mui/material/Autocomplete';
 import { Divider} from '@mantine/core';
+import { getProjectDetails } from '@/services/api'
 
 const SideDrawer: React.FC = () => {
     const [projectDetails, setProjectDetails] = useState({
@@ -25,7 +26,8 @@ const SideDrawer: React.FC = () => {
 
     useEffect(() => {
         // Fetch project details from the API
-        axios.get('/api/project-details')
+        // axios.get('http://localhost:9090/project-details')
+        getProjectDetails()
             .then(response => {
                 setProjectDetails(response.data);
             })
@@ -73,7 +75,7 @@ const SideDrawer: React.FC = () => {
                     {/* <Typography variant="h6">Project Details</Typography> */}
                     <Typography variant="subtitle1"><strong>Project Name:</strong> {projectDetails.projectName}</Typography>
                     <Typography variant="subtitle1"><strong>Project Description:</strong> {projectDetails.projectDescription}</Typography>
-                    <Typography variant="subtitle1"><strong>Assignees:</strong> {projectDetails.assignees}</Typography>
+                    {/* <Typography variant="subtitle1"><strong>Assignees:</strong> {projectDetails.assignees}</Typography> */}
                     <Typography variant="subtitle1"><strong>Start Date:</strong> {projectDetails.startDate}</Typography>
                     <Typography variant="subtitle1"><strong>Due Date:</strong> {projectDetails.dueDate}</Typography>
                     <Typography variant="subtitle1"><strong>Status:</strong> {projectDetails.status}</Typography>

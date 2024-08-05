@@ -1,3 +1,4 @@
+import { useMsal } from '@azure/msal-react';
 import { Menu, Group, Text, Avatar, useMantineTheme, rem, UnstyledButton, ActionIcon } from '@mantine/core';
 import {
     IconLogout,
@@ -12,6 +13,15 @@ import {
 
 export default function UserMenu({ className }: { className?: string }) {
     const theme = useMantineTheme();
+
+    const { instance } = useMsal();
+
+    const handleLogout = () => {
+        instance.logoutRedirect({
+            postLogoutRedirectUri: "/",
+        });
+    }
+
     return (
         <Group>
             <Menu
@@ -98,6 +108,7 @@ export default function UserMenu({ className }: { className?: string }) {
                     </Menu.Item>
                     <Menu.Item
                         leftSection={<IconLogout style={{ width: rem(16), height: rem(16) }} stroke={1.5} />}
+                        onClick={() => { handleLogout() }}
                     >
                         Logout
                     </Menu.Item>

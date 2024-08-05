@@ -46,9 +46,9 @@ export default function AddtaskPopup({ open, onClose }: AddtaskPopupProps) {
   const priorityColors = {
     low: '#4CAF50',
     medium: '#FFC107',
-    high: '#F44336',
+    high: '#F44336',
     none: 'F44336'
-  };
+  };
   // State hooks to manage form input values and other state
   const [formState, setFormState] = useState({
     title: "",
@@ -65,7 +65,7 @@ export default function AddtaskPopup({ open, onClose }: AddtaskPopupProps) {
   // Refs for accessing the TimeInput components' methods
   const startRef = useRef<HTMLInputElement>(null);
   const endRef = useRef<HTMLInputElement>(null);
-  
+
 
   // Function to handle form submission
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -84,7 +84,7 @@ export default function AddtaskPopup({ open, onClose }: AddtaskPopupProps) {
       startTime &&
       endTime &&
       new Date(`1970-01-01T${startTime}Z`).getTime() >=
-        new Date(`1970-01-01T${endTime}Z`).getTime()
+      new Date(`1970-01-01T${endTime}Z`).getTime()
     ) {
       newErrors.time = "Start time should be less than end time";
     }
@@ -103,8 +103,8 @@ export default function AddtaskPopup({ open, onClose }: AddtaskPopupProps) {
     // Adjust dueDate to UTC
     const adjustedDueDate = dueDate
       ? new Date(
-          Date.UTC(dueDate.getFullYear(), dueDate.getMonth(), dueDate.getDate())
-        )
+        Date.UTC(dueDate.getFullYear(), dueDate.getMonth(), dueDate.getDate())
+      )
       : null;
 
     // Constructing newTask object with form data

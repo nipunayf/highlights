@@ -158,7 +158,11 @@ const Pomo: React.FC = () => {
 };
 
 const Stopwatch: React.FC = () => {
-  return <div><Stop_watch /></div>;
+  return (
+    <div>
+      <Stop_watch />
+    </div>
+  );
 };
 
 Focus.getLayout = function getLayout(page: ReactNode) {

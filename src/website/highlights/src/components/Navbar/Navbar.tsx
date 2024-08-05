@@ -74,7 +74,7 @@ export default function Navbar() {
                 setActive(currentTaskList);
             }
         }
-    }, [router.pathname, taskListIds]);
+    }, [router.pathname, router.asPath, taskListIds]);
 
     const mainLinks = links.map((link) => (
         <UnstyledButton

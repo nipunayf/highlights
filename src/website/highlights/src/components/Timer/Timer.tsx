@@ -1,17 +1,19 @@
-import { useState, useEffect, forwardRef } from 'react';
+
+
+
+
+import React, { useState, useEffect, forwardRef } from 'react';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import { showNotification } from '@mantine/notifications';
-import { IconInfoCircle, IconChevronRight, IconCalendarDue } from '@tabler/icons-react';
-import { Group, Avatar, Text, Menu, UnstyledButton, ScrollArea, TextInput, Tabs } from '@mantine/core';
+import { IconInfoCircle, IconChevronRight, IconCalendarDue, IconHourglassHigh } from '@tabler/icons-react';
+import { Group, Avatar, Text, Menu, UnstyledButton, TextInput, Tabs, Modal, Button } from '@mantine/core';
 import styles from './Timer.module.css';
-
-const tasks = [
-  { title: 'Learning Ballerina', time: '9:00am-1:00pm' },
-  { title: 'React Project', time: '2:00pm-5:00pm' },
-  { title: 'Exercise', time: '6:00pm-7:00pm' },
-  // Add more tasks as needed
-];
+import { useHighlights } from "@/hooks/useHighlights";
+import { useTimers } from '@/hooks/useTimer';
+import { HighlightTask } from "@/models/HighlightTask";
+import { mTimer } from '@/models/Timer';
+import { sendTimerEndData, sendPauseData, sendContinueData } from "@/services/api";
 
 interface UserButtonProps {
   image?: string;
@@ -22,10 +24,11 @@ interface UserButtonProps {
       fontSize?: string;
     };
   };
+  onClick?: () => void;
 }
 
 const UserButton = forwardRef<HTMLButtonElement, UserButtonProps>(
-  ({ image, label, icon, styles: userStyles, ...others }: UserButtonProps, ref) => {
+  ({ image, label, icon, styles: userStyles, onClick, ...others }: UserButtonProps, ref) => {
     return (
       <UnstyledButton
         ref={ref}
@@ -34,6 +37,7 @@ const UserButton = forwardRef<HTMLButtonElement, UserButtonProps>(
           color: 'var(--mantine-color-text)',
           borderRadius: 'var(--mantine-radius-sm)',
         }}
+        onClick={onClick}
         {...others}
       >
         <Group>
@@ -52,11 +56,76 @@ const UserButton = forwardRef<HTMLButtonElement, UserButtonProps>(
   }
 );
 
+const HighlightMenu = ({ highlights, onHighlightSelect, closeMenu }: { highlights: HighlightTask[], onHighlightSelect: (index: number) => void, closeMenu: () => void }) => {
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredHighlights = highlights.filter((highlight) =>
+    highlight.highlight_name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const handleSelect = (index: number) => {
+    onHighlightSelect(index);
+    closeMenu();
+  };
+
+  return (
+    <Tabs.Panel value="Task">
+      <div className={styles.taskContainer}>
+        <TextInput
+          placeholder="Search"
+          className={styles.searchInput}
+          value={searchQuery}
+          onChange={(event) => setSearchQuery(event.currentTarget.value)}
+        />
+        <div className={styles.taskHeader}>
+          <Text className={styles.today}><IconCalendarDue /> Today &gt;</Text>
+        </div>
+        <Menu>
+          {filteredHighlights.map((highlight, index) => (
+            <Menu.Item key={highlight.id} onClick={() => handleSelect(index)}>
+              {highlight.highlight_name}
+            </Menu.Item>
+          ))}
+        </Menu>
+      </div>
+    </Tabs.Panel>
+  );
+};
+
+const TimerMenu = ({ timer_details }: { timer_details: mTimer[] }) => {
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredTimers = timer_details.filter((timer) =>
+    timer.timer_name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  return (
+    <Tabs.Panel value="Timer">
+      <div className={styles.taskContainer}>
+        <TextInput
+          placeholder="Search"
+          className={styles.searchInput}
+          value={searchQuery}
+          onChange={(event) => setSearchQuery(event.currentTarget.value)}
+        />
+        <div className={styles.taskHeader}>
+          <Text className={styles.today}><IconHourglassHigh /></Text>
+        </div>
+        <Menu>
+          {filteredTimers.map((timer) => (
+            <Menu.Item key={timer.timer_id}>{timer.timer_name}</Menu.Item>
+          ))}
+        </Menu>
+      </div>
+    </Tabs.Panel>
+  );
+};
+
 const Timer = () => {
-  const WORK_TIME = 25; // in minutes for work session
-  const SHORT_BREAK = 5; // in minutes for short break
-  const LONG_BREAK = 15; // in minutes for long break
-  const CYCLES_BEFORE_LONG_BREAK = 4; // number of work sessions before a long break
+  const WORK_TIME = 25;
+  const SHORT_BREAK = 5;
+  const LONG_BREAK = 15;
+  const CYCLES_BEFORE_LONG_BREAK = 4;
 
   const [active, setActive] = useState('focus'); // 'focus' for work session, 'break' for break session
   const [minCount, setMinCount] = useState(WORK_TIME); // Initial time is set to WORK_TIME
@@ -66,6 +135,11 @@ const Timer = () => {
   const [timerId, setTimerId] = useState<NodeJS.Timeout | null>(null); // Timer ID for setInterval
   const [cycles, setCycles] = useState(0); // Number of completed work cycles
   const [selectedTask, setSelectedTask] = useState<number | null>(null); // State to track selected task
+  const { highlights, isHighlightsLoading, isHighlightsError } = useHighlights();
+  const { timer_details, istimer_detailsLoading, istimer_detailsError } = useTimers();
+  const [menuOpened, setMenuOpened] = useState(false);
+  const [modalOpened, setModalOpened] = useState(false); // State for modal visibility
+  const [startTime, setStartTime] = useState<Date | null>(null); // State to track start time
 
   const formatTime = (minutes: number, seconds: number) => {
     return `${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`;
@@ -77,32 +151,184 @@ const Timer = () => {
     setCount(0);
     setPaused(true);
     setStarted(false);
+    setStartTime(null); // Reset start time
   };
 
-  const pauseTimer = () => {
+
+
+
+
+
+
+  const pauseTimer = async () => {
     setPaused(true);
     if (timerId) clearInterval(timerId);
+
+    const currentTimerId = selectedTask !== null && timer_details
+      ? Number(timer_details[selectedTask]?.timer_id)
+      : -1;
+
+    const pause_time = new Date();
+    const pauseDetails = {
+      // timer_id: currentTimerId,
+      highlight_id: selectedTask !== null ? selectedTask : 1,
+      // user_id: 11, // Replace with actual user ID
+      pause_time: pause_time.toISOString(),
+      // status: "paused"
+    };
+    console.log(pauseDetails);
+
+    try {
+      await sendPauseData(pauseDetails);
+      showNotification({
+        title: 'Timer Paused',
+        message: 'The timer has been paused and details have been sent.',
+        icon: <IconInfoCircle />,
+        color: 'blue',
+        autoClose: 3000,
+        radius: 'md',
+        styles: (theme) => ({
+          root: {
+            backgroundColor: theme.colors.blue[6],
+            borderColor: theme.colors.blue[6],
+            '&::before': { backgroundColor: theme.white },
+          },
+          title: { color: theme.white },
+          description: { color: theme.white },
+          closeButton: {
+            color: theme.white,
+            '&:hover': { backgroundColor: theme.colors.blue[7] },
+          },
+        }),
+      });
+
+    } catch (error) {
+      showNotification({
+        title: 'Error',
+        message: 'Failed to send pause details.',
+        icon: <IconInfoCircle />,
+        color: 'red',
+        autoClose: 3000,
+        radius: 'md',
+        styles: (theme) => ({
+          root: {
+            backgroundColor: theme.colors.red[6],
+            borderColor: theme.colors.red[6],
+            '&::before': { backgroundColor: theme.white },
+          },
+          title: { color: theme.white },
+          description: { color: theme.white },
+          closeButton: {
+            color: theme.white,
+            '&:hover': { backgroundColor: theme.colors.red[7] },
+          },
+        }),
+      });
+    }
   };
 
-  const startTimer = () => {
+
+
+
+
+
+
+  const startTimer = async () => {
+
     setStarted(true);
+
     if (paused) {
+
       setPaused(false);
-      setTimerId(
-        setInterval(() => {
-          setCount(prevCount => {
-            if (prevCount === 0) {
-              if (minCount === 0) {
-                handleTimerEnd();
-                return 0;
-              }
-              setMinCount(prevMinCount => prevMinCount - 1);
-              return 59;
+
+      const continueTime = new Date();
+
+      setStartTime(continueTime); // Set start time
+
+      const currentTimerId = selectedTask !== null && timer_details
+        ? Number(timer_details[selectedTask]?.timer_id)
+        : -1;
+
+      const continueDetails = {
+        highlight_id: selectedTask !== null ? selectedTask : -1,
+        continue_time: continueTime.toISOString(),
+      };
+
+      try {
+        await sendContinueData(continueDetails);
+        showNotification({
+          title: 'Timer Continued',
+          message: 'The timer has been continued and details have been sent.',
+          icon: <IconInfoCircle />,
+          color: 'green',
+          autoClose: 3000,
+          radius: 'md',
+          styles: (theme) => ({
+            root: {
+              backgroundColor: theme.colors.green[6],
+              borderColor: theme.colors.green[6],
+              '&::before': { backgroundColor: theme.white },
+            },
+            title: { color: theme.white },
+            description: { color: theme.white },
+            closeButton: {
+              color: theme.white,
+              '&:hover': { backgroundColor: theme.colors.green[7] },
+            },
+          }),
+        });
+      } catch (error) {
+        showNotification({
+          title: 'Error',
+          message: 'Failed to send continue details.',
+          icon: <IconInfoCircle />,
+          color: 'red',
+          autoClose: 3000,
+          radius: 'md',
+          styles: (theme) => ({
+            root: {
+              backgroundColor: theme.colors.red[6],
+              borderColor: theme.colors.red[6],
+              '&::before': { backgroundColor: theme.white },
+            },
+            title: { color: theme.white },
+            description: { color: theme.white },
+            closeButton: {
+              color: theme.white,
+              '&:hover': { backgroundColor: theme.colors.red[7] },
+            },
+          }),
+        });
+      }
+
+      // const id = setInterval(() => {
+      //   setCount((prevCount) => {
+      //     if (prevCount === 59) {
+      //       setMinCount((prevMinCount) => prevMinCount - 1);
+      //       return 0;
+      //     }
+      //     return prevCount + 1;
+      //   });
+      // }, 1000);
+
+
+
+
+      const id = setInterval(() => {
+        setCount((prevCount) => {
+          if (prevCount === 0) {
+            if (minCount === 0) {
+              handleTimerEnd();
+              clearInterval(id); // Optional: Stop the timer if it's no longer needed
+              return 0;
             }
-            return prevCount - 1;
-          });
-        }, 1000)
-      );
+            setMinCount((prevMinCount) => prevMinCount - 1);
+            return 59;
+          }
+          return prevCount - 1;
+        });
+      }, 1000); // Adjust interval as needed, e.g., 1000 ms for 1-second intervals
+      setTimerId(id);
     }
   };
 
@@ -119,44 +345,123 @@ const Timer = () => {
     setCount(0);
     setPaused(true);
     setStarted(false);
+
+    showNotification({
+      title: 'Timer Ended',
+      message: 'Time to switch!',
+      icon: <IconInfoCircle />,
+      color: 'teal',
+    });
   };
 
   const endTimer = () => {
-    if (timerId) clearInterval(timerId);
+    if (timerId) clearInterval(timerId); // Ensure the timer is stopped
+    setModalOpened(true); // Open modal instead of directly sending data
+  };
+  function parseISOStringToTimeComponents(isoString: string) {
+    const date = new Date(isoString);
+    return {
+      hour: date.getUTCHours(),
+      minute: date.getUTCMinutes(),
+      second: date.getUTCSeconds(),
+    };
+  }
+
+  const handleEndTimerConfirm = async (isTaskComplete: boolean) => {
+    setModalOpened(false);
+
+    if (isTaskComplete) {
+      // Ensure timerId is a number
+      const currentTimerId = selectedTask !== null && timer_details
+        ? Number(timer_details[selectedTask]?.timer_id) // Convert to number
+        : -1; // Default value or handle as needed
+
+      // Handle cases where highlightId might be undefined
+      const highlightId = selectedTask !== null && highlights
+        ? highlights[selectedTask]?.id || '4' // Provide a default value or handle as needed
+        : '2'; // Default to empty string if no task is selected
+
+      const end_time = new Date();
+
+      const userId = 11; // Replace with actual user ID if available
+
+      const pomoDetails = {
+        timer_id: currentTimerId,
+        highlight_id: selectedTask !== null ? selectedTask : -1, // Ensure selectedTask is a number
+        user_id: userId,
+        // start_time: startTime?.toISOString() || '', // Use =-
+        start_time: startTime?.toISOString() || '', // Use recorded start time
+        end_time: end_time.toISOString(), // Format as ISO 8601 string
+
+        status: "complete"
+      };
+
+
+
+
+
+      try {
+        await sendTimerEndData(pomoDetails);
+        showNotification({
+          title: 'Timer Ended',
+          message: 'The timer has been reset to the beginning and details have been sent.',
+          icon: <IconInfoCircle />,
+          color: 'blue',
+          autoClose: 3000,
+          radius: 'md',
+          styles: (theme) => ({
+            root: {
+              backgroundColor: theme.colors.blue[6],
+              borderColor: theme.colors.blue[6],
+              '&::before': { backgroundColor: theme.white },
+            },
+            title: { color: theme.white },
+            description: { color: theme.white },
+            closeButton: {
+              color: theme.white,
+              '&:hover': { backgroundColor: theme.colors.blue[7] },
+            },
+          }),
+        });
+      } catch (error) {
+        showNotification({
+          title: 'Error',
+          message: 'Failed to send timer details.',
+          icon: <IconInfoCircle />,
+          color: 'red',
+          autoClose: 3000,
+          radius: 'md',
+          styles: (theme) => ({
+            root: {
+              backgroundColor: theme.colors.red[6],
+              borderColor: theme.colors.red[6],
+              '&::before': { backgroundColor: theme.white },
+            },
+            title: { color: theme.white },
+            description: { color: theme.white },
+            closeButton: {
+              color: theme.white,
+              '&:hover': { backgroundColor: theme.colors.red[7] },
+            },
+          }),
+        });
+      }
+    }
+
+    // Reset the timer state
     setActive('focus');
     setMinCount(WORK_TIME);
     setCount(0);
     setPaused(true);
     setStarted(false);
-    showNotification({
-      title: 'Timer Ended',
-      message: 'The timer has been reset to the beginning.',
-      icon: <IconInfoCircle />,
-      color: 'blue',
-      autoClose: 3000,
-      radius: 'md',
-      styles: (theme) => ({
-        root: {
-          backgroundColor: theme.colors.blue[6],
-          borderColor: theme.colors.blue[6],
-          '&::before': { backgroundColor: theme.white },
-        },
-        title: { color: theme.white },
-        description: { color: theme.white },
-        closeButton: {
-          color: theme.white,
-          '&:hover': { backgroundColor: theme.colors.blue[7] },
-        },
-      }),
-    });
   };
 
   const totalSeconds = minCount * 60 + count;
   const initialTotalSeconds = active === 'focus'
     ? WORK_TIME * 60
     : cycles % CYCLES_BEFORE_LONG_BREAK === 0
-    ? LONG_BREAK * 60
-    : SHORT_BREAK * 60;
+      ? LONG_BREAK * 60
+      : SHORT_BREAK * 60;
   const percentage = totalSeconds > 0
     ? 100 - (totalSeconds / initialTotalSeconds) * 100
     : 0;
@@ -167,23 +472,26 @@ const Timer = () => {
     }
   }, [totalSeconds, started]);
 
-  const handleTaskClick = (index: number) => {
-    setSelectedTask(selectedTask === index ? null : index);
+  const handleHighlightSelect = (index: number) => {
+    setSelectedTask(index+1);
+    setMenuOpened(false);
   };
+
 
   return (
     <div className={styles.container}>
       <div className={styles.pomodoro}>
         <div className={styles.focusLink}>
-          <Menu withArrow>
+          <Menu withArrow opened={menuOpened} onChange={setMenuOpened}>
             <Menu.Target>
               <UserButton
-                label="Focus"
+                label={selectedTask !== null && highlights ? highlights[selectedTask]?.highlight_name : "Focus"}
                 styles={{
                   label: {
-                    fontSize: '14px', // Adjust font size
+                    fontSize: '14px',
                   },
                 }}
+                onClick={() => setMenuOpened((prev) => !prev)}
               />
             </Menu.Target>
             <Menu.Dropdown>
@@ -192,44 +500,8 @@ const Timer = () => {
                   <Tabs.Tab value="Task">Task</Tabs.Tab>
                   <Tabs.Tab value="Timer">Timer</Tabs.Tab>
                 </Tabs.List>
-
-                <Tabs.Panel value="Task">
-                  <div className={styles.taskContainer}>
-                    <TextInput
-                      placeholder="search"
-                      className={styles.searchInput}
-                    />
-                    <div className={styles.taskHeader}>
-                      <IconCalendarDue />
-                      <Text>Today &gt;</Text>
-                    </div>
-                    <Menu.Label>Select doing Task</Menu.Label>
-                    {tasks.map((task, index) => (
-                      <Menu.Item
-                        key={index}
-                        onClick={() => handleTaskClick(index)}
-                        
-                      >
-                        {task.title}
-                      </Menu.Item>
-                    ))}
-                  </div>
-                </Tabs.Panel>
-
-                <Tabs.Panel value="Timer">
-                  <div className={styles.taskContainer}>
-                    <TextInput
-                      placeholder="search"
-                      className={styles.searchInput}
-                    />
-                    <Menu.Label>Select a Timer</Menu.Label>
-                    {tasks.map((task, index) => (
-                      <Menu.Item key={index}>
-                        {task.title}
-                      </Menu.Item>
-                    ))}
-                  </div>
-                </Tabs.Panel>
+                {highlights ? <HighlightMenu highlights={highlights} onHighlightSelect={handleHighlightSelect} closeMenu={() => setMenuOpened(false)} /> : null}
+                {timer_details ? <TimerMenu timer_details={timer_details} /> : null}
               </Tabs>
             </Menu.Dropdown>
           </Menu>
@@ -270,6 +542,19 @@ const Timer = () => {
           )}
         </div>
       </div>
+
+      <Modal
+        opened={modalOpened}
+        onClose={() => setModalOpened(false)}
+        title="Task Completion"
+      >
+        <Text>Is the task complete?</Text>
+        <Group align="center" justify="center" mt="md">
+          <Button color="green" onClick={() => handleEndTimerConfirm(true)}>Yes</Button>
+          <Button color="red" onClick={() => handleEndTimerConfirm(false)}>No</Button>
+        </Group>
+
+      </Modal>
     </div>
   );
 };

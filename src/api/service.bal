@@ -11,6 +11,7 @@ type CreateUser record {|
     string sub;
 |};
 
+
 type User record {|
     int id;
     string sub;

@@ -1,0 +1,30 @@
+name: New Feature Request
+description: File a new feature request
+title: "[New Feature]: "
+labels: ["Type/NewFeature"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this new feature request!
+  - type: textarea
+    id: what
+    attributes:
+      label: What it does?
+      description: Give a brief description of the feature
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why is it important?
+      description: Describe why this feature is important to the app.
+    validations:
+      required: false
+  - type: textarea
+    id: how
+    attributes:
+      label: How it works?
+      description: Describe the steps of your solution.
+    validations:
+      required: false

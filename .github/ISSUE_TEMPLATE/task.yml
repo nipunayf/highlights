@@ -1,0 +1,23 @@
+name: Task Request
+description: File a task request
+title: "[Task]: "
+labels: ["Type/Task"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this task form!
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Give a brief description of the task
+    validations:
+      required: true
+  - type: textarea
+    id: task-description
+    attributes:
+      label: Describe your task(s)
+      description: Detailed description on the task.
+    validations:
+      required: false

@@ -1,0 +1,23 @@
+name: Improvement Request
+description: File a improvement request
+title: "[Improvement]: "
+labels: ["Type/Improvement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this improvement request!
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Give a brief description of the improvement
+    validations:
+      required: true
+  - type: textarea
+    id: solution-description
+    attributes:
+      label: Describe your solution(s)
+      description: Detailed description on the solution
+    validations:
+      required: false

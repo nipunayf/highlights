@@ -27,6 +27,7 @@ export interface mPauses_details {
 }
 
 export interface mTimeRecord {
+    pomo_id: number; 
     highlight_id: number;
     highlight_name: string;
     start_time: string;
@@ -35,6 +36,7 @@ export interface mTimeRecord {
 }
 
 export interface mPauseContinueDetails {
+    pomo_id: number; 
     start_time: string;
     highlight_id: number;
     pause_time: string;
@@ -50,6 +52,7 @@ export interface StartDetails {
     status: string;
   }
   export interface EndDetails {
+    pomo_id: number;
     timer_id: number;
     highlight_id: number; // Changed from string to number
     user_id: number;
@@ -57,3 +60,8 @@ export interface StartDetails {
     end_time: string;     // Assuming ISO 8601 string format for time
     status: string;
   }
+
+  export interface ActiveHighlightDetails {
+    pomo_id: number;
+    highlight_id: number;
+}

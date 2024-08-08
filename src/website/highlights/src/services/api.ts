@@ -2,7 +2,7 @@ import { apiEndpoint } from "@/apiConfig";
 import { aquireAccessToken } from "@/util/auth";
 import { Task } from "@/models/Task";
 import { HighlightTask } from "@/models/HighlightTask";
-import { mTimer, mPomo_details, mPauses_details, mTimeRecord, mPauseContinueDetails,StartDetails,EndDetails } from "@/models/Timer";
+import { mTimer, mPomo_details, mPauses_details, mTimeRecord, mPauseContinueDetails,StartDetails,EndDetails ,ActiveHighlightDetails} from "@/models/Timer";
 import { Tip } from "@/models/Tip";
 import axios, { AxiosInstance } from "axios";
 import { Highlight } from "@/models/Highlight";
@@ -76,6 +76,7 @@ export async function getTimerDetails(): Promise<mTimer[]> {
 
 // Function to send timer end data
 export async function sendTimerEndData(pomo_details: {
+    pomo_id: number;
     timer_id: number;
     highlight_id: number;  // Changed from string to number
     user_id: number;
@@ -167,6 +168,7 @@ export async function sendStartTimeData(startDetails: {
 
 // Function to send pause data
 export async function sendPauseData(pauseDetails: {
+    pomo_id: number;
     highlight_id: number;
     pause_time: string;
 
@@ -202,6 +204,7 @@ export async function sendPauseData(pauseDetails: {
 
 
 export async function sendContinueData(continueDetails: {
+    pomo_id: number;
     highlight_id: number;
     continue_time: string;
 
@@ -259,6 +262,20 @@ export async function getFocusRecord(userId: number): Promise<mTimeRecord[]> {
     }
 }
 
+
+export async function getActiveTimerHighlightDetails(userId: number): Promise<ActiveHighlightDetails[]> {
+    try {
+        const response = await getAxiosClient('active_timer_highlight_details').request<ActiveHighlightDetails[]>({
+            method: 'GET',
+            url: `/${userId}`
+        });
+        
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching active timer highlight details:', error);
+        throw error;
+    }
+}
 
 
 export async function getPauseDetails(userId: number): Promise<mPauseContinueDetails[]> {

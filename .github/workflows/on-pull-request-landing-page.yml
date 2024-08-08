@@ -1,4 +1,4 @@
-name: Build Highlights web app check
+name: Build landing page check
 
 env:
   APP_DIR: src/landingpage

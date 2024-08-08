@@ -1,7 +1,3 @@
-
-
-
-
 import React, { useState, useEffect, forwardRef } from 'react';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
@@ -12,8 +8,8 @@ import styles from './Timer.module.css';
 import { useHighlights } from "@/hooks/useHighlights";
 import { useTimers } from '@/hooks/useTimer';
 import { HighlightTask } from "@/models/HighlightTask";
-import { mTimer,ActiveHighlightDetails } from '@/models/Timer';
-import { sendTimerEndData, sendPauseData, sendContinueData, sendStartTimeData,getActiveTimerHighlightDetails } from "@/services/api";
+import { mTimer, ActiveHighlightDetails } from '@/models/Timer';
+import { sendTimerEndData, sendPauseData, sendContinueData, sendStartTimeData, getActiveTimerHighlightDetails } from "@/services/api";
 
 interface UserButtonProps {
   image?: string;
@@ -32,18 +28,14 @@ const UserButton = forwardRef<HTMLButtonElement, UserButtonProps>(
     return (
       <UnstyledButton
         ref={ref}
-        style={{
-          padding: 'var(--mantine-spacing-md)',
-          color: 'var(--mantine-color-text)',
-          borderRadius: 'var(--mantine-radius-sm)',
-        }}
+        className={styles.userButton}
         onClick={onClick}
         {...others}
       >
         <Group>
           {image && <Avatar src={image} radius="xl" />}
 
-          <div style={{ flex: 1 }}>
+          <div className={styles.userButtonLabel}>
             <Text size="sm" fw={500} style={userStyles?.label}>
               {label}
             </Text>
@@ -168,28 +160,6 @@ const Timer = () => {
 
 
 
-
-
-
-
-
-
-
-  const resetTime = () => {
-    if (timerId) clearInterval(timerId);
-    setMinCount(active === 'focus' ? WORK_TIME : (cycles % CYCLES_BEFORE_LONG_BREAK === 0 ? LONG_BREAK : SHORT_BREAK));
-    setCount(0);
-    setPaused(true);
-    setStarted(false);
-    setStartTime(null); // Reset start time
-  };
-
-
-
-
-
-
-
   const pauseTimer = async () => {
     setPaused(true);
     if (timerId) clearInterval(timerId);
@@ -257,14 +227,6 @@ const Timer = () => {
 
 
 
-
-
-
-
-
-
-
-
   const startTimer = async () => {
     setStarted(true);
 
@@ -272,7 +234,7 @@ const Timer = () => {
         setPaused(false);
 
         const continueTime = new Date();
-        setStartTime(continueTime); // Set start time
+        setStartTime(continueTime); 
 
         const currentTimerId = selectedTask !== null && timer_details
             ? Number(timer_details[selectedTask]?.timer_id)
@@ -356,7 +318,6 @@ const Timer = () => {
             highlight_id: selectedTask !== null ? Number(selectedTask) : -1,
             user_id: userId,
             start_time: startTime.toISOString(),
-            // end_time: new Date().toISOString(), // Ensure end_time is provided if needed
             status: "uncomplete"
         };
 
@@ -364,8 +325,8 @@ const Timer = () => {
             await sendStartTimeData(startDetails);
             const response = await getActiveTimerHighlightDetails(userId);
             const { pomo_id, highlight_id } = response[0];
-            setPomoId(pomo_id); // Store pomo_id in state
-            setHighlightId(highlight_id); // Store highlight_id in state
+            setPomoId(pomo_id); 
+            setHighlightId(highlight_id); 
 
             showNotification({
                 title: 'Timer Started',
@@ -433,10 +394,6 @@ const Timer = () => {
 
 
 
-
-
-
-
   const handleTimerEnd = () => {
     if (timerId) clearInterval(timerId);
     if (active === 'focus') {
@@ -460,23 +417,15 @@ const Timer = () => {
   };
 
   const endTimer = () => {
-    if (timerId) clearInterval(timerId); // Ensure the timer is stopped
-    setModalOpened(true); // Open modal instead of directly sending data
+    if (timerId) clearInterval(timerId); 
+    setModalOpened(true);
   };
-  function parseISOStringToTimeComponents(isoString: string) {
-    const date = new Date(isoString);
-    return {
-      hour: date.getUTCHours(),
-      minute: date.getUTCMinutes(),
-      second: date.getUTCSeconds(),
-    };
-  }
+
 
   const handleEndTimerConfirm = async (isTaskComplete: boolean) => {
     setModalOpened(false);
 
     if (isTaskComplete) {
-      // Ensure timerId is a number
       const currentTimerId = selectedTask !== null && timer_details
         ? Number(timer_details[selectedTask]?.timer_id) // Convert to number
         : -1; // Default value or handle as needed
@@ -485,17 +434,14 @@ const Timer = () => {
 
       const end_time = new Date();
 
-      const userId = 11; // Replace with actual user ID if available
+      const userId = 11; 
 
       const endPomoDetails = {
-        pomo_id: pomoId ?? -1,
+        pomo_id: pomoId ?? 1,
         timer_id: currentTimerId,
         highlight_id: highlightId ?? 1,
-        // Ensure selectedTask is a number
         user_id: userId,
-        // start_time: startTime?.toISOString() || '', // Use =-
-        // start_time: startTime?.toISOString() || '', // Use recorded start time
-        end_time: end_time.toISOString(), // Format as ISO 8601 string
+        end_time: end_time.toISOString(), 
 
         status: "complete"
       };
@@ -615,7 +561,7 @@ const Timer = () => {
             value={percentage}
             text={formatTime(minCount, count)}
             styles={buildStyles({
-              pathColor: active === 'focus' ? `#007bff` : `#ff6347`, // Blue for focus, Red for break
+              pathColor: active === 'focus' ? `#007bff` : `#ff6347`, 
               textColor: '#000',
               trailColor: '#d6d6d6',
               textSize: '16px',

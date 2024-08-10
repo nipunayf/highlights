@@ -114,8 +114,8 @@ const TimerMenu = ({ timer_details }: { timer_details: mTimer[] }) => {
 };
 
 const Timer = () => {
-  const WORK_TIME = 25;
-  const SHORT_BREAK = 5;
+  const WORK_TIME = 1;
+  const SHORT_BREAK = 2;
   const LONG_BREAK = 15;
   const CYCLES_BEFORE_LONG_BREAK = 4;
   const userId = 11;
@@ -161,251 +161,432 @@ const Timer = () => {
 
 
   const pauseTimer = async () => {
-    setPaused(true);
-    if (timerId) clearInterval(timerId);
+    if(active === 'focus'){
 
-    const currentTimerId = selectedTask !== null && timer_details
-      ? Number(timer_details[selectedTask]?.timer_id)
-      : -1;
+      setPaused(true);
+      if (timerId) clearInterval(timerId);
+  
+      const currentTimerId = selectedTask !== null && timer_details
+        ? Number(timer_details[selectedTask]?.timer_id)
+        : -1;
+  
+      const pause_time = new Date();
+      const pauseDetails = {
+        pomo_id : pomoId?? 0,
+        highlight_id:  highlightId ?? 1,
+        pause_time: pause_time.toISOString(),
+      };
+      console.log(pauseDetails);
+  
+      try {
+        await sendPauseData(pauseDetails);
+        showNotification({
+          title: 'Timer Paused',
+          message: 'The timer has been paused and details have been sent.',
+          icon: <IconInfoCircle />,
+          color: 'blue',
+          autoClose: 3000,
+          radius: 'md',
+          styles: (theme) => ({
+            root: {
+              backgroundColor: theme.colors.blue[6],
+              borderColor: theme.colors.blue[6],
+              '&::before': { backgroundColor: theme.white },
+            },
+            title: { color: theme.white },
+            description: { color: theme.white },
+            closeButton: {
+              color: theme.white,
+              '&:hover': { backgroundColor: theme.colors.blue[7] },
+            },
+          }),
+        });
+  
+      } catch (error) {
+        showNotification({
+          title: 'Error',
+          message: 'Failed to send pause details.',
+          icon: <IconInfoCircle />,
+          color: 'red',
+          autoClose: 3000,
+          radius: 'md',
+          styles: (theme) => ({
+            root: {
+              backgroundColor: theme.colors.red[6],
+              borderColor: theme.colors.red[6],
+              '&::before': { backgroundColor: theme.white },
+            },
+            title: { color: theme.white },
+            description: { color: theme.white },
+            closeButton: {
+              color: theme.white,
+              '&:hover': { backgroundColor: theme.colors.red[7] },
+            },
+          }),
+        });
+      }
 
-    const pause_time = new Date();
-    const pauseDetails = {
-      pomo_id : pomoId?? 0,
-      highlight_id:  highlightId ?? 1,
-      pause_time: pause_time.toISOString(),
-    };
-    console.log(pauseDetails);
+    }else{
 
-    try {
-      await sendPauseData(pauseDetails);
-      showNotification({
-        title: 'Timer Paused',
-        message: 'The timer has been paused and details have been sent.',
-        icon: <IconInfoCircle />,
-        color: 'blue',
-        autoClose: 3000,
-        radius: 'md',
-        styles: (theme) => ({
-          root: {
-            backgroundColor: theme.colors.blue[6],
-            borderColor: theme.colors.blue[6],
-            '&::before': { backgroundColor: theme.white },
-          },
-          title: { color: theme.white },
-          description: { color: theme.white },
-          closeButton: {
-            color: theme.white,
-            '&:hover': { backgroundColor: theme.colors.blue[7] },
-          },
-        }),
-      });
 
-    } catch (error) {
-      showNotification({
-        title: 'Error',
-        message: 'Failed to send pause details.',
-        icon: <IconInfoCircle />,
-        color: 'red',
-        autoClose: 3000,
-        radius: 'md',
-        styles: (theme) => ({
-          root: {
-            backgroundColor: theme.colors.red[6],
-            borderColor: theme.colors.red[6],
-            '&::before': { backgroundColor: theme.white },
-          },
-          title: { color: theme.white },
-          description: { color: theme.white },
-          closeButton: {
-            color: theme.white,
-            '&:hover': { backgroundColor: theme.colors.red[7] },
-          },
-        }),
-      });
+      setPaused(true);
+      if (timerId) clearInterval(timerId);
+  
+      const currentTimerId = selectedTask !== null && timer_details
+        ? Number(timer_details[selectedTask]?.timer_id)
+        : -1;
+
+  
+      try {
+        showNotification({
+          title: 'Timer Paused',
+          message: 'The timer has been paused and details have been sent.',
+          icon: <IconInfoCircle />,
+          color: 'blue',
+          autoClose: 3000,
+          radius: 'md',
+          styles: (theme) => ({
+            root: {
+              backgroundColor: theme.colors.blue[6],
+              borderColor: theme.colors.blue[6],
+              '&::before': { backgroundColor: theme.white },
+            },
+            title: { color: theme.white },
+            description: { color: theme.white },
+            closeButton: {
+              color: theme.white,
+              '&:hover': { backgroundColor: theme.colors.blue[7] },
+            },
+          }),
+        });
+  
+      } catch (error) {
+        showNotification({
+          title: 'Error',
+          message: 'Failed to send pause details.',
+          icon: <IconInfoCircle />,
+          color: 'red',
+          autoClose: 3000,
+          radius: 'md',
+          styles: (theme) => ({
+            root: {
+              backgroundColor: theme.colors.red[6],
+              borderColor: theme.colors.red[6],
+              '&::before': { backgroundColor: theme.white },
+            },
+            title: { color: theme.white },
+            description: { color: theme.white },
+            closeButton: {
+              color: theme.white,
+              '&:hover': { backgroundColor: theme.colors.red[7] },
+            },
+          }),
+        });
+      }
+
     }
+
   };
 
 
 
-  const startTimer = async () => {
-    setStarted(true);
+const startTimer = async () => {
+  setStarted(true);
 
-    if (paused) {
+  if (active === 'focus') {
+      if (paused) {
+          setPaused(false);
+
+          const continueTime = new Date();
+          setStartTime(continueTime);
+
+          const continueDetails = {
+              pomo_id: pomoId ?? 0,
+              highlight_id: highlightId ?? 1,
+              continue_time: continueTime.toISOString(),
+          };
+
+          try {
+              await sendContinueData(continueDetails);
+              showNotification({
+                  title: 'Timer Continued',
+                  message: 'The timer has been continued and details have been sent.',
+                  icon: <IconInfoCircle />,
+                  color: 'green',
+                  autoClose: 3000,
+                  radius: 'md',
+                  styles: (theme) => ({
+                      root: {
+                          backgroundColor: theme.colors.green[6],
+                          borderColor: theme.colors.green[6],
+                          '&::before': { backgroundColor: theme.white },
+                      },
+                      title: { color: theme.white },
+                      description: { color: theme.white },
+                      closeButton: {
+                          color: theme.white,
+                          '&:hover': { backgroundColor: theme.colors.green[7] },
+                      },
+                  }),
+              });
+          } catch (error) {
+              showNotification({
+                  title: 'Error',
+                  message: 'Failed to send continue details.',
+                  icon: <IconInfoCircle />,
+                  color: 'red',
+                  autoClose: 3000,
+                  radius: 'md',
+                  styles: (theme) => ({
+                      root: {
+                          backgroundColor: theme.colors.red[6],
+                          borderColor: theme.colors.red[6],
+                          '&::before': { backgroundColor: theme.white },
+                      },
+                      title: { color: theme.white },
+                      description: { color: theme.white },
+                      closeButton: {
+                          color: theme.white,
+                          '&:hover': { backgroundColor: theme.colors.red[7] },
+                      },
+                  }),
+              });
+          }
+
+          const id = setInterval(() => {
+              setCount((prevCount) => {
+                  if (prevCount === 0) {
+                      if (minCount === 0) {
+                          handleTimerEnd();
+                          clearInterval(id); // Stop the timer if it's no longer needed
+                          return 0;
+                      }
+                      setMinCount((prevMinCount) => prevMinCount - 1);
+                      return 59;
+                  }
+                  return prevCount - 1;
+              });
+          }, 1000); // 1-second intervals
+          setTimerId(id);
+      } else {
+          const startTime = new Date();
+          setStartTime(startTime); // Set start time
+
+          const startDetails = {
+              timer_id: selectedTask !== null ? Number(selectedTask) : -1,
+              highlight_id: selectedTask !== null ? Number(selectedTask) : -1,
+              user_id: 11, // Replace with the actual user ID
+              start_time: startTime.toISOString(),
+              status: "uncomplete"
+          };
+
+          try {
+              await sendStartTimeData(startDetails);
+              const response = await getActiveTimerHighlightDetails(11); // Replace with the actual user ID
+              const { pomo_id, highlight_id } = response[0];
+              setPomoId(pomo_id);
+              setHighlightId(highlight_id);
+
+              showNotification({
+                  title: 'Timer Started',
+                  message: 'The timer has started and start time details have been sent.',
+                  icon: <IconInfoCircle />,
+                  color: 'blue',
+                  autoClose: 3000,
+                  radius: 'md',
+                  styles: (theme) => ({
+                      root: {
+                          backgroundColor: theme.colors.blue[6],
+                          borderColor: theme.colors.blue[6],
+                          '&::before': { backgroundColor: theme.white },
+                      },
+                      title: { color: theme.white },
+                      description: { color: theme.white },
+                      closeButton: {
+                          color: theme.white,
+                          '&:hover': { backgroundColor: theme.colors.blue[7] },
+                      },
+                  }),
+              });
+          } catch (error) {
+              showNotification({
+                  title: 'Error',
+                  message: 'Failed to send start time details.',
+                  icon: <IconInfoCircle />,
+                  color: 'red',
+                  autoClose: 3000,
+                  radius: 'md',
+                  styles: (theme) => ({
+                      root: {
+                          backgroundColor: theme.colors.red[6],
+                          borderColor: theme.colors.red[6],
+                          '&::before': { backgroundColor: theme.white },
+                      },
+                      title: { color: theme.white },
+                      description: { color: theme.white },
+                      closeButton: {
+                          color: theme.white,
+                          '&:hover': { backgroundColor: theme.colors.red[7] },
+                      },
+                  }),
+              });
+          }
+
+          const id = setInterval(() => {
+              setCount((prevCount) => {
+                  if (prevCount === 0) {
+                      if (minCount === 0) {
+                          handleTimerEnd();
+                          clearInterval(id); // Stop the timer if it's no longer needed
+                          return 0;
+                      }
+                      setMinCount((prevMinCount) => prevMinCount - 1);
+                      return 59;
+                  }
+                  return prevCount - 1;
+              });
+          }, 1000); // 1-second intervals
+          setTimerId(id);
+      }
+
+  } else if (active === 'break') {
+      if (paused) {
         setPaused(false);
 
         const continueTime = new Date();
-        setStartTime(continueTime); 
+        setStartTime(continueTime);
 
-        const currentTimerId = selectedTask !== null && timer_details
-            ? Number(timer_details[selectedTask]?.timer_id)
-            : -1;
+          showNotification({
+              title: 'Break Timer Continued',
+              message: 'The break timer has been continued.',
+              icon: <IconInfoCircle />,
+              color: 'green',
+              autoClose: 3000,
+              radius: 'md',
+              styles: (theme) => ({
+                  root: {
+                      backgroundColor: theme.colors.green[6],
+                      borderColor: theme.colors.green[6],
+                      '&::before': { backgroundColor: theme.white },
+                  },
+                  title: { color: theme.white },
+                  description: { color: theme.white },
+                  closeButton: {
+                      color: theme.white,
+                      '&:hover': { backgroundColor: theme.colors.green[7] },
+                  },
+              }),
+          });
 
-        const continueDetails = {
-            pomo_id : pomoId?? 0,
-            highlight_id: highlightId ?? 1,
-            continue_time: continueTime.toISOString(),
-        };
+          const id = setInterval(() => {
+              setCount((prevCount) => {
+                  if (prevCount === 0) {
+                      if (minCount === 0) {
+                          handleTimerEnd();
+                          clearInterval(id); // Stop the timer if it's no longer needed
+                          return 0;
+                      }
+                      setMinCount((prevMinCount) => prevMinCount - 1);
+                      return 59;
+                  }
+                  return prevCount - 1;
+              });
+          }, 1000); // 1-second intervals
+          setTimerId(id);
+      } else {
 
-        try {
-            await sendContinueData(continueDetails);
-            showNotification({
-                title: 'Timer Continued',
-                message: 'The timer has been continued and details have been sent.',
-                icon: <IconInfoCircle />,
-                color: 'green',
-                autoClose: 3000,
-                radius: 'md',
-                styles: (theme) => ({
-                    root: {
-                        backgroundColor: theme.colors.green[6],
-                        borderColor: theme.colors.green[6],
-                        '&::before': { backgroundColor: theme.white },
-                    },
-                    title: { color: theme.white },
-                    description: { color: theme.white },
-                    closeButton: {
-                        color: theme.white,
-                        '&:hover': { backgroundColor: theme.colors.green[7] },
-                    },
-                }),
-            });
-        } catch (error) {
-            showNotification({
-                title: 'Error',
-                message: 'Failed to send continue details.',
-                icon: <IconInfoCircle />,
-                color: 'red',
-                autoClose: 3000,
-                radius: 'md',
-                styles: (theme) => ({
-                    root: {
-                        backgroundColor: theme.colors.red[6],
-                        borderColor: theme.colors.red[6],
-                        '&::before': { backgroundColor: theme.white },
-                    },
-                    title: { color: theme.white },
-                    description: { color: theme.white },
-                    closeButton: {
-                        color: theme.white,
-                        '&:hover': { backgroundColor: theme.colors.red[7] },
-                    },
-                }),
-            });
-        }
+          const pauseTime = new Date();
+          const pauseDetails = {
+              pomo_id: pomoId ?? 0,
+              highlight_id: highlightId ?? 1,
+              pause_time: pauseTime.toISOString(),
+          };
 
-        const id = setInterval(() => {
-            setCount((prevCount) => {
-                if (prevCount === 0) {
-                    if (minCount === 0) {
-                        handleTimerEnd();
-                        clearInterval(id); // Stop the timer if it's no longer needed
-                        return 0;
-                    }
-                    setMinCount((prevMinCount) => prevMinCount - 1);
-                    return 59;
-                }
-                return prevCount - 1;
-            });
-        }, 1000); // 1-second intervals
-        setTimerId(id);
-    } else {
-        const startTime = new Date();
-        setStartTime(startTime); // Set start time
-        const userId = 11;
+          try {
 
-        const startDetails = {
-            timer_id: selectedTask !== null ? Number(selectedTask) : -1,
-            highlight_id: selectedTask !== null ? Number(selectedTask) : -1,
-            user_id: userId,
-            start_time: startTime.toISOString(),
-            status: "uncomplete"
-        };
+              await sendPauseData(pauseDetails);
 
-        try {
-            await sendStartTimeData(startDetails);
-            const response = await getActiveTimerHighlightDetails(userId);
-            const { pomo_id, highlight_id } = response[0];
-            setPomoId(pomo_id); 
-            setHighlightId(highlight_id); 
+              showNotification({
+                  title: 'Break Timer Paused',
+                  message: 'The break timer has been paused.',
+                  icon: <IconInfoCircle />,
+                  color: 'blue',
+                  autoClose: 3000,
+                  radius: 'md',
+                  styles: (theme) => ({
+                      root: {
+                          backgroundColor: theme.colors.blue[6],
+                          borderColor: theme.colors.blue[6],
+                          '&::before': { backgroundColor: theme.white },
+                      },
+                      title: { color: theme.white },
+                      description: { color: theme.white },
+                      closeButton: {
+                          color: theme.white,
+                          '&:hover': { backgroundColor: theme.colors.blue[7] },
+                      },
+                  }),
+              });
+          } catch (error) {
+              showNotification({
+                  title: 'Error',
+                  message: 'Failed to send break pause details.',
+                  icon: <IconInfoCircle />,
+                  color: 'red',
+                  autoClose: 3000,
+                  radius: 'md',
+                  styles: (theme) => ({
+                      root: {
+                          backgroundColor: theme.colors.red[6],
+                          borderColor: theme.colors.red[6],
+                          '&::before': { backgroundColor: theme.white },
+                      },
+                      title: { color: theme.white },
+                      description: { color: theme.white },
+                      closeButton: {
+                          color: theme.white,
+                          '&:hover': { backgroundColor: theme.colors.red[7] },
+                      },
+                  }),
+              });
+          }
 
-            showNotification({
-                title: 'Timer Started',
-                message: 'The timer has started and start time details have been sent.',
-                icon: <IconInfoCircle />,
-                color: 'blue',
-                autoClose: 3000,
-                radius: 'md',
-                styles: (theme) => ({
-                    root: {
-                        backgroundColor: theme.colors.blue[6],
-                        borderColor: theme.colors.blue[6],
-                        '&::before': { backgroundColor: theme.white },
-                    },
-                    title: { color: theme.white },
-                    description: { color: theme.white },
-                    closeButton: {
-                        color: theme.white,
-                        '&:hover': { backgroundColor: theme.colors.blue[7] },
-                    },
-                }),
-            });
-        } catch (error) {
-            showNotification({
-                title: 'Error',
-                message: 'Failed to send start time details.',
-                icon: <IconInfoCircle />,
-                color: 'red',
-                autoClose: 3000,
-                radius: 'md',
-                styles: (theme) => ({
-                    root: {
-                        backgroundColor: theme.colors.red[6],
-                        borderColor: theme.colors.red[6],
-                        '&::before': { backgroundColor: theme.white },
-                    },
-                    title: { color: theme.white },
-                    description: { color: theme.white },
-                    closeButton: {
-                        color: theme.white,
-                        '&:hover': { backgroundColor: theme.colors.red[7] },
-                    },
-                }),
-            });
-        }
-
-        const id = setInterval(() => {
-            setCount((prevCount) => {
-                if (prevCount === 0) {
-                    if (minCount === 0) {
-                        handleTimerEnd();
-                        clearInterval(id); // Stop the timer if it's no longer needed
-                        return 0;
-                    }
-                    setMinCount((prevMinCount) => prevMinCount - 1);
-                    return 59;
-                }
-                return prevCount - 1;
-            });
-        }, 1000); // 1-second intervals
-        setTimerId(id);
-    }
+          const id = setInterval(() => {
+              setCount((prevCount) => {
+                  if (prevCount === 0) {
+                      if (minCount === 0) {
+                          handleTimerEnd();
+                          clearInterval(id); // Stop the timer if it's no longer needed
+                          return 0;
+                      }
+                      setMinCount((prevMinCount) => prevMinCount - 1);
+                      return 59;
+                  }
+                  return prevCount - 1;
+              });
+          }, 1000); // 1-second intervals
+          setTimerId(id);
+      }
+  }
 };
 
 
 
 
-  const handleTimerEnd = () => {
+  const  handleTimerEnd = () => {
     if (timerId) clearInterval(timerId);
     if (active === 'focus') {
       setCycles(prevCycles => prevCycles + 1);
       setActive('break');
+      setPaused(false);
       setMinCount((cycles + 1) % CYCLES_BEFORE_LONG_BREAK === 0 ? LONG_BREAK : SHORT_BREAK);
     } else {
       setActive('focus');
       setMinCount(WORK_TIME);
+      setPaused(true);
     }
     setCount(0);
-    setPaused(true);
+    
     setStarted(false);
 
     showNotification({

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, forwardRef } from 'react';
+import React, { useState, useEffect, forwardRef, useCallback } from 'react';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import { showNotification } from '@mantine/notifications';
@@ -47,6 +47,7 @@ const UserButton = forwardRef<HTMLButtonElement, UserButtonProps>(
     );
   }
 );
+UserButton.displayName = "UserButton";
 
 const HighlightMenu = ({ highlights, onHighlightSelect, closeMenu }: { highlights: HighlightTask[], onHighlightSelect: (index: number) => void, closeMenu: () => void }) => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -573,8 +574,9 @@ const startTimer = async () => {
 
 
 
-  const  handleTimerEnd = () => {
+  const handleTimerEnd = useCallback(() => {
     if (timerId) clearInterval(timerId);
+  
     if (active === 'focus') {
       setCycles(prevCycles => prevCycles + 1);
       setActive('break');
@@ -585,18 +587,18 @@ const startTimer = async () => {
       setMinCount(WORK_TIME);
       setPaused(true);
     }
+  
     setCount(0);
-    
     setStarted(false);
-
+  
     showNotification({
       title: 'Timer Ended',
       message: 'Time to switch!',
       icon: <IconInfoCircle />,
       color: 'teal',
     });
-  };
-
+  }, [timerId, active, cycles, setCycles, setActive, setPaused, setMinCount, setCount, setStarted]);
+  
   const endTimer = () => {
     if (timerId) clearInterval(timerId); 
     setModalOpened(true);
@@ -697,11 +699,12 @@ const startTimer = async () => {
     ? 100 - (totalSeconds / initialTotalSeconds) * 100
     : 0;
 
-  useEffect(() => {
-    if (totalSeconds === 0 && started) {
-      handleTimerEnd();
-    }
-  }, [totalSeconds, started]);
+    useEffect(() => {
+      if (totalSeconds === 0 && started) {
+        handleTimerEnd();
+      }
+    }, [totalSeconds, started, handleTimerEnd]);
+    
 
   const handleHighlightSelect = (index: number) => {
     setSelectedTask(index+1);

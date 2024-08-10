@@ -58,11 +58,11 @@ const FocusSummary = () => {
       <h2 className={styles.title}>Overview</h2>
       <div className={styles.overview}>
         <div className={styles.card}>
-          <div className={styles.label}>Today's Pomo</div>
+        <div className={styles.label}>Today&apos;s Pomo</div>
           <div className={styles.value}>0</div>
         </div>
         <div className={styles.card}>
-          <div className={styles.label}>Today's Focus</div>
+          <div className={styles.label}>Today&apos;s Focus</div>
           <div className={styles.value}>0m</div>
         </div>
         <div className={styles.card}>

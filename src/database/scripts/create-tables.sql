@@ -81,6 +81,25 @@ CREATE TABLE `PausesPomoDetails` (
   
 );
 
+CREATE TABLE `HighlightStopwatchDetails` (
+  `stopwatch_id` integer PRIMARY KEY AUTO_INCREMENT,
+  `timer_id` INTEGER,
+  `highlight_id` INT ,
+  `user_id` INTEGER NOT NULL,
+  `start_time` DATETIME,
+  `end_time` DATETIME,
+  `status` ENUM('complete', 'uncomplete') DEFAULT 'uncomplete'
+);
+
+
+CREATE TABLE `PausesStopwatchDetails` (
+  `pauses_stopwatch_id` INT AUTO_INCREMENT PRIMARY KEY,
+  `stopwatch_id` INT ,
+  `highlight_id` INT ,
+  `pause_time` DATETIME NOT NULL,
+  `continue_time` DATETIME 
+  
+);
 
 
 CREATE TABLE `hi` (

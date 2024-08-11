@@ -42,9 +42,9 @@ const FocusSummary = () => {
     return new Date(datetime).toLocaleTimeString();
   };
 
-  const getPauseAndContinueTimes = (highlightId: number) => {
+  const getPauseAndContinueTimes = (pomoId: number) => {
     return pauseDetails
-      .filter((detail) => detail.highlight_id === highlightId)
+      .filter((detail) => detail.pomo_id === pomoId)
       .map((detail) => [
         formatTime(detail.pause_time ?? ''), 
         formatTime(detail.continue_time ?? '')
@@ -58,11 +58,11 @@ const FocusSummary = () => {
       <h2 className={styles.title}>Overview</h2>
       <div className={styles.overview}>
         <div className={styles.card}>
-          <div className={styles.label}>Today's Pomo</div>
+        <div className={styles.label}>Today&apos;s Pomo</div>
           <div className={styles.value}>0</div>
         </div>
         <div className={styles.card}>
-          <div className={styles.label}>Today's Focus</div>
+          <div className={styles.label}>Today&apos;s Focus</div>
           <div className={styles.value}>0m</div>
         </div>
         <div className={styles.card}>
@@ -82,14 +82,14 @@ const FocusSummary = () => {
             <div className={styles.date}>{date}</div>
             <div className={styles.timeline}>
               {groupedRecords[date]
-                .sort((a, b) => a.highlight_id - b.highlight_id)
+                .sort((a, b) => new Date(b.end_time).getTime() - new Date(a.end_time).getTime())
                 .map((record) => (
-                  <div key={record.highlight_id} className={styles.timeRecord}>
+                  <div key={record.pomo_id} className={styles.timeRecord}>
                     <span className={styles.mainRecord}>
                       {record.highlight_name} { }  :   { }                      
                       {formatTime(record.start_time)} - {formatTime(record.end_time)}
                     </span>
-                    {getPauseAndContinueTimes(record.highlight_id).map((time, index) => (
+                    {getPauseAndContinueTimes(record.pomo_id).map((time, index) => (
                       <div key={index} className={styles.pauseRecord}>
                         <span>{time[0]} - {time[1]}</span>
                       </div>

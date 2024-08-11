@@ -62,6 +62,7 @@ CREATE TABLE `hilights_hasintha` (
 );
 
 CREATE TABLE `HighlightPomoDetails` (
+  `pomo_id` integer PRIMARY KEY AUTO_INCREMENT,
   `timer_id` INTEGER,
   `highlight_id` INT ,
   `user_id` INTEGER NOT NULL,
@@ -73,6 +74,7 @@ CREATE TABLE `HighlightPomoDetails` (
 
 CREATE TABLE `PausesPomoDetails` (
   `pauses_pomo_id` INT AUTO_INCREMENT PRIMARY KEY,
+  `pomo_id` INT ,
   `highlight_id` INT ,
   `pause_time` DATETIME NOT NULL,
   `continue_time` DATETIME 
@@ -156,6 +158,8 @@ ALTER TABLE `task_lists` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 ALTER TABLE `events` ADD FOREIGN KEY (`calendar_id`) REFERENCES `calendars` (`id`);
 
 ALTER TABLE `calendars` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+
+-- ALTER TABLE `PausesPomoDetails` ADD FOREIGN KEY (`pomo_id`) REFERENCES `HighlightPomoDetails` (`pomo_id`);
 
 -- ALTER TABLE `timer_details` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 

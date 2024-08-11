@@ -245,7 +245,7 @@ export async function sendContinueData(continueDetails: {
 
 
 
-export async function getFocusRecord(userId: number): Promise<mTimeRecord[]> {
+export async function getFocusRecord(userId: number, activeTab: string): Promise<mTimeRecord[]> {
     try {
         const response = await getAxiosClient('focus_record').request<mTimeRecord[]>({
             method: 'GET',
@@ -278,7 +278,7 @@ export async function getActiveTimerHighlightDetails(userId: number): Promise<Ac
 }
 
 
-export async function getPauseDetails(userId: number): Promise<mPauseContinueDetails[]> {
+export async function getPauseDetails(userId: number, activeTab: string): Promise<mPauseContinueDetails[]> {
     try {
 
         const response = await getAxiosClient('pause_details').request<mPauseContinueDetails[]>({

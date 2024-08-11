@@ -943,8 +943,8 @@ service / on http_listener:Listener {
 
         sql:ExecutionResult|sql:Error result = database:Client->execute(`
             UPDATE HighlightPomoDetails 
-            SET end_time = ${formattedEndTime} 
-            WHERE highlight_id = ${highlightPomoDetails.highlight_id} AND pomo_id=${highlightPomoDetails.pomo_id};
+            SET end_time = ${formattedEndTime}, status = ${highlightPomoDetails.status}
+            WHERE pomo_id=${highlightPomoDetails.pomo_id} AND highlight_id = ${highlightPomoDetails.highlight_id}  ;
         `);
 
         if result is sql:Error {

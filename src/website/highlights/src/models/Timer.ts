@@ -25,6 +25,14 @@ export interface mPauses_details {
     continue_time: string;     // Assuming ISO 8601 string format for time
     
 }
+export interface mStopwatch_Pauses_details {
+    pauses_stopwatch_id: number;
+    highlight_id: number; // Changed from string to number
+    // user_id: number;
+    pause_time: string;   // Assuming ISO 8601 string format for time
+    continue_time: string;     // Assuming ISO 8601 string format for time
+    
+}
 
 export interface mTimeRecord {
     pomo_id: number; 

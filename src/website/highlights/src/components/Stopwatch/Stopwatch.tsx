@@ -8,7 +8,7 @@ import { useHighlights } from "@/hooks/useHighlights";
 import { useTimers } from '@/hooks/useTimer';
 import { HighlightTask } from "@/models/HighlightTask";
 import { mTimer } from '@/models/Timer';
-import { getActiveStopwatchHighlightDetails, getActiveTimerHighlightDetails, sendEndStopwatchData, sendStartStopwatchData } from '@/services/api';
+import { getActiveStopwatchHighlightDetails, getActiveTimerHighlightDetails, sendContinueStopwatchData, sendEndStopwatchData, sendPauseStopwatchData, sendStartStopwatchData } from '@/services/api';
 
 
 
@@ -216,13 +216,144 @@ const Stopwatch: React.FC = () => {
     }
   };
 
-  const handlePause = () => {
+  const handlePause = async () => {
+    const pauseTime = new Date(); 
     setIsPaused(true);
+  
+    const currentTimerId = selectedTask !== null && timer_details
+      ? Number(timer_details[selectedTask]?.timer_id) // Convert to number
+      : -1; // Default value or handle as needed
+  
+    const userId = 11;
+  
+    
+    const pauseDetails = {
+      stopwatch_id: stopwatchId ?? 1,
+      timer_id: currentTimerId,
+      highlight_id: highlightId ?? 1,
+      user_id: userId,
+      pause_time: pauseTime.toISOString(),
+    };
+  
+    try {
+      
+      await sendPauseStopwatchData(pauseDetails);
+  
+      showNotification({
+        title: 'Paused',
+        message: 'The pause time has been recorded and sent to the backend.',
+        icon: <IconInfoCircle />,
+        color: 'blue',
+        autoClose: 3000,
+        radius: 'md',
+        styles: (theme) => ({
+          root: {
+            backgroundColor: theme.colors.blue[6],
+            borderColor: theme.colors.blue[6],
+            '&::before': { backgroundColor: theme.white },
+          },
+          title: { color: theme.white },
+          description: { color: theme.white },
+          closeButton: {
+            color: theme.white,
+            '&:hover': { backgroundColor: theme.colors.blue[7] },
+          },
+        }),
+      });
+    } catch (error) {
+      showNotification({
+        title: 'Error',
+        message: 'Failed to send pause time details.',
+        icon: <IconInfoCircle />,
+        color: 'red',
+        autoClose: 3000,
+        radius: 'md',
+        styles: (theme) => ({
+          root: {
+            backgroundColor: theme.colors.red[6],
+            borderColor: theme.colors.red[6],
+            '&::before': { backgroundColor: theme.white },
+          },
+          title: { color: theme.white },
+          description: { color: theme.white },
+          closeButton: {
+            color: theme.white,
+            '&:hover': { backgroundColor: theme.colors.red[7] },
+          },
+        }),
+      });
+    }
   };
+  
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
+    const continueTime = new Date(); 
     setIsPaused(false);
+  
+    const currentTimerId = selectedTask !== null && timer_details
+      ? Number(timer_details[selectedTask]?.timer_id) // Convert to number
+      : -1; // Default value or handle as needed
+  
+    const userId = 11;
+  
+    const continueDetails = {
+      stopwatch_id: stopwatchId ?? 1,
+      timer_id: currentTimerId,
+      highlight_id: highlightId ?? 1,
+      user_id: userId,
+      continue_time: continueTime.toISOString(),
+    };
+  
+    try {
+      
+      await sendContinueStopwatchData(continueDetails);
+  
+      showNotification({
+        title: 'Continued',
+        message: 'The continue time has been recorded and sent to the backend.',
+        icon: <IconInfoCircle />,
+        color: 'blue',
+        autoClose: 3000,
+        radius: 'md',
+        styles: (theme) => ({
+          root: {
+            backgroundColor: theme.colors.blue[6],
+            borderColor: theme.colors.blue[6],
+            '&::before': { backgroundColor: theme.white },
+          },
+          title: { color: theme.white },
+          description: { color: theme.white },
+          closeButton: {
+            color: theme.white,
+            '&:hover': { backgroundColor: theme.colors.blue[7] },
+          },
+        }),
+      });
+    } catch (error) {
+      showNotification({
+        title: 'Error',
+        message: 'Failed to send continue time details.',
+        icon: <IconInfoCircle />,
+        color: 'red',
+        autoClose: 3000,
+        radius: 'md',
+        styles: (theme) => ({
+          root: {
+            backgroundColor: theme.colors.red[6],
+            borderColor: theme.colors.red[6],
+            '&::before': { backgroundColor: theme.white },
+          },
+          title: { color: theme.white },
+          description: { color: theme.white },
+          closeButton: {
+            color: theme.white,
+            '&:hover': { backgroundColor: theme.colors.red[7] },
+          },
+        }),
+      });
+    }
   };
+  
 
 
   const handleEnd = () => {

@@ -154,6 +154,19 @@ type PausesDetailsTemp record {
     string pause_time;
     // string continue_time;
 };
+type h_stopwatch_PausesDetails record {
+    int stopwatch_id;
+    int highlight_id;
+    string pause_time;
+    // string continue_time;
+};
+
+type h_stopwatch_PausesDetailsTemp record {
+    int stopwatch_id;
+    int highlight_id;
+    string pause_time;
+    // string continue_time;
+};
 
 type ContinueDetails record {
     int pomo_id;
@@ -164,6 +177,19 @@ type ContinueDetails record {
 
 type ContinueDetailsTemp record {
     int pomo_id;
+    int highlight_id;
+    // string pause_time;
+    string continue_time;
+};
+type h_stopwatch_ContinueDetails record {
+    int stopwatch_id;
+    int highlight_id;
+    // string pause_time;
+    string continue_time;
+};
+
+type h_stopwatch_ContinueDetailsTemp record {
+    int stopwatch_id;
     int highlight_id;
     // string pause_time;
     string continue_time;
@@ -1431,6 +1457,107 @@ service / on http_listener:Listener {
         }
 
         // io:println("Data inserted successfully");
+        check caller->respond(http:STATUS_OK);
+    }
+
+        resource function post pause_stopwatch_details(http:Caller caller, http:Request req) returns error? {
+
+        json|http:ClientError payload = req.getJsonPayload();
+
+        if payload is http:ClientError {
+            log:printError("Error while parsing request payload (pause_stopwatch_details)", 'error = payload);
+            check caller->respond(http:STATUS_BAD_REQUEST);
+            return;
+        }
+
+        // Convert the payload to the h_HighlightPomoDetailsTemp record
+        h_stopwatch_PausesDetailsTemp tempDetails = check payload.cloneWithType(h_stopwatch_PausesDetailsTemp);
+        // io:println("Received highlightPomoDetails:", tempDetails);
+
+        // Convert pause_time string to time:Utc
+        time:Utc|error pauseTime = time:utcFromString(tempDetails.pause_time);
+
+        if (pauseTime is error) {
+            log:printError("Error parsing pause_time", 'error = pauseTime);
+            check caller->respond(http:STATUS_BAD_REQUEST);
+            return;
+        }
+
+        // Create a negative duration of 5 hours and 30 minutes
+        time:Utc adjustedPauseTime = time:utcAddSeconds(pauseTime, +(5 * 3600 + 30 * 60));
+
+        // Convert time:Utc to RFC 3339 string
+        string adjustedPauseTimeStr = time:utcToString(adjustedPauseTime);
+
+        // Manual formatting from RFC 3339 to "yyyy-MM-dd HH:mm:ss"
+        string formattedPauseTime = adjustedPauseTimeStr.substring(0, 10) + " " + adjustedPauseTimeStr.substring(11, 19);
+
+        // Create PausesDetails record with adjusted times
+        h_stopwatch_PausesDetails pausesDetails = {
+            stopwatch_id: tempDetails.stopwatch_id,
+            highlight_id: tempDetails.highlight_id,
+            pause_time: formattedPauseTime
+        };
+
+        // Insert data into database
+        sql:ExecutionResult|sql:Error result = database:Client->execute(`
+        INSERT INTO PausesStopwatchDetails (highlight_id, stopwatch_id,  pause_time) 
+        VALUES (${pausesDetails.highlight_id}, ${pausesDetails.stopwatch_id}, ${pausesDetails.pause_time});
+    `);
+
+        if result is sql:Error {
+            log:printError("Error while inserting data into HighlightPomoDetails", 'error = result);
+            check caller->respond(http:STATUS_INTERNAL_SERVER_ERROR);
+            return;
+        }
+
+        // io:println("Data inserted successfully");
+        check caller->respond(http:STATUS_OK);
+    }
+        resource function post continue_stopwatch_details(http:Caller caller, http:Request req) returns error? {
+
+        json|http:ClientError payload = req.getJsonPayload();
+
+        if payload is http:ClientError {
+            log:printError("Error while parsing request payload (continue_stopwatch_details)", 'error = payload);
+            check caller->respond(http:STATUS_BAD_REQUEST);
+            return;
+        }
+        h_stopwatch_ContinueDetailsTemp tempDetails = check payload.cloneWithType(h_stopwatch_ContinueDetailsTemp);
+
+        time:Utc|error continueTime = time:utcFromString(tempDetails.continue_time);
+
+        if (continueTime is error) {
+            log:printError("Error parsing pause_time", 'error = continueTime);
+            check caller->respond(http:STATUS_BAD_REQUEST);
+            return;
+        }
+
+        time:Utc adjustedContinueTime = time:utcAddSeconds(continueTime, +(5 * 3600 + 30 * 60));
+
+        string adjustedContinueTimeStr = time:utcToString(adjustedContinueTime);
+
+        string formattedContinueTime = adjustedContinueTimeStr.substring(0, 10) + " " + adjustedContinueTimeStr.substring(11, 19);
+
+        h_stopwatch_ContinueDetails continueDetails = {
+            stopwatch_id: tempDetails.stopwatch_id,
+            highlight_id: tempDetails.highlight_id,
+            continue_time: formattedContinueTime
+        };
+
+        sql:ExecutionResult|sql:Error result = database:Client->execute(`
+        UPDATE PausesStopwatchDetails 
+        SET continue_time = ${continueDetails.continue_time} 
+        WHERE highlight_id = ${continueDetails.highlight_id} AND  stopwatch_id = ${continueDetails.stopwatch_id}
+        AND continue_time IS NULL;
+    `);
+
+        if result is sql:Error {
+            log:printError("Error while updating data into PausesDetails", 'error = result);
+            check caller->respond(http:STATUS_INTERNAL_SERVER_ERROR);
+            return;
+        }
+        
         check caller->respond(http:STATUS_OK);
     }
 

@@ -2,7 +2,7 @@ import { apiEndpoint } from "@/apiConfig";
 import { aquireAccessToken } from "@/util/auth";
 import { Task } from "@/models/Task";
 import { HighlightTask } from "@/models/HighlightTask";
-import { mTimer, mPomo_details, mPauses_details, mTimeRecord, mPauseContinueDetails,StartDetails,EndDetails ,ActiveHighlightDetails, ActiveStopwatchDetails, EndStopwatchDetails} from "@/models/Timer";
+import { mTimer, mPomo_details, mPauses_details, mTimeRecord, mPauseContinueDetails,StartDetails,EndDetails ,ActiveHighlightDetails, ActiveStopwatchDetails, EndStopwatchDetails, mStopwatch_Pauses_details} from "@/models/Timer";
 import { Tip } from "@/models/Tip";
 import axios, { AxiosInstance } from "axios";
 import { Highlight } from "@/models/Highlight";
@@ -383,8 +383,61 @@ export async function sendStartStopwatchData(startDetails: {
     }
 }
 
+export async function sendPauseStopwatchData(pauseDetails: {
+    stopwatch_id: number;
+    highlight_id: number;
+    pause_time: string;
 
+}): Promise<mStopwatch_Pauses_details> {
+    try {
+        
+        console.log('Sending pause data:', JSON.stringify(pauseDetails, null, 2));
 
+        const axiosInstance = getAxiosClient('pause_stopwatch_details');
+
+        const response = await axiosInstance.post('', pauseDetails);
+
+        return response.data;
+    } catch (error) {
+
+        if (axios.isAxiosError(error)) {
+            console.error('Error sending pause data:', error.response?.data || error.message);
+        } else {
+            console.error('Unexpected error:', error);
+        }
+
+        throw error;
+    }
+}
+
+export async function sendContinueStopwatchData(continueDetails: {
+    stopwatch_id: number;
+    highlight_id: number;
+    continue_time: string;
+
+}): Promise<mStopwatch_Pauses_details> {
+    try {
+        
+        console.log('Sending pause data:', JSON.stringify(continueDetails, null, 2));
+
+        const axiosInstance = getAxiosClient('continue_stopwatch_details');
+
+        const response = await axiosInstance.post('', continueDetails);
+
+        return response.data;
+    } catch (error) {
+        
+        if (axios.isAxiosError(error)) {
+            
+            console.error('Error sending pause data:', error.response?.data || error.message);
+        } else {
+            
+            console.error('Unexpected error:', error);
+        }
+
+        throw error;
+    }
+}
 
 
 

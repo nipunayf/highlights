@@ -24,7 +24,6 @@ function getAxiosClient(route: string): AxiosInstance {
     return client;
 }
 
-// Function to get tasks
 export async function getTasks(): Promise<Task[]> {
     const response = await getAxiosClient('tasks').request<Task[]>({
         method: 'GET'
@@ -52,7 +51,6 @@ export async function createTask(task: Task): Promise<Task> {
     return response.data;
 }
 
-// Function to get highlights
 export async function getHighlights(): Promise<HighlightTask[]> {
     const response = await getAxiosClient('highlights').request<HighlightTask[]>({
         method: 'GET'
@@ -61,11 +59,6 @@ export async function getHighlights(): Promise<HighlightTask[]> {
     return response.data;
 }
 
-
-
-
-
-// Function to get timer details
 export async function getTimerDetails(): Promise<mTimer[]> {
     const response = await getAxiosClient('timer_details').request<mTimer[]>({
         method: 'GET'
@@ -74,54 +67,38 @@ export async function getTimerDetails(): Promise<mTimer[]> {
     return response.data;
 }
 
-// Function to send timer end data
 export async function sendTimerEndData(pomo_details: {
     pomo_id: number;
     timer_id: number;
-    highlight_id: number;  // Changed from string to number
+    highlight_id: number;  
     user_id: number;
-    // start_time: string;  // Assuming ISO 8601 string format for time
-    end_time: string;    // Assuming ISO 8601 string format for time
+    // start_time: string; 
+    end_time: string;   
     status: string;
 }): Promise<EndDetails> {
     try {
 
-        // Print the details of the data being sent
         console.log('Sending timer end data:', JSON.stringify(pomo_details, null, 2));
 
-        // Create the Axios instance with the appropriate base URL
         const axiosInstance = getAxiosClient('end_pomo_details');
 
-
-        // Make the POST request to the backend API
         const response = await axiosInstance.post('', pomo_details);
 
-        // Return the response data
         return response.data;
     } catch (error) {
-        // Handle errors
+        
         if (axios.isAxiosError(error)) {
-            // Handle known Axios errors
+            
             console.error('Error sending timer end data:', error.response?.data || error.message);
         } else {
-            // Handle other errors
+        
             console.error('Unexpected error:', error);
         }
 
-        // Optionally, you can throw the error again or handle it differently
         throw error;
     }
 }
 
-
-
-
-
-
-
-
-
-// Function to send start time data to the backend
 export async function sendStartTimeData(startDetails: {
     timer_id: number;
     highlight_id: number;  // Changed from string to number
@@ -157,16 +134,6 @@ export async function sendStartTimeData(startDetails: {
     }
   }
 
-
-
-
-
-
-
-
-
-
-// Function to send pause data
 export async function sendPauseData(pauseDetails: {
     pomo_id: number;
     highlight_id: number;
@@ -174,34 +141,27 @@ export async function sendPauseData(pauseDetails: {
 
 }): Promise<mPauses_details> {
     try {
-        // Print the details of the data being sent
+        
         console.log('Sending pause data:', JSON.stringify(pauseDetails, null, 2));
 
-        // Create the Axios instance with the appropriate base URL
         const axiosInstance = getAxiosClient('pause_pomo_details');
 
-        // Make the POST request to the backend API
         const response = await axiosInstance.post('', pauseDetails);
 
-        // Return the response data
         return response.data;
     } catch (error) {
-        // Handle errors
+
         if (axios.isAxiosError(error)) {
-            // Handle known Axios errors
+            
             console.error('Error sending pause data:', error.response?.data || error.message);
         } else {
-            // Handle other errors
+            
             console.error('Unexpected error:', error);
         }
 
-        // Optionally, you can throw the error again or handle it differently
         throw error;
     }
 }
-
-
-
 
 export async function sendContinueData(continueDetails: {
     pomo_id: number;
@@ -210,40 +170,26 @@ export async function sendContinueData(continueDetails: {
 
 }): Promise<mPauses_details> {
     try {
-        // Print the details of the data being sent
         console.log('Sending pause data:', JSON.stringify(continueDetails, null, 2));
 
-        // Create the Axios instance with the appropriate base URL
         const axiosInstance = getAxiosClient('continue_pomo_details');
 
-        // Make the POST request to the backend API
         const response = await axiosInstance.post('', continueDetails);
 
-        // Return the response data
         return response.data;
     } catch (error) {
-        // Handle errors
+        
         if (axios.isAxiosError(error)) {
-            // Handle known Axios errors
+            
             console.error('Error sending pause data:', error.response?.data || error.message);
         } else {
-            // Handle other errors
+            
             console.error('Unexpected error:', error);
         }
 
-        // Optionally, you can throw the error again or handle it differently
         throw error;
     }
 }
-
-
-
-
-
-
-
-
-
 
 export async function getFocusRecord(userId: number, activeTab: string): Promise<mTimeRecord[]> {
     try {
@@ -252,7 +198,6 @@ export async function getFocusRecord(userId: number, activeTab: string): Promise
             url: `/${userId}`
         });
 
-        // Log the response data to the console
         console.log('Data sent to the backend:----------------------------------------------------------', response.data);
 
         return response.data;
@@ -261,7 +206,6 @@ export async function getFocusRecord(userId: number, activeTab: string): Promise
         throw error;
     }
 }
-
 
 export async function getActiveTimerHighlightDetails(userId: number): Promise<ActiveHighlightDetails[]> {
     try {
@@ -276,6 +220,7 @@ export async function getActiveTimerHighlightDetails(userId: number): Promise<Ac
         throw error;
     }
 }
+
 export async function getActiveStopwatchHighlightDetails(userId: number): Promise<ActiveStopwatchDetails[]> {
     try {
         const response = await getAxiosClient('active_stopwatch_highlight_details').request<ActiveStopwatchDetails[]>({
@@ -289,7 +234,6 @@ export async function getActiveStopwatchHighlightDetails(userId: number): Promis
         throw error;
     }
 }
-
 
 export async function getPauseDetails(userId: number, activeTab: string): Promise<mPauseContinueDetails[]> {
     try {
@@ -307,39 +251,33 @@ export async function getPauseDetails(userId: number, activeTab: string): Promis
     }
 }
 
-
-
 export async function sendStartStopwatchData(startDetails: {
     timer_id: number;
-    highlight_id: number;  // Changed from string to number
+    highlight_id: number;  
     user_id: number;
-    start_time: string;  // Assuming ISO 8601 string format for time
-    // end_time: string;    // Assuming ISO 8601 string format for time
+    start_time: string;  
+    // end_time: string;   
     status: string
 }): Promise<StartDetails> {
     try {
-      // Print the details of the data being sent
+        
       console.log('Sending start time data:', JSON.stringify(startDetails, null, 2));
   
-      // Create the Axios instance with the appropriate base URL
       const axiosInstance = getAxiosClient('start_stopwatch_details');
   
-      // Make the POST request to the backend API
       const response = await axiosInstance.post('', startDetails);
   
-      // Return the response data (if any)
       return response.data;
     } catch (error) {
-      // Handle errors
+        
       if (axios.isAxiosError(error)) {
-        // Handle known Axios errors
+        
         console.error('Error sending start time data:', error.response?.data || error.message);
       } else {
-        // Handle other errors
+        
         console.error('Unexpected error:', error);
       }
-  
-      // Optionally, you can throw the error again or handle it differently
+
       throw error;
     }
   }
@@ -438,16 +376,6 @@ export async function sendContinueStopwatchData(continueDetails: {
         throw error;
     }
 }
-
-
-
-
-
-
-
-
-
-
 
 export async function updateTask(task: Task): Promise<Task> {
     console.log("Updating task:", task);

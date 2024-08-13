@@ -7,6 +7,8 @@ import { useHighlights } from "@/hooks/useHighlights";
 import { useTimers } from '@/hooks/useTimer';
 import { HighlightTask } from "@/models/HighlightTask";
 import { mTimer } from '@/models/Timer';
+import { getActiveStopwatchHighlightDetails, getActiveTimerHighlightDetails, sendEndStopwatchData, sendStartStopwatchData } from '@/services/api';
+import Swal from 'sweetalert';
 
 
 
@@ -128,6 +130,25 @@ const Stopwatch: React.FC = () => {
 
 
 
+  const [startTime, setStartTime] = useState<Date | null>(null);
+  const [pauseTime, setPauseTime] = useState<Date | null>(null);
+  const [continueTime, setContinueTime] = useState<Date | null>(null);
+  const [endTime, setEndTime] = useState<Date | null>(null);
+  const [stopwatchId, setStopwatchId] = useState<number | null>(null);
+  const [highlightId, setHighlightId] = useState<number | null>(null);
+
+
+
+
+
+
+
+
+
+
+
+
+
   useEffect(() => {
     if (isActive && !isPaused) {
       intervalRef.current = window.setInterval(() => {
@@ -143,9 +164,93 @@ const Stopwatch: React.FC = () => {
     };
   }, [isActive, isPaused]);
 
-  const handleStart = () => {
+
+
+
+
+  const handleStart = async () => {
     setIsActive(true);
     setIsPaused(false);
+
+    const startTime = new Date();
+    setStartTime(startTime);
+
+
+    const startDetails = {
+      timer_id: selectedTask !== null ? Number(selectedTask) : -1,
+      highlight_id: selectedTask !== null ? Number(selectedTask) : -1,
+      user_id: 11, // Replace with the actual user ID
+      start_time: startTime.toISOString(),
+      status: "uncomplete"
+    };
+
+
+
+    try {
+      await sendStartStopwatchData(startDetails);
+
+      const response = await getActiveStopwatchHighlightDetails(11); // Replace with the actual user ID
+      const { stopwatch_id, highlight_id } = response[0];
+      setStopwatchId(stopwatch_id);
+      setHighlightId(highlight_id);
+
+      showNotification({
+        title: 'Timer Started',
+        message: 'The timer has started and start time details have been sent.',
+        icon: <IconInfoCircle />,
+        color: 'blue',
+        autoClose: 3000,
+        radius: 'md',
+        styles: (theme) => ({
+          root: {
+            backgroundColor: theme.colors.blue[6],
+            borderColor: theme.colors.blue[6],
+            '&::before': { backgroundColor: theme.white },
+          },
+          title: { color: theme.white },
+          description: { color: theme.white },
+          closeButton: {
+            color: theme.white,
+            '&:hover': { backgroundColor: theme.colors.blue[7] },
+          },
+        }),
+      });
+    } catch (error) {
+      showNotification({
+        title: 'Error',
+        message: 'Failed to send start time details.',
+        icon: <IconInfoCircle />,
+        color: 'red',
+        autoClose: 3000,
+        radius: 'md',
+        styles: (theme) => ({
+          root: {
+            backgroundColor: theme.colors.red[6],
+            borderColor: theme.colors.red[6],
+            '&::before': { backgroundColor: theme.white },
+          },
+          title: { color: theme.white },
+          description: { color: theme.white },
+          closeButton: {
+            color: theme.white,
+            '&:hover': { backgroundColor: theme.colors.red[7] },
+          },
+        }),
+      });
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
   };
 
   const handlePause = () => {
@@ -157,31 +262,90 @@ const Stopwatch: React.FC = () => {
   };
 
   const handleEnd = () => {
-    setIsActive(false);
-    setIsPaused(false);
-    setTime(0);
-    showNotification({
-      title: 'Timer Ended',
-      message: 'The stopwatch has been reset.',
-      icon: <IconInfoCircle />,
-      color: 'blue',
-      autoClose: 3000,
-      radius: 'md',
-      styles: (theme) => ({
-        root: {
-          backgroundColor: theme.colors.blue[6],
-          borderColor: theme.colors.blue[6],
-          '&::before': { backgroundColor: theme.white },
-        },
-        title: { color: theme.white },
-        description: { color: theme.white },
-        closeButton: {
-          color: theme.white,
-          '&:hover': { backgroundColor: theme.colors.blue[7] },
-        },
-      }),
+    Swal({
+      title: "Is the task complete?",
+      text: "Please confirm if you have completed the task.",
+      icon: "warning",
+      buttons: ["Not Yet", "Yes, Complete!"],
+      dangerMode: true,
+    }).then(async (isComplete) => {
+      if (isComplete) {
+        const endTime = new Date();
+        setEndTime(endTime);
+
+      const currentTimerId = selectedTask !== null && timer_details
+      ? Number(timer_details[selectedTask]?.timer_id) // Convert to number
+      : -1; // Default value or handle as needed
+
+        const userId = 11;
+  
+        // Prepare the payload for the backend
+        const endDetails = {
+          stopwatch_id: stopwatchId?? 1,
+          timer_id: currentTimerId,
+          highlight_id: highlightId?? 1,
+          user_id: userId,
+          end_time: endTime.toISOString(),
+          status: "complete"
+        };
+  
+        try {
+          // Replace with the appropriate function to send end details to the backend
+          await sendEndStopwatchData(endDetails);
+  
+          showNotification({
+            title: 'Task Completed',
+            message: 'The task has been marked as complete, and the end time has been sent.',
+            icon: <IconInfoCircle />,
+            color: 'blue',
+            autoClose: 3000,
+            radius: 'md',
+            styles: (theme) => ({
+              root: {
+                backgroundColor: theme.colors.blue[6],
+                borderColor: theme.colors.blue[6],
+                '&::before': { backgroundColor: theme.white },
+              },
+              title: { color: theme.white },
+              description: { color: theme.white },
+              closeButton: {
+                color: theme.white,
+                '&:hover': { backgroundColor: theme.colors.blue[7] },
+              },
+            }),
+          });
+        } catch (error) {
+          showNotification({
+            title: 'Error',
+            message: 'Failed to send end time details.',
+            icon: <IconInfoCircle />,
+            color: 'red',
+            autoClose: 3000,
+            radius: 'md',
+            styles: (theme) => ({
+              root: {
+                backgroundColor: theme.colors.red[6],
+                borderColor: theme.colors.red[6],
+                '&::before': { backgroundColor: theme.white },
+              },
+              title: { color: theme.white },
+              description: { color: theme.white },
+              closeButton: {
+                color: theme.white,
+                '&:hover': { backgroundColor: theme.colors.red[7] },
+              },
+            }),
+          });
+        }
+  
+        // Reset stopwatch
+        setIsActive(false);
+        setIsPaused(false);
+        setTime(0);
+      }
     });
   };
+  
 
 
 

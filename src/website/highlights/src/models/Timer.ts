@@ -60,8 +60,22 @@ export interface StartDetails {
     end_time: string;     // Assuming ISO 8601 string format for time
     status: string;
   }
+  export interface EndStopwatchDetails {
+    stopwatch_id: number;
+    timer_id: number;
+    highlight_id: number; // Changed from string to number
+    user_id: number;
+    start_time: string;   // Assuming ISO 8601 string format for time
+    end_time: string;     // Assuming ISO 8601 string format for time
+    status: string;
+  }
 
   export interface ActiveHighlightDetails {
     pomo_id: number;
+    highlight_id: number;
+}
+
+export interface ActiveStopwatchDetails {
+    stopwatch_id: number;
     highlight_id: number;
 }

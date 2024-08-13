@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useRef, forwardRef } from 'react';
-import {Group, TextInput, Text, Menu, UnstyledButton, Tabs, Avatar } from '@mantine/core';
-import { IconInfoCircle, IconChevronRight, IconCalendarDue,IconHourglassHigh  } from '@tabler/icons-react';
+import { Group, TextInput, Text, Menu, UnstyledButton, Tabs, Avatar, Button } from '@mantine/core';
+import { IconInfoCircle, IconChevronRight, IconCalendarDue, IconHourglassHigh } from '@tabler/icons-react';
 import { showNotification } from '@mantine/notifications';
+import Swal from 'sweetalert';
 import styles from './Stopwatch.module.css';
 import { useHighlights } from "@/hooks/useHighlights";
 import { useTimers } from '@/hooks/useTimer';
 import { HighlightTask } from "@/models/HighlightTask";
 import { mTimer } from '@/models/Timer';
 import { getActiveStopwatchHighlightDetails, getActiveTimerHighlightDetails, sendEndStopwatchData, sendStartStopwatchData } from '@/services/api';
-import Swal from 'sweetalert';
+
 
 
 
@@ -111,12 +112,6 @@ const TimerMenu = ({ timer_details }: { timer_details: mTimer[] }) => {
   );
 };
 
-
-
-
-
-
-
 const Stopwatch: React.FC = () => {
   const [time, setTime] = useState(0);
   const [isActive, setIsActive] = useState(false);
@@ -127,26 +122,12 @@ const Stopwatch: React.FC = () => {
   const { highlights, isHighlightsLoading, isHighlightsError } = useHighlights();
   const { timer_details, istimer_detailsLoading, istimer_detailsError } = useTimers();
   const [menuOpened, setMenuOpened] = useState(false);
-
-
-
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [pauseTime, setPauseTime] = useState<Date | null>(null);
   const [continueTime, setContinueTime] = useState<Date | null>(null);
   const [endTime, setEndTime] = useState<Date | null>(null);
   const [stopwatchId, setStopwatchId] = useState<number | null>(null);
   const [highlightId, setHighlightId] = useState<number | null>(null);
-
-
-
-
-
-
-
-
-
-
-
 
 
   useEffect(() => {
@@ -165,9 +146,6 @@ const Stopwatch: React.FC = () => {
   }, [isActive, isPaused]);
 
 
-
-
-
   const handleStart = async () => {
     setIsActive(true);
     setIsPaused(false);
@@ -183,8 +161,6 @@ const Stopwatch: React.FC = () => {
       start_time: startTime.toISOString(),
       status: "uncomplete"
     };
-
-
 
     try {
       await sendStartStopwatchData(startDetails);
@@ -238,19 +214,6 @@ const Stopwatch: React.FC = () => {
         }),
       });
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
   };
 
   const handlePause = () => {
@@ -273,26 +236,26 @@ const Stopwatch: React.FC = () => {
         const endTime = new Date();
         setEndTime(endTime);
 
-      const currentTimerId = selectedTask !== null && timer_details
-      ? Number(timer_details[selectedTask]?.timer_id) // Convert to number
-      : -1; // Default value or handle as needed
+        const currentTimerId = selectedTask !== null && timer_details
+          ? Number(timer_details[selectedTask]?.timer_id) // Convert to number
+          : -1; // Default value or handle as needed
 
         const userId = 11;
-  
+
         // Prepare the payload for the backend
         const endDetails = {
-          stopwatch_id: stopwatchId?? 1,
+          stopwatch_id: stopwatchId ?? 1,
           timer_id: currentTimerId,
-          highlight_id: highlightId?? 1,
+          highlight_id: highlightId ?? 1,
           user_id: userId,
           end_time: endTime.toISOString(),
           status: "complete"
         };
-  
+
         try {
           // Replace with the appropriate function to send end details to the backend
           await sendEndStopwatchData(endDetails);
-  
+
           showNotification({
             title: 'Task Completed',
             message: 'The task has been marked as complete, and the end time has been sent.',
@@ -337,7 +300,7 @@ const Stopwatch: React.FC = () => {
             }),
           });
         }
-  
+
         // Reset stopwatch
         setIsActive(false);
         setIsPaused(false);
@@ -345,7 +308,7 @@ const Stopwatch: React.FC = () => {
       }
     });
   };
-  
+
 
 
 
@@ -416,8 +379,15 @@ const Stopwatch: React.FC = () => {
           </g>
         </svg>
         <div className={styles.buttons}>
-          {!isActive && <button className={styles.startButton} onClick={handleStart}>Start</button>}
-          {isActive && !isPaused && <button className={styles.pauseButton} onClick={handlePause}>Pause</button>}
+          {!isActive && (
+            <button className={styles.startButton} onClick={handleStart}>Start</button>
+          )}
+          {isActive && !isPaused && (
+            <>
+              <button className={styles.pauseButton} onClick={handlePause}>Pause</button>
+              <button className={styles.endButton} onClick={handleEnd}>End</button>
+            </>
+          )}
           {isPaused && (
             <>
               <button className={styles.continueButton} onClick={handleContinue}>Continue</button>

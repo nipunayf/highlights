@@ -307,12 +307,12 @@ export async function getTasktime(): Promise<Task[]> {
 
 export const changestatus = async (taskId: string): Promise<void> => {
     console.log(taskId); 
-
-    // await getAxiosClient('completed').request({
-    //     method: 'PATCH',
-    //     url: `/completed/${taskId}`,
-    //     data: { status: 'completed' } 
-    // });
+console.log("ccc")
+    await getAxiosClient('completed').request({
+        method: 'PATCH',
+        url: `/completed/${taskId}`,
+        data: { status: 'completed' } 
+    });
 }
 
 

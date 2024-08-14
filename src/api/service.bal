@@ -220,6 +220,14 @@ type TimeRecord record {
     string end_time;
     string[][] pause_and_continue_times;
 };
+type h_StopwatchTimeRecord record {
+    int stopwatch_id;
+    int highlight_id;
+    string highlight_name;
+    string start_time;
+    string end_time;
+    string[][] pause_and_continue_times;
+};
 
 Task[] tasks = [
 
@@ -258,6 +266,13 @@ type HighlightRecord record {
 
 type h_PauseContinueDetails record {|
     int pomo_id;
+    int highlight_id;
+    string pause_time;
+    string? continue_time;
+|};
+
+type h_Stopwatch_PauseContinueDetails record {|
+    int stopwatch_id;
     int highlight_id;
     string pause_time;
     string? continue_time;
@@ -1557,9 +1572,106 @@ service / on http_listener:Listener {
             check caller->respond(http:STATUS_INTERNAL_SERVER_ERROR);
             return;
         }
-        
+
         check caller->respond(http:STATUS_OK);
     }
+        resource function get stopwatch_focus_record/[int userId]() returns h_StopwatchTimeRecord[]|error {
+        // Query to get all highlights and their names for the given user with non-null end_time
+        sql:ParameterizedQuery highlightQuery = `SELECT hpd.stopwatch_id,hpd.highlight_id, hh.highlight_name, hpd.start_time, hpd.end_time 
+                                             FROM HighlightStopwatchDetails hpd
+                                             JOIN hilights_hasintha hh ON hpd.highlight_id = hh.highlight_id
+                                             WHERE hpd.user_id = ${userId} AND hpd.end_time IS NOT NULL`;
+        stream<record {|int stopwatch_id; int highlight_id; string highlight_name; time:Utc start_time; time:Utc end_time;|}, sql:Error?> highlightStream = database:Client->query(highlightQuery);
+
+        h_StopwatchTimeRecord[] highlightTimeRecords = [];
+
+        // Iterate over the highlight results
+        check from var highlight in highlightStream
+            do {
+                string[][] pauseAndContinueTimes = [];
+
+                // Add the duration to start_time and end_time
+                time:Utc newStartTime = time:utcAddSeconds(highlight.start_time, +(5 * 3600 + 30 * 60));
+                time:Utc newEndTime = time:utcAddSeconds(highlight.end_time, +(5 * 3600 + 30 * 60));
+
+                // Convert time:Utc to RFC 3339 strings
+                string startTimeStr = time:utcToString(newStartTime);
+                string endTimeStr = time:utcToString(newEndTime);
+
+                // Manual formatting from RFC 3339 to "yyyy-MM-dd HH:mm:ss"
+                string formattedStartTime = startTimeStr.substring(0, 10) + " " + startTimeStr.substring(11, 19);
+                string formattedEndTime = endTimeStr.substring(0, 10) + " " + endTimeStr.substring(11, 19);
+
+                h_StopwatchTimeRecord timeRecord = {
+                    stopwatch_id: highlight.stopwatch_id,
+                    highlight_id: highlight.highlight_id,
+                    highlight_name: highlight.highlight_name,
+                    start_time: formattedStartTime,
+                    end_time: formattedEndTime,
+                    pause_and_continue_times: pauseAndContinueTimes
+                };
+
+                highlightTimeRecords.push(timeRecord);
+            };
+        // io:println(highlightTimeRecords);
+        return highlightTimeRecords;
+    }
+        resource function get stopwatch_pause_details/[int userId]() returns h_Stopwatch_PauseContinueDetails[]|error {
+        // SQL query to retrieve pause and continue details by pomo_id and highlight_id
+        sql:ParameterizedQuery sqlQuery = `SELECT 
+                                        h.stopwatch_id,
+                                        h.highlight_id, 
+                                        p.pause_time, 
+                                        p.continue_time 
+                                      FROM 
+                                        HighlightStopwatchDetails h 
+                                      JOIN 
+                                        PausesStopwatchDetails p 
+                                      ON 
+                                        h.stopwatch_id = p.stopwatch_id 
+                                      WHERE 
+                                        h.user_id = ${userId}`;
+
+        // Execute the query and retrieve the results
+        stream<record {|
+            int stopwatch_id;
+            int highlight_id;
+            time:Utc pause_time;
+            time:Utc? continue_time;
+        |}, sql:Error?> resultStream = database:Client->query(sqlQuery);
+
+        h_Stopwatch_PauseContinueDetails[] pauseContinueDetails = [];
+
+        // Iterate over the results
+        check from var pauseDetail in resultStream
+            do {
+                // Add the duration to pause_time and continue_time
+                time:Utc newPauseTime = time:utcAddSeconds(pauseDetail.pause_time, +(5 * 3600 + 30 * 60));
+                time:Utc? newContinueTime = pauseDetail.continue_time != () ? time:utcAddSeconds(<time:Utc>pauseDetail.continue_time, +(5 * 3600 + 30 * 60)) : ();
+
+                // Convert time:Utc to RFC 3339 strings
+                string pauseTimeStr = time:utcToString(newPauseTime);
+                string? continueTimeStr = newContinueTime != () ? time:utcToString(newContinueTime) : ();
+
+                // Manual formatting from RFC 3339 to "yyyy-MM-dd HH:mm:ss"
+                string formattedPauseTime = pauseTimeStr.substring(0, 10) + " " + pauseTimeStr.substring(11, 19);
+                string? formattedContinueTime = continueTimeStr != () ? continueTimeStr.substring(0, 10) + " " + continueTimeStr.substring(11, 19) : ();
+
+                h_Stopwatch_PauseContinueDetails pauseContinueDetail = {
+                    stopwatch_id: pauseDetail.stopwatch_id,
+                    highlight_id: pauseDetail.highlight_id,
+                    pause_time: formattedPauseTime,
+                    continue_time: formattedContinueTime
+                };
+
+                pauseContinueDetails.push(pauseContinueDetail);
+            };
+
+        io:println(pauseContinueDetails);
+
+        return pauseContinueDetails;
+    }
+    
 
 }
 

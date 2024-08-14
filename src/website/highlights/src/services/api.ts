@@ -2,7 +2,7 @@ import { apiEndpoint } from "@/apiConfig";
 import { aquireAccessToken } from "@/util/auth";
 import { Task } from "@/models/Task";
 import { HighlightTask } from "@/models/HighlightTask";
-import { mTimer, mPomo_details, mPauses_details, mTimeRecord, mPauseContinueDetails,StartDetails,EndDetails ,ActiveHighlightDetails, ActiveStopwatchDetails, EndStopwatchDetails, mStopwatch_Pauses_details} from "@/models/Timer";
+import { mTimer, mPomo_details, mPauses_details, mTimeRecord, mPauseContinueDetails,StartDetails,EndDetails ,ActiveHighlightDetails, ActiveStopwatchDetails, EndStopwatchDetails, mStopwatch_Pauses_details, mStopwatchPauseContinueDetails, mStopwatchTimeRecord} from "@/models/Timer";
 import { Tip } from "@/models/Tip";
 import axios, { AxiosInstance } from "axios";
 import { Highlight } from "@/models/Highlight";
@@ -373,6 +373,38 @@ export async function sendContinueStopwatchData(continueDetails: {
             console.error('Unexpected error:', error);
         }
 
+        throw error;
+    }
+}
+
+export async function getStopwatchPauseDetails(userId: number, activeTab: string): Promise<mStopwatchPauseContinueDetails[]> {
+    try {
+
+        const response = await getAxiosClient('stopwatch_pause_details').request<mStopwatchPauseContinueDetails[]>({
+            method: 'GET',
+            url: `/${userId}`
+        });
+
+        return response.data;
+
+    } catch (error) {
+        console.error('Error fetching pause details:', error);
+        throw error;
+    }
+}
+
+export async function getStopwatchFocusRecord(userId: number, activeTab: string): Promise<mStopwatchTimeRecord[]> {
+    try {
+        const response = await getAxiosClient('stopwatch_focus_record').request<mStopwatchTimeRecord[]>({
+            method: 'GET',
+            url: `/${userId}`
+        });
+
+        console.log('Data sent to the backend:----------------------------------------------------------', response.data);
+
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching focus record:', error);
         throw error;
     }
 }

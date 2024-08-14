@@ -42,7 +42,14 @@ export interface mTimeRecord {
     end_time: string;
     pause_and_continue_times: string[][];
 }
-
+export interface mStopwatchTimeRecord {
+    stopwatch_id: number; 
+    highlight_id: number;
+    highlight_name: string;
+    start_time: string;
+    end_time: string;
+    pause_and_continue_times: string[][];
+}
 export interface mPauseContinueDetails {
     pomo_id: number; 
     start_time: string;
@@ -50,13 +57,19 @@ export interface mPauseContinueDetails {
     pause_time: string;
     continue_time?: string;
 }
-
+export interface mStopwatchPauseContinueDetails {
+    stopwatch_id: number; 
+    start_time: string;
+    highlight_id: number;
+    pause_time: string;
+    continue_time?: string;
+}
 export interface StartDetails {
     timer_id: number;
     highlight_id: number; // Changed from string to number
     user_id: number;
-    start_time: string;   // Assuming ISO 8601 string format for time
-    // end_time: string;     // Assuming ISO 8601 string format for time
+    start_time: string;  
+    // end_time: string;    
     status: string;
   }
   export interface EndDetails {

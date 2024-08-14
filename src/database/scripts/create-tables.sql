@@ -47,7 +47,7 @@ CREATE TABLE `calendars` (
 
 CREATE TABLE `timer_details` (
   `timer_id` integer PRIMARY KEY AUTO_INCREMENT,
-    `timer_name` VARCHAR(255) NOT NULL,
+  `timer_name` VARCHAR(255) NOT NULL,
   `pomo_duration` TIME,
   `short_break_duration` TIME,
   `long_break_duration` TIME,
@@ -131,7 +131,10 @@ CREATE TABLE `his` (
   FOREIGN KEY (`parentTaskId`) REFERENCES `hi` (`id`)
 );
 
-
+CREATE TABLE `review` (
+  `id` integer,
+  `description` TEXT
+);
 
 CREATE TABLE `projects` (
   `id` integer PRIMARY KEY AUTO_INCREMENT,

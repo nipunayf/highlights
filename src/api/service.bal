@@ -9,7 +9,8 @@ import ballerina/log;
 import ballerina/sql;
 import ballerina/time;
 import ballerinax/mysql.driver as _;
-
+// import ballerina/jsonutils;
+// import ballerina/lang.'int as int;
 type CreateUser record {|
     string sub;
 |};
@@ -44,12 +45,16 @@ type CreateTask record {|
 
 |};
 
-type Highlight record {|
-    string id;
-    string created;
-    string title;
-    time:Utc? dueDate = null;
-|};
+// type CreateSubTask record {|
+//     string title;
+//     string description;
+//     string? dueDate;
+//     string? startTime;
+//     string? endTime;
+//     string? reminder;
+//     string priority;
+//     int parentTaskId;
+// |};
 
 type h_Highlight record {|
     int highlight_id;
@@ -308,6 +313,11 @@ type CreateDailyTip record {|
     // time:Date date;
 |};
 
+type review record{|
+string id;
+
+string description;
+|};
 // listener http:Listener securedEP = new (9090);
 
 // Define the configuration variables
@@ -319,6 +329,26 @@ type PauseAndContinueTime record {
 };
 
 @http:ServiceConfig {
+    // auth: [
+    //     {
+    //         jwtValidatorConfig: {
+    //             issuer: azureAdIssuer,
+    //             audience: azureAdAudience,
+    //             scopeKey: "scp"
+    //         },
+    //         scopes: ["User.Read"]
+    //     }
+    // ],
+    // auth: [
+    //     {
+    //         jwtValidatorConfig: {
+    //             issuer: azureAdIssuer,
+    //             audience: azureAdAudience,
+    //             scopeKey: "scp"
+    //         },
+    //         scopes: ["User.Read"]
+    //     }
+    // ],
     cors: {
         allowOrigins: ["http://localhost:3000"],
         allowCredentials: false,
@@ -354,7 +384,7 @@ service / on http_listener:Listener {
 
     //  resource function get tasks() returns Task[]|error {
     //         sql:ParameterizedQuery query = `SELECT id,title, dueDate, startTime, endTime, label, reminder, priority, description , status FROM hi`;
-    //         stream<Task, sql:Error?> resultStream = database:Client->query(query);
+    //         stream<Task, sql:Error?> resultStream = self.db->query(query);
     //         Task[] tasksList = [];
     //         error? e = resultStream.forEach(function(Task task) {
     //             tasksList.push(task);
@@ -408,7 +438,7 @@ service / on http_listener:Listener {
     // }
 
     resource function get tasks() returns Task[]|error {
-        io:println("cbbbb");
+       
         return self.fetchTasksForToday();
     }
 
@@ -449,7 +479,7 @@ service / on http_listener:Listener {
             return;
         }
 
-        io:println(tasks);
+        // io:println(tasks);
 
         check caller->respond(tasks);
 
@@ -459,13 +489,11 @@ service / on http_listener:Listener {
     }
 
     resource function put tasks/[int taskId](http:Caller caller, http:Request req) returns error? {
-        // io:println("ss");
-        // io:println(Task);
-
+    
         json|http:ClientError payload = req.getJsonPayload();
         if payload is http:ClientError {
             log:printError("Error while parsing request payload", 'error = payload);
-            io:println("xdd");
+          
             check caller->respond(http:STATUS_BAD_REQUEST);
             return;
         }
@@ -534,16 +562,7 @@ service / on http_listener:Listener {
         return;
     }
 
-    // Handle preflight OPTIONS request for CORS
-    // resource function options addTask(http:Caller caller, http:Request req) returns error? {
-    //     http:Response response = new;
-    //     response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
-    //     response.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-    //     response.setHeader("Access-Control-Allow-Headers", "Content-Type");
-    //     check caller->respond(response);
-
-    //     return;
-    // }
+   
 
     resource function post addProjects(http:Caller caller, http:Request req) returns error? {
         io:print("this inside add project");
@@ -578,16 +597,7 @@ service / on http_listener:Listener {
         return;
     }
 
-    // Handle preflight OPTIONS request for CORS
-    // resource function options addProjects(http:Caller caller, http:Request req) returns error? {
-    //     http:Response response = new;
-    //     response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
-    //     response.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-    //     response.setHeader("Access-Control-Allow-Headers", "Content-Type");
-    //     check caller->respond(response);
-
-    //     return;
-    // }
+  
 
     /////////////////////////////////////////////////////////
     resource function get projects(http:Caller caller, http:Request req) returns error? {
@@ -611,17 +621,7 @@ service / on http_listener:Listener {
         return;
     }
 
-    // Handle preflight OPTIONS request for CORS
-    // resource function options projects(http:Caller caller, http:Request req) returns error? {
-    //     http:Response response = new;
-    //     response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
-    //     response.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-    //     response.setHeader("Access-Control-Allow-Headers", "Content-Type");
-    //     check caller->respond(response);
-
-    //     return;
-    // }
-
+   
     // New resource function to update project details
     resource function put updateProject(http:Caller caller, http:Request req) returns error? {
         json payload = check req.getJsonPayload();
@@ -660,16 +660,7 @@ service / on http_listener:Listener {
         return;
     }
 
-    // Handle preflight OPTIONS request for CORS
-    // resource function options updateProject(http:Caller caller, http:Request req) returns error? {
-    //     http:Response response = new;
-    //     response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
-    //     response.setHeader("Access-Control-Allow-Methods", "PUT, OPTIONS");
-    //     response.setHeader("Access-Control-Allow-Headers", "Content-Type");
-    //     check caller->respond(response);
-
-    //     return;
-    // }
+   
 
     // New resource function to get details of a specific project based on project id
     resource function get project/[int projectId](http:Caller caller, http:Request req) returns error? {
@@ -715,16 +706,7 @@ service / on http_listener:Listener {
         return;
     }
 
-    // Handle preflight OPTIONS request for CORS
-    // resource function options project/[int projectId](http:Caller caller, http:Request req) returns error? {
-    //     http:Response response = new;
-    //     response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
-    //     response.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
-    //     response.setHeader("Access-Control-Allow-Headers", "Content-Type");
-    //     check caller->respond(response);
-
-    //     return;
-    // }
+   
 
     resource function put updateTask(http:Caller caller, http:Request req) returns error? {
         json payload = check req.getJsonPayload();
@@ -758,16 +740,6 @@ service / on http_listener:Listener {
         return;
     }
 
-    // // Handle preflight OPTIONS request for CORS
-    // resource function options updateTask(http:Caller caller, http:Request req) returns error? {
-    //     http:Response response = new;
-    //     response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
-    //     response.setHeader("Access-Control-Allow-Methods", "PUT, OPTIONS");
-    //     response.setHeader("Access-Control-Allow-Headers", "Content-Type");
-    //     check caller->respond(response);
-
-    //     return;
-    // }
 
     resource function get tasks/[int projectId](http:Caller caller, http:Request req) returns error? {
 
@@ -1673,28 +1645,174 @@ service / on http_listener:Listener {
     }
     
 
-}
 
-function formatDateTime(string isodueDateTime) returns string {
-    time:Utc utc = checkpanic time:utcFromString(isodueDateTime);
-    time:Civil dt = time:utcToCivil(utc);
-    return string `${dt.year}-${dt.month}-${dt.day}`;
-}
+ resource function post predict(http:Caller caller, http:Request req) returns error? {
+    
+        json payload = check req.getJsonPayload();
+        log:printInfo("Received payload: " + payload.toString());
 
-function formatTime(string isoTime) returns string {
-    // Construct a full RFC 3339 formatted string with a default date and seconds
-    string fullTime = "1970-01-01T" + (isoTime.length() == 5 ? isoTime + ":00Z" : isoTime + "Z");
-
-    // Parse the fullTime string into UTC time
-    time:Utc|time:Error utc = time:utcFromString(fullTime);
-    if (utc is error) {
-        log:printError("Error parsing time string:", utc);
-        return "";
+        // Call the Python API to get the estimated time
+        var response = callPythonPredictAPI(payload);
+        json responseJson;
+        if (response is json) {
+            responseJson = response;
+        } else {
+            responseJson = { "error": response.toString() };
+        }
+        
+        // Send the response
+        check caller->respond(responseJson);
     }
 
-    // Convert UTC time to civil time to get hours, minutes, and seconds
-    time:Civil dt = time:utcToCivil(<time:Utc>utc);
 
-    // Format the time components into HH:MM:SS format
-    return string `${dt.hour}:${dt.minute}:${dt.second ?: 0}`;
+
+resource function post review/[int id](http:Caller caller, http:Request req) returns error? {
+    // Extract the description from the request payload
+    json payload = check req.getJsonPayload();
+    
+    // Check if the description field exists and is of type string
+    string? description = (check payload.description).toString();
+
+    if (description is string) {
+        // Execute the SQL query using the SQL client
+        sql:ExecutionResult|sql:Error result = database:Client->execute(
+            `INSERT INTO review (id, description) VALUES (${id}, ${description})`
+        );
+
+        // Check the result and handle errors if necessary
+        if (result is sql:Error) {
+            log:printError("Error while inserting data into the review table", 'error = result);
+            // Respond with an error and status code
+            check caller->respond({
+                "error": "Internal Server Error: Failed to insert review"
+            });
+            return;
+        }
+
+        // Return success if there are no errors
+        log:printInfo("Data inserted successfully for review ID: " + id.toString());
+        // Respond with a success message and status code
+        check caller->respond({
+            "message": "Review inserted successfully"
+        });
+    } else {
+        // Handle the case where the description is missing or not a string
+        log:printError("Invalid description field in the request payload");
+        // Respond with a bad request error and status code
+        check caller->respond({
+            "error": "Bad Request: Missing or invalid 'description' field"
+        });
+    }
 }
+
+
+
+  resource function get time() returns Task[]|error {
+            sql:ParameterizedQuery query = `SELECT  dueDate, startTime, endTime FROM hi`;
+            stream<Task, sql:Error?> resultStream = database:Client->query(query);
+            Task[] tasksList = [];
+            error? e = resultStream.forEach(function(Task task) {
+                tasksList.push(task);
+            });
+            if (e is error) {
+                log:printError("Error occurred while fetching tasks: ", 'error = e);
+                return e;
+            }
+    // io:print(tasklist);
+    // io:println(tasksList);
+            return tasksList;
+        }
+
+    resource function patch completed/[int taskId]/status(@http:Payload Task status) returns error? {
+    io:println("Updating task status");
+    
+    // Check if the status object and taskId are valid before executing SQL
+    if status.status is string && taskId is int {
+                // sql:ExecutionResult|sql:Error result = database:Client->execute(`
+
+        sql:ExecutionResult|sql:Error result = database:Client->execute(`
+            UPDATE hi SET status = ${status.status} WHERE id = ${taskId}
+        `);
+        
+        if result is sql:Error {
+            log:printError("Error occurred while updating task status", result);
+            return error("Failed to update status for task: " + taskId.toString());
+        } else {
+            if result.affectedRowCount > 0 {
+                return;
+            } else {
+                return error("No task found with id: " + taskId.toString());
+            }
+        }
+    } 
+}
+
+
+
+
+
+
+
+}
+
+
+function callPythonPredictAPI(json payload) returns json|error {
+    io:print("tes1");
+    io:println(payload);
+    io:print("test2");
+
+    // Create an HTTP client instance
+    http:Client clientEP = check new("http://localhost:8081");
+
+    // Create a new HTTP request
+    http:Request req = new;
+    req.setPayload(payload);
+    req.setHeader("Content-Type", "application/json");
+
+    // Send a POST request to the Python API
+    http:Response response = check clientEP->post("/predict", req);
+
+    // Process the response
+    if (response.statusCode == 200) {
+        var jsonResponse = response.getJsonPayload();
+        if (jsonResponse is json) {
+            return jsonResponse;
+        } else {
+            return { "error": "Invalid JSON response from Python API" };
+        }
+    } else {
+        // return { "error": "Error from Python API: " + response.statusCode().toString() };
+
+    
+
+    }
+
+
+}
+
+
+
+
+    function formatDateTime(string isodueDateTime) returns string {
+        time:Utc utc = checkpanic time:utcFromString(isodueDateTime);
+        time:Civil dt = time:utcToCivil(utc);
+        return string `${dt.year}-${dt.month}-${dt.day}`;
+    }
+
+    function formatTime(string isoTime) returns string {
+        // Construct a full RFC 3339 formatted string with a default date and seconds
+        string fullTime = "1970-01-01T" + (isoTime.length() == 5 ? isoTime + ":00Z" : isoTime + "Z");
+
+        // Parse the fullTime string into UTC time
+        time:Utc|time:Error utc = time:utcFromString(fullTime);
+        if (utc is error) {
+            log:printError("Error parsing time string:", utc);
+            return "";
+        }
+
+        // Convert UTC time to civil time to get hours, minutes, and seconds
+        time:Civil dt = time:utcToCivil(<time:Utc>utc);
+
+        // Format the time components into HH:MM:SS format
+        return string `${dt.hour}:${dt.minute}:${dt.second ?: 0}`;
+    }

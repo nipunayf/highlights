@@ -1,6 +1,6 @@
 import { apiEndpoint } from "@/apiConfig";
 import { aquireAccessToken } from "@/util/auth";
-import { Task } from "@/models/Task";
+import { Task ,Review} from "@/models/Task";
 import { HighlightTask } from "@/models/HighlightTask";
 import { mTimer, mPomo_details, mPauses_details, mTimeRecord, mPauseContinueDetails,StartDetails,EndDetails ,ActiveHighlightDetails, ActiveStopwatchDetails, EndStopwatchDetails, mStopwatch_Pauses_details, mStopwatchPauseContinueDetails, mStopwatchTimeRecord} from "@/models/Timer";
 import { Tip } from "@/models/Tip";
@@ -10,6 +10,7 @@ import { AppUser } from "@/hooks/useAppUser";
 
 // Function to create an Axios client with authorization
 function getAxiosClient(route: string): AxiosInstance {
+    console.log("d")
     const client = axios.create({
         baseURL: `${apiEndpoint}/${route}`
     });
@@ -283,7 +284,23 @@ export async function sendStartStopwatchData(startDetails: {
   }
 
 
-  export async function sendEndStopwatchData(stopwatch_details: {
+  export const changestatus = async (taskId: string): Promise<void> => {
+    console.log(taskId); 
+console.log("ccc")
+    await getAxiosClient('completed').request({
+        method: 'PATCH',
+        url: `/completed/${taskId}`,
+        data: { status: 'completed' } 
+    });
+}
+export async function getTasktime(): Promise<Task[]> {
+    const response = await getAxiosClient('time').request<Task[]>({
+        method: 'GET'
+    });
+    return response.data;
+}
+
+export async function sendEndStopwatchData(stopwatch_details: {
     stopwatch_id: number;
     timer_id: number,
     highlight_id: number;  // Changed from string to number
@@ -320,6 +337,22 @@ export async function sendStartStopwatchData(startDetails: {
         throw error;
     }
 }
+
+
+
+export const updateReview = async (review: Review): Promise<Review> => {
+    console.log(review); // Log the review object, not 'task'
+
+    const response = await getAxiosClient('review').request<Review>({
+        method: 'POST',
+        url: `/${review.id}`, 
+        data: review
+    });
+
+    return response.data;
+}
+
+
 
 export async function sendPauseStopwatchData(pauseDetails: {
     stopwatch_id: number;
@@ -527,3 +560,15 @@ export async function project(projectId: any) {
     // console.log(response);
     return response.data;
 }
+
+export const getEstimatedTime = async (task: any) => {
+    try {
+    //   const client = getAxiosClient(''); 
+      const response = await axios.post(`${apiEndpoint}/predict/`, task);
+      return response.data.estimated_time;
+    } catch (error) {
+      console.error("Error getting estimated time:", error);
+      return null;
+    }
+  };
+  

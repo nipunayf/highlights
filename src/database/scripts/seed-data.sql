@@ -34,12 +34,12 @@ VALUES
 (9, 'Ballerina Integration with Other Systems', 109),
 (10, 'Advanced Ballerina Features', 110);
 
-INSERT INTO highlights.PausesPomoDetails (pauses_pomo_id, highlight_id, pause_time, continue_time)
+INSERT INTO highlights.PausesPomoDetails (pauses_pomo_id,pomo_id, highlight_id, pause_time, continue_time)
 VALUES 
-(1, 9, '2024-07-31 11:27:07', '2024-07-31 11:27:08'),
-(2, 9, '2024-07-31 11:27:10', '2024-07-31 11:27:11'),
-(3, 9, '2024-07-31 11:27:12', '2024-07-31 11:27:14'),
-(4, 7, '2024-07-31 11:37:18', '2024-07-31 11:37:20');
+(1,1, 9, '2024-07-31 11:27:07', '2024-07-31 11:27:08'),
+(2,1, 9, '2024-07-31 11:27:10', '2024-07-31 11:27:11'),
+(3,1, 9, '2024-07-31 11:27:12', '2024-07-31 11:27:14'),
+(4,2, 7, '2024-07-31 11:37:18', '2024-07-31 11:37:20');
 
 INSERT INTO highlights.HighlightPomoDetails (timer_id, highlight_id, user_id, start_time, end_time, status)
 VALUES (10, 9, 11, '2024-07-31 11:27:14', '2024-07-31 11:27:17', 'complete'),

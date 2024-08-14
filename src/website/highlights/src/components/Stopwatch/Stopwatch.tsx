@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, forwardRef } from 'react';
-import {Group, TextInput, List, ThemeIcon, Text, Menu, UnstyledButton, Tabs, Avatar } from '@mantine/core';
+import {Group, TextInput, Text, Menu, UnstyledButton, Tabs, Avatar } from '@mantine/core';
 import { IconInfoCircle, IconChevronRight, IconCalendarDue,IconHourglassHigh  } from '@tabler/icons-react';
 import { showNotification } from '@mantine/notifications';
 import styles from './Stopwatch.module.css';
@@ -41,6 +41,7 @@ const UserButton = forwardRef<HTMLButtonElement, UserButtonProps>(
   )
 );
 
+UserButton.displayName = 'UserButton'; // Setting the displayName to satisfy react/display-name rule
 
 const HighlightMenu = ({ highlights, onHighlightSelect, closeMenu }: { highlights: HighlightTask[], onHighlightSelect: (index: number) => void, closeMenu: () => void }) => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -59,13 +60,13 @@ const HighlightMenu = ({ highlights, onHighlightSelect, closeMenu }: { highlight
     <Tabs.Panel value="Task">
       <div className={styles.taskContainer}>
         <TextInput
-          placeholder="search"
+          placeholder="Search"
           className={styles.searchInput}
           value={searchQuery}
           onChange={(event) => setSearchQuery(event.currentTarget.value)}
         />
         <div className={styles.taskHeader}>
-          <Text className={styles.today}> <IconCalendarDue />Today &gt;</Text>
+          <Text className={styles.today}><IconCalendarDue />Today &gt;</Text>
         </div>
         <Menu>
           {filteredHighlights.map((highlight, index) => (
@@ -90,16 +91,15 @@ const TimerMenu = ({ timer_details }: { timer_details: mTimer[] }) => {
     <Tabs.Panel value="Timer">
       <div className={styles.taskContainer}>
         <TextInput
-          placeholder="search"
+          placeholder="Search"
           className={styles.searchInput}
           value={searchQuery}
           onChange={(event) => setSearchQuery(event.currentTarget.value)}
         />
         <div className={styles.taskHeader}>
-          <Text className={styles.today}> <IconHourglassHigh /> </Text>
+          <Text className={styles.today}><IconHourglassHigh /></Text>
         </div>
         <Menu>
-          {/* <Menu.Label>Select doing Task</Menu.Label> */}
           {filteredTimers.map((timer) => (
             <Menu.Item key={timer.timer_id}>{timer.timer_name}</Menu.Item>
           ))}
@@ -190,11 +190,10 @@ const Stopwatch: React.FC = () => {
   const progress = (time % 2100) / 2100; // 35 minutes * 60 seconds
   const offset = circumference - progress * circumference;
 
-  // Formatting time to MM:SS
   const minutes = Math.floor(time / 60);
   const seconds = time % 60;
   const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-  
+
   const handleHighlightSelect = (index: number) => {
     setSelectedTask(index);
     setMenuOpened(false);
@@ -204,9 +203,9 @@ const Stopwatch: React.FC = () => {
     <div className={styles.stopwatch}>
       <div>
         <div className={styles.focusLink}>
-        <Menu withArrow opened={menuOpened} onChange={setMenuOpened}>
+          <Menu withArrow opened={menuOpened} onChange={setMenuOpened}>
             <Menu.Target>
-            <UserButton
+              <UserButton
                 label={selectedTask !== null && highlights ? highlights[selectedTask]?.highlight_name : "Focus"}
                 styles={{
                   label: {
@@ -221,10 +220,10 @@ const Stopwatch: React.FC = () => {
                   <Tabs.Tab value="Task">Task</Tabs.Tab>
                   <Tabs.Tab value="Timer">Timer</Tabs.Tab>
                 </Tabs.List>
-                {highlights ? <HighlightMenu highlights={highlights} onHighlightSelect={handleHighlightSelect} closeMenu={() => setMenuOpened(false)} /> : null}
+                {highlights ? (
+                  <HighlightMenu highlights={highlights} onHighlightSelect={handleHighlightSelect} closeMenu={() => setMenuOpened(false)} />
+                ) : null}
                 {timer_details ? <TimerMenu timer_details={timer_details} /> : null}
-
-           
               </Tabs>
             </Menu.Dropdown>
           </Menu>
@@ -253,12 +252,12 @@ const Stopwatch: React.FC = () => {
           </g>
         </svg>
         <div className={styles.buttons}>
-          {!isActive && <button className={`${styles.startButton}`} onClick={handleStart}>Start</button>}
-          {isActive && !isPaused && <button className={`${styles.pauseButton}`} onClick={handlePause}>Pause</button>}
+          {!isActive && <button className={styles.startButton} onClick={handleStart}>Start</button>}
+          {isActive && !isPaused && <button className={styles.pauseButton} onClick={handlePause}>Pause</button>}
           {isPaused && (
             <>
-              <button className={`${styles.continueButton}`} onClick={handleContinue}>Continue</button>
-              <button className={`${styles.endButton}`} onClick={handleEnd}>End</button>
+              <button className={styles.continueButton} onClick={handleContinue}>Continue</button>
+              <button className={styles.endButton} onClick={handleEnd}>End</button>
             </>
           )}
         </div>

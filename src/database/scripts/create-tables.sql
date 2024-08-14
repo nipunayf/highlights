@@ -110,7 +110,10 @@ CREATE TABLE `his` (
   FOREIGN KEY (`parentTaskId`) REFERENCES `hi` (`id`)
 );
 
-
+CREATE TABLE `review` (
+  `id` integer,
+  `description` TEXT
+);
 
 CREATE TABLE `projects` (
   `id` integer PRIMARY KEY AUTO_INCREMENT,

@@ -1,6 +1,6 @@
 import { apiEndpoint } from "@/apiConfig";
 import { aquireAccessToken } from "@/util/auth";
-import { Task } from "@/models/Task";
+import { Task ,Review} from "@/models/Task";
 import { HighlightTask } from "@/models/HighlightTask";
 import { mTimer, mPomo_details, mPauses_details, mTimeRecord, mPauseContinueDetails } from "@/models/Timer";
 import { Tip } from "@/models/Tip";
@@ -233,10 +233,38 @@ export async function getPauseDetails(userId: number): Promise<mPauseContinueDet
 
 
 
+export async function getTasktime(): Promise<Task[]> {
+    const response = await getAxiosClient('time').request<Task[]>({
+        method: 'GET'
+    });
+    return response.data;
+}
+
+
+export const changestatus = async (taskId: string): Promise<void> => {
+    console.log(taskId); 
+
+    // await getAxiosClient('completed').request({
+    //     method: 'PATCH',
+    //     url: `/completed/${taskId}`,
+    //     data: { status: 'completed' } 
+    // });
+}
 
 
 
 
+export const updateReview = async (review: Review): Promise<Review> => {
+    console.log(review); // Log the review object, not 'task'
+
+    const response = await getAxiosClient('review').request<Review>({
+        method: 'POST',
+        url: `/${review.id}`, 
+        data: review
+    });
+
+    return response.data;
+}
 
 
 
@@ -368,3 +396,15 @@ export async function project(projectId: any) {
     // console.log(response);
     return response.data;
 }
+
+export const getEstimatedTime = async (task: any) => {
+    try {
+      const client = getAxiosClient(''); // Adjust the route if needed
+      const response = await client.post('/predict', task);
+      return response.data.estimated_time;
+    } catch (error) {
+      console.error("Error getting estimated time:", error);
+      return null;
+    }
+  };
+  

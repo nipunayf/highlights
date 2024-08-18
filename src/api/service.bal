@@ -1,6 +1,7 @@
 import webapp.backend.database;
 import webapp.backend.http_listener;
 import webapp.backend.lists as _;
+import webapp.backend.users as _;
 
 import ballerina/http;
 import ballerina/io;
@@ -9,16 +10,6 @@ import ballerina/log;
 import ballerina/sql;
 import ballerina/time;
 import ballerinax/mysql.driver as _;
-// import ballerina/jsonutils;
-// import ballerina/lang.'int as int;
-type CreateUser record {|
-    string sub;
-|};
-
-type User record {|
-    int id;
-    string sub;
-|};
 
 type Task record {
     int id;
@@ -159,6 +150,7 @@ type PausesDetailsTemp record {
     string pause_time;
     // string continue_time;
 };
+
 type h_stopwatch_PausesDetails record {
     int stopwatch_id;
     int highlight_id;
@@ -186,6 +178,7 @@ type ContinueDetailsTemp record {
     // string pause_time;
     string continue_time;
 };
+
 type h_stopwatch_ContinueDetails record {
     int stopwatch_id;
     int highlight_id;
@@ -225,6 +218,7 @@ type TimeRecord record {
     string end_time;
     string[][] pause_and_continue_times;
 };
+
 type h_StopwatchTimeRecord record {
     int stopwatch_id;
     int highlight_id;
@@ -233,10 +227,6 @@ type h_StopwatchTimeRecord record {
     string end_time;
     string[][] pause_and_continue_times;
 };
-
-Task[] tasks = [
-
-];
 
 type FocusRecord record {
     string highlight_id;
@@ -293,13 +283,6 @@ type h_ActiveStopwatchDetails record {|
     int highlight_id;
 |};
 
-type TaskList record {|
-    int id;
-    @sql:Column {name: "user_id"}
-    int userId;
-    string title;
-|};
-
 type DailyTip record {
     int id;
     string label;
@@ -313,11 +296,11 @@ type CreateDailyTip record {|
     // time:Date date;
 |};
 
-type review record{|
-string id;
-
-string description;
+type review record {|
+    string id;
+    string description;
 |};
+
 // listener http:Listener securedEP = new (9090);
 
 // Define the configuration variables
@@ -358,29 +341,6 @@ type PauseAndContinueTime record {
     }
 }
 service / on http_listener:Listener {
-    resource function post users(CreateUser createUser) returns http:Created|http:Conflict|http:InternalServerError {
-
-        User|sql:Error result = database:Client->queryRow(`SELECT * FROM users WHERE sub = ${createUser.sub}`);
-
-        if result is sql:NoRowsError {
-            do {
-                _ = check database:Client->execute(`
-                        INSERT INTO users (sub)
-                        VALUES (${createUser.sub});`);
-            } on fail var e {
-                log:printError("Error occurred while inserting data: ", e);
-                return http:INTERNAL_SERVER_ERROR;
-            }
-
-            return http:CREATED;
-        }
-
-        if result is User {
-            return http:CONFLICT;
-        }
-
-        return http:INTERNAL_SERVER_ERROR;
-    }
 
     //  resource function get tasks() returns Task[]|error {
     //         sql:ParameterizedQuery query = `SELECT id,title, dueDate, startTime, endTime, label, reminder, priority, description , status FROM hi`;
@@ -418,27 +378,7 @@ service / on http_listener:Listener {
         return tasksList;
     }
 
-    resource function get taskLists(string sub) returns TaskList[]|error {
-        User|sql:Error result = database:Client->queryRow(`SELECT * FROM users WHERE sub = ${sub}`);
-
-        if result is sql:NoRowsError {
-            return error("User not found");
-        }
-
-        stream<TaskList, sql:Error?> taskListStream = database:Client->query(
-            `SELECT * FROM task_lists WHERE user_id=(SELECT u.id FROM users AS u WHERE u.sub=${sub});`
-        );
-
-        return from TaskList taskList in taskListStream
-            select taskList;
-    }
-
-    // resource function get tasks() returns Task[] {
-    //     return tasks;
-    // }
-
     resource function get tasks() returns Task[]|error {
-       
         return self.fetchTasksForToday();
     }
 
@@ -489,11 +429,11 @@ service / on http_listener:Listener {
     }
 
     resource function put tasks/[int taskId](http:Caller caller, http:Request req) returns error? {
-    
+
         json|http:ClientError payload = req.getJsonPayload();
         if payload is http:ClientError {
             log:printError("Error while parsing request payload", 'error = payload);
-          
+
             check caller->respond(http:STATUS_BAD_REQUEST);
             return;
         }
@@ -562,8 +502,6 @@ service / on http_listener:Listener {
         return;
     }
 
-   
-
     resource function post addProjects(http:Caller caller, http:Request req) returns error? {
         io:print("this inside add project");
         json payload = check req.getJsonPayload();
@@ -597,8 +535,6 @@ service / on http_listener:Listener {
         return;
     }
 
-  
-
     /////////////////////////////////////////////////////////
     resource function get projects(http:Caller caller, http:Request req) returns error? {
 
@@ -621,7 +557,6 @@ service / on http_listener:Listener {
         return;
     }
 
-   
     // New resource function to update project details
     resource function put updateProject(http:Caller caller, http:Request req) returns error? {
         json payload = check req.getJsonPayload();
@@ -659,8 +594,6 @@ service / on http_listener:Listener {
 
         return;
     }
-
-   
 
     // New resource function to get details of a specific project based on project id
     resource function get project/[int projectId](http:Caller caller, http:Request req) returns error? {
@@ -706,8 +639,6 @@ service / on http_listener:Listener {
         return;
     }
 
-   
-
     resource function put updateTask(http:Caller caller, http:Request req) returns error? {
         json payload = check req.getJsonPayload();
 
@@ -739,7 +670,6 @@ service / on http_listener:Listener {
 
         return;
     }
-
 
     resource function get tasks/[int projectId](http:Caller caller, http:Request req) returns error? {
 
@@ -1447,7 +1377,7 @@ service / on http_listener:Listener {
         check caller->respond(http:STATUS_OK);
     }
 
-        resource function post pause_stopwatch_details(http:Caller caller, http:Request req) returns error? {
+    resource function post pause_stopwatch_details(http:Caller caller, http:Request req) returns error? {
 
         json|http:ClientError payload = req.getJsonPayload();
 
@@ -1501,7 +1431,8 @@ service / on http_listener:Listener {
         // io:println("Data inserted successfully");
         check caller->respond(http:STATUS_OK);
     }
-        resource function post continue_stopwatch_details(http:Caller caller, http:Request req) returns error? {
+
+    resource function post continue_stopwatch_details(http:Caller caller, http:Request req) returns error? {
 
         json|http:ClientError payload = req.getJsonPayload();
 
@@ -1547,7 +1478,8 @@ service / on http_listener:Listener {
 
         check caller->respond(http:STATUS_OK);
     }
-        resource function get stopwatch_focus_record/[int userId]() returns h_StopwatchTimeRecord[]|error {
+
+    resource function get stopwatch_focus_record/[int userId]() returns h_StopwatchTimeRecord[]|error {
         // Query to get all highlights and their names for the given user with non-null end_time
         sql:ParameterizedQuery highlightQuery = `SELECT hpd.stopwatch_id,hpd.highlight_id, hh.highlight_name, hpd.start_time, hpd.end_time 
                                              FROM HighlightStopwatchDetails hpd
@@ -1588,7 +1520,8 @@ service / on http_listener:Listener {
         // io:println(highlightTimeRecords);
         return highlightTimeRecords;
     }
-        resource function get stopwatch_pause_details/[int userId]() returns h_Stopwatch_PauseContinueDetails[]|error {
+
+    resource function get stopwatch_pause_details/[int userId]() returns h_Stopwatch_PauseContinueDetails[]|error {
         // SQL query to retrieve pause and continue details by pomo_id and highlight_id
         sql:ParameterizedQuery sqlQuery = `SELECT 
                                         h.stopwatch_id,
@@ -1643,11 +1576,9 @@ service / on http_listener:Listener {
 
         return pauseContinueDetails;
     }
-    
 
+    resource function post predict(http:Caller caller, http:Request req) returns error? {
 
- resource function post predict(http:Caller caller, http:Request req) returns error? {
-    
         json payload = check req.getJsonPayload();
         log:printInfo("Received payload: " + payload.toString());
 
@@ -1657,104 +1588,93 @@ service / on http_listener:Listener {
         if (response is json) {
             responseJson = response;
         } else {
-            responseJson = { "error": response.toString() };
+            responseJson = {"error": response.toString()};
         }
-        
+
         // Send the response
         check caller->respond(responseJson);
     }
 
+    resource function post review/[int id](http:Caller caller, http:Request req) returns error? {
+        // Extract the description from the request payload
+        json payload = check req.getJsonPayload();
 
+        // Check if the description field exists and is of type string
+        string? description = (check payload.description).toString();
 
-resource function post review/[int id](http:Caller caller, http:Request req) returns error? {
-    // Extract the description from the request payload
-    json payload = check req.getJsonPayload();
-    
-    // Check if the description field exists and is of type string
-    string? description = (check payload.description).toString();
-
-    if (description is string) {
-        // Execute the SQL query using the SQL client
-        sql:ExecutionResult|sql:Error result = database:Client->execute(
+        if (description is string) {
+            // Execute the SQL query using the SQL client
+            sql:ExecutionResult|sql:Error result = database:Client->execute(
             `INSERT INTO review (id, description) VALUES (${id}, ${description})`
-        );
+            );
 
-        // Check the result and handle errors if necessary
-        if (result is sql:Error) {
-            log:printError("Error while inserting data into the review table", 'error = result);
-            // Respond with an error and status code
-            check caller->respond({
-                "error": "Internal Server Error: Failed to insert review"
-            });
-            return;
-        }
-
-        // Return success if there are no errors
-        log:printInfo("Data inserted successfully for review ID: " + id.toString());
-        // Respond with a success message and status code
-        check caller->respond({
-            "message": "Review inserted successfully"
-        });
-    } else {
-        // Handle the case where the description is missing or not a string
-        log:printError("Invalid description field in the request payload");
-        // Respond with a bad request error and status code
-        check caller->respond({
-            "error": "Bad Request: Missing or invalid 'description' field"
-        });
-    }
-}
-
-
-
-  resource function get time() returns Task[]|error {
-            sql:ParameterizedQuery query = `SELECT  dueDate, startTime, endTime FROM hi`;
-            stream<Task, sql:Error?> resultStream = database:Client->query(query);
-            Task[] tasksList = [];
-            error? e = resultStream.forEach(function(Task task) {
-                tasksList.push(task);
-            });
-            if (e is error) {
-                log:printError("Error occurred while fetching tasks: ", 'error = e);
-                return e;
+            // Check the result and handle errors if necessary
+            if (result is sql:Error) {
+                log:printError("Error while inserting data into the review table", 'error = result);
+                // Respond with an error and status code
+                check caller->respond({
+                    "error": "Internal Server Error: Failed to insert review"
+                });
+                return;
             }
-    // io:print(tasklist);
-    // io:println(tasksList);
-            return tasksList;
+
+            // Return success if there are no errors
+            log:printInfo("Data inserted successfully for review ID: " + id.toString());
+            // Respond with a success message and status code
+            check caller->respond({
+                "message": "Review inserted successfully"
+            });
+        } else {
+            // Handle the case where the description is missing or not a string
+            log:printError("Invalid description field in the request payload");
+            // Respond with a bad request error and status code
+            check caller->respond({
+                "error": "Bad Request: Missing or invalid 'description' field"
+            });
         }
+    }
+
+    resource function get time() returns Task[]|error {
+        sql:ParameterizedQuery query = `SELECT  dueDate, startTime, endTime FROM hi`;
+        stream<Task, sql:Error?> resultStream = database:Client->query(query);
+        Task[] tasksList = [];
+        error? e = resultStream.forEach(function(Task task) {
+            tasksList.push(task);
+        });
+        if (e is error) {
+            log:printError("Error occurred while fetching tasks: ", 'error = e);
+            return e;
+        }
+        // io:print(tasklist);
+        // io:println(tasksList);
+        return tasksList;
+    }
 
     resource function patch completed/[int taskId]/status(@http:Payload Task status) returns error? {
-    io:println("Updating task status");
-    
-    // Check if the status object and taskId are valid before executing SQL
-    if status.status is string && taskId is int {
-                // sql:ExecutionResult|sql:Error result = database:Client->execute(`
+        io:println("Updating task status");
 
-        sql:ExecutionResult|sql:Error result = database:Client->execute(`
+        // Check if the status object and taskId are valid before executing SQL
+        if status.status is string && taskId is int {
+            // sql:ExecutionResult|sql:Error result = database:Client->execute(`
+
+            sql:ExecutionResult|sql:Error result = database:Client->execute(`
             UPDATE hi SET status = ${status.status} WHERE id = ${taskId}
         `);
-        
-        if result is sql:Error {
-            log:printError("Error occurred while updating task status", result);
-            return error("Failed to update status for task: " + taskId.toString());
-        } else {
-            if result.affectedRowCount > 0 {
-                return;
+
+            if result is sql:Error {
+                log:printError("Error occurred while updating task status", result);
+                return error("Failed to update status for task: " + taskId.toString());
             } else {
-                return error("No task found with id: " + taskId.toString());
+                if result.affectedRowCount > 0 {
+                    return;
+                } else {
+                    return error("No task found with id: " + taskId.toString());
+                }
             }
         }
-    } 
-}
-
-
-
-
-
-
+    }
 
 }
-
 
 function callPythonPredictAPI(json payload) returns json|error {
     io:print("tes1");
@@ -1762,7 +1682,7 @@ function callPythonPredictAPI(json payload) returns json|error {
     io:print("test2");
 
     // Create an HTTP client instance
-    http:Client clientEP = check new("http://localhost:8081");
+    http:Client clientEP = check new ("http://localhost:8081");
 
     // Create a new HTTP request
     http:Request req = new;
@@ -1778,41 +1698,35 @@ function callPythonPredictAPI(json payload) returns json|error {
         if (jsonResponse is json) {
             return jsonResponse;
         } else {
-            return { "error": "Invalid JSON response from Python API" };
+            return {"error": "Invalid JSON response from Python API"};
         }
     } else {
         // return { "error": "Error from Python API: " + response.statusCode().toString() };
 
-    
-
     }
-
 
 }
 
+function formatDateTime(string isodueDateTime) returns string {
+    time:Utc utc = checkpanic time:utcFromString(isodueDateTime);
+    time:Civil dt = time:utcToCivil(utc);
+    return string `${dt.year}-${dt.month}-${dt.day}`;
+}
 
+function formatTime(string isoTime) returns string {
+    // Construct a full RFC 3339 formatted string with a default date and seconds
+    string fullTime = "1970-01-01T" + (isoTime.length() == 5 ? isoTime + ":00Z" : isoTime + "Z");
 
-
-    function formatDateTime(string isodueDateTime) returns string {
-        time:Utc utc = checkpanic time:utcFromString(isodueDateTime);
-        time:Civil dt = time:utcToCivil(utc);
-        return string `${dt.year}-${dt.month}-${dt.day}`;
+    // Parse the fullTime string into UTC time
+    time:Utc|time:Error utc = time:utcFromString(fullTime);
+    if (utc is error) {
+        log:printError("Error parsing time string:", utc);
+        return "";
     }
 
-    function formatTime(string isoTime) returns string {
-        // Construct a full RFC 3339 formatted string with a default date and seconds
-        string fullTime = "1970-01-01T" + (isoTime.length() == 5 ? isoTime + ":00Z" : isoTime + "Z");
+    // Convert UTC time to civil time to get hours, minutes, and seconds
+    time:Civil dt = time:utcToCivil(<time:Utc>utc);
 
-        // Parse the fullTime string into UTC time
-        time:Utc|time:Error utc = time:utcFromString(fullTime);
-        if (utc is error) {
-            log:printError("Error parsing time string:", utc);
-            return "";
-        }
-
-        // Convert UTC time to civil time to get hours, minutes, and seconds
-        time:Civil dt = time:utcToCivil(<time:Utc>utc);
-
-        // Format the time components into HH:MM:SS format
-        return string `${dt.hour}:${dt.minute}:${dt.second ?: 0}`;
-    }
+    // Format the time components into HH:MM:SS format
+    return string `${dt.hour}:${dt.minute}:${dt.second ?: 0}`;
+}

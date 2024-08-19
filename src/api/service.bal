@@ -1576,7 +1576,7 @@ service / on http_listener:Listener {
         check caller->respond(http:STATUS_OK);
     }
         resource function get stopwatch_focus_record/[int userId]() returns h_StopwatchTimeRecord[]|error {
-        // Query to get all highlights and their names for the given user with non-null end_time
+
         sql:ParameterizedQuery highlightQuery = `SELECT hpd.stopwatch_id,hpd.highlight_id, hh.highlight_name, hpd.start_time, hpd.end_time 
                                              FROM HighlightStopwatchDetails hpd
                                              JOIN hilights_hasintha hh ON hpd.highlight_id = hh.highlight_id
@@ -1585,16 +1585,13 @@ service / on http_listener:Listener {
 
         h_StopwatchTimeRecord[] highlightTimeRecords = [];
 
-        // Iterate over the highlight results
         check from var highlight in highlightStream
             do {
                 string[][] pauseAndContinueTimes = [];
 
-                // Add the duration to start_time and end_time
                 time:Utc newStartTime = time:utcAddSeconds(highlight.start_time, +(5 * 3600 + 30 * 60));
                 time:Utc newEndTime = time:utcAddSeconds(highlight.end_time, +(5 * 3600 + 30 * 60));
 
-                // Convert time:Utc to RFC 3339 strings
                 string startTimeStr = time:utcToString(newStartTime);
                 string endTimeStr = time:utcToString(newEndTime);
 
@@ -1617,7 +1614,7 @@ service / on http_listener:Listener {
         return highlightTimeRecords;
     }
         resource function get stopwatch_pause_details/[int userId]() returns h_Stopwatch_PauseContinueDetails[]|error {
-        // SQL query to retrieve pause and continue details by pomo_id and highlight_id
+            
         sql:ParameterizedQuery sqlQuery = `SELECT 
                                         h.stopwatch_id,
                                         h.highlight_id, 
@@ -1632,7 +1629,7 @@ service / on http_listener:Listener {
                                       WHERE 
                                         h.user_id = ${userId}`;
 
-        // Execute the query and retrieve the results
+
         stream<record {|
             int stopwatch_id;
             int highlight_id;
@@ -1642,14 +1639,14 @@ service / on http_listener:Listener {
 
         h_Stopwatch_PauseContinueDetails[] pauseContinueDetails = [];
 
-        // Iterate over the results
+
         check from var pauseDetail in resultStream
             do {
-                // Add the duration to pause_time and continue_time
+                
                 time:Utc newPauseTime = time:utcAddSeconds(pauseDetail.pause_time, +(5 * 3600 + 30 * 60));
                 time:Utc? newContinueTime = pauseDetail.continue_time != () ? time:utcAddSeconds(<time:Utc>pauseDetail.continue_time, +(5 * 3600 + 30 * 60)) : ();
 
-                // Convert time:Utc to RFC 3339 strings
+
                 string pauseTimeStr = time:utcToString(newPauseTime);
                 string? continueTimeStr = newContinueTime != () ? time:utcToString(newContinueTime) : ();
 
@@ -1682,19 +1679,18 @@ function formatDateTime(string isodueDateTime) returns string {
 }
 
 function formatTime(string isoTime) returns string {
-    // Construct a full RFC 3339 formatted string with a default date and seconds
+    
     string fullTime = "1970-01-01T" + (isoTime.length() == 5 ? isoTime + ":00Z" : isoTime + "Z");
 
-    // Parse the fullTime string into UTC time
+
     time:Utc|time:Error utc = time:utcFromString(fullTime);
     if (utc is error) {
         log:printError("Error parsing time string:", utc);
         return "";
     }
 
-    // Convert UTC time to civil time to get hours, minutes, and seconds
+
     time:Civil dt = time:utcToCivil(<time:Utc>utc);
 
-    // Format the time components into HH:MM:SS format
     return string `${dt.hour}:${dt.minute}:${dt.second ?: 0}`;
 }

@@ -30,7 +30,6 @@ const FocusSummary: React.FC<FocusSummaryProps> = ({ activeTab }) => {
             getStopwatchFocusRecord(userId, activeTab),
             getStopwatchPauseDetails(userId, activeTab)
           ]);
-          console.log("-------------------------------pppppppppppppppppp",records);
 
           setstopwatchFocusRecords(records);
           setstopwatchPauseDetails(pauses);

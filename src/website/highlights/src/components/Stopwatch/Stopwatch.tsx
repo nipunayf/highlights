@@ -9,7 +9,7 @@ import { useTimers } from '@/hooks/useTimer';
 import { HighlightTask } from "@/models/HighlightTask";
 import { mTimer } from '@/models/Timer';
 import { getActiveStopwatchHighlightDetails, getActiveTimerHighlightDetails, sendContinueStopwatchData, sendEndStopwatchData, sendPauseStopwatchData, sendStartStopwatchData } from '@/services/api';
-
+import FocusSummary from '../FocusSummary/FocusSummary';
 
 
 
@@ -128,6 +128,7 @@ const Stopwatch: React.FC = () => {
   const [endTime, setEndTime] = useState<Date | null>(null);
   const [stopwatchId, setStopwatchId] = useState<number | null>(null);
   const [highlightId, setHighlightId] = useState<number | null>(null);
+  const [showFocusSummary, setShowFocusSummary] = useState(false);
 
 
   useEffect(() => {
@@ -145,6 +146,10 @@ const Stopwatch: React.FC = () => {
     };
   }, [isActive, isPaused]);
 
+  useEffect(() => {
+    // Reset the showFocusSummary state on page load or component mount
+    setShowFocusSummary(false);
+  }, []);
 
   const handleStart = async () => {
     setIsActive(true);
@@ -387,6 +392,8 @@ const Stopwatch: React.FC = () => {
       try {
         
         await sendEndStopwatchData(endDetails);
+
+        setShowFocusSummary(true);
   
         const notificationTitle = isComplete ? 'Task Completed' : 'Task Not Completed';
         const notificationMessage = isComplete
@@ -415,6 +422,7 @@ const Stopwatch: React.FC = () => {
             },
           }),
         });
+        setShowFocusSummary(true);
       } catch (error) {
         showNotification({
           title: 'Error',
@@ -533,6 +541,7 @@ const Stopwatch: React.FC = () => {
           )}
         </div>
       </div>
+      {showFocusSummary && <FocusSummary activeTab={'Stopwatch'} />}
     </div>
   );
 };

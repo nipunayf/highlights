@@ -8,6 +8,7 @@ import styles from './index.module.css';
 import Timer from '../../components/Timer/Timer';
 import Stop_watch from '../../components/Stopwatch/Stopwatch';
 import FocusSummary from '../../components/FocusSummary/FocusSummary';
+import WebSocketComponent from '@/components/RemainderNotification/RemainderNotification';
 
 export default function Focus() {
   const [activeTab, setActiveTab] = useState<'Pomo' | 'Stopwatch'>('Pomo');
@@ -26,7 +27,8 @@ export default function Focus() {
   };
 
   return (
-    <Container className={styles.app}>
+  <><WebSocketComponent />
+  <Container className={styles.app}>
       <ResizableBox
         className={styles.resizableBox}
         width={800}
@@ -104,8 +106,7 @@ export default function Focus() {
                   min={1}
                   max={60}
                   step={1}
-                  placeholder="Minutes"
-                />
+                  placeholder="Minutes" />
               </div>
             </div>
             <div className={styles.timerOption}>
@@ -116,8 +117,7 @@ export default function Focus() {
                 min={1}
                 max={30}
                 step={1}
-                placeholder="Minutes"
-              />
+                placeholder="Minutes" />
             </div>
             <div className={styles.timerOption}>
               <span>Long break duration</span>
@@ -127,8 +127,7 @@ export default function Focus() {
                 min={5}
                 max={60}
                 step={1}
-                placeholder="Minutes"
-              />
+                placeholder="Minutes" />
             </div>
             <div className={styles.timerOption}>
               <span>Pomodoros per long break</span>
@@ -138,8 +137,7 @@ export default function Focus() {
                 min={1}
                 max={10}
                 step={1}
-                placeholder="Pomos"
-              />
+                placeholder="Pomos" />
             </div>
           </div>
           <div className={styles.buttonContainer}>
@@ -148,7 +146,7 @@ export default function Focus() {
           </div>
         </div>
       </Modal>
-    </Container>
+    </Container></>
   );
 }
 

@@ -1,4 +1,5 @@
 import ballerina/persist as _;
+import ballerina/time;
 import ballerinax/persist.sql;
 
 type User record {|
@@ -13,6 +14,7 @@ type TaskList record {|
     readonly int id;
     User user;
     string title;
+    time:Civil createdAt;
     Task[] task;
 |};
 

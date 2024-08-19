@@ -30,7 +30,8 @@ public isolated client class Client {
                 sub: {columnName: "sub"},
                 "tasklist[].id": {relation: {entityName: "tasklist", refField: "id"}},
                 "tasklist[].userId": {relation: {entityName: "tasklist", refField: "userId"}},
-                "tasklist[].title": {relation: {entityName: "tasklist", refField: "title"}}
+                "tasklist[].title": {relation: {entityName: "tasklist", refField: "title"}},
+                "tasklist[].createdAt": {relation: {entityName: "tasklist", refField: "createdAt"}}
             },
             keyFields: ["id"],
             joinMetadata: {tasklist: {entity: TaskList, fieldName: "tasklist", refTable: "TaskList", refColumns: ["userId"], joinColumns: ["id"], 'type: psql:MANY_TO_ONE}}
@@ -42,6 +43,7 @@ public isolated client class Client {
                 id: {columnName: "id", dbGenerated: true},
                 userId: {columnName: "userId"},
                 title: {columnName: "title"},
+                createdAt: {columnName: "createdAt"},
                 "user.id": {relation: {entityName: "user", refField: "id"}},
                 "user.sub": {relation: {entityName: "user", refField: "sub"}},
                 "task[].id": {relation: {entityName: "task", refField: "id"}},
@@ -79,7 +81,8 @@ public isolated client class Client {
                 status: {columnName: "status"},
                 "taskList.id": {relation: {entityName: "taskList", refField: "id"}},
                 "taskList.userId": {relation: {entityName: "taskList", refField: "userId"}},
-                "taskList.title": {relation: {entityName: "taskList", refField: "title"}}
+                "taskList.title": {relation: {entityName: "taskList", refField: "title"}},
+                "taskList.createdAt": {relation: {entityName: "taskList", refField: "createdAt"}}
             },
             keyFields: ["id"],
             joinMetadata: {taskList: {entity: TaskList, fieldName: "taskList", refTable: "TaskList", refColumns: ["id"], joinColumns: ["tasklistId"], 'type: psql:ONE_TO_MANY}}

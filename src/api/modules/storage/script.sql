@@ -16,6 +16,7 @@ CREATE TABLE `User` (
 CREATE TABLE `TaskList` (
 	`id` INT AUTO_INCREMENT,
 	`title` VARCHAR(191) NOT NULL,
+	`createdAt` DATETIME NOT NULL,
 	`userId` INT NOT NULL,
 	FOREIGN KEY(`userId`) REFERENCES `User`(`id`),
 	PRIMARY KEY(`id`)

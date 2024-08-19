@@ -3,6 +3,8 @@
 // This file is an auto-generated file by Ballerina persistence layer for model.
 // It should not be modified by hand.
 
+import ballerina/time;
+
 public type User record {|
     readonly int id;
     string sub;
@@ -33,6 +35,7 @@ public type TaskList record {|
     readonly int id;
     int userId;
     string title;
+    time:Civil createdAt;
 
 |};
 
@@ -40,6 +43,7 @@ public type TaskListOptionalized record {|
     int id?;
     int userId?;
     string title?;
+    time:Civil createdAt?;
 |};
 
 public type TaskListWithRelations record {|
@@ -53,11 +57,13 @@ public type TaskListTargetType typedesc<TaskListWithRelations>;
 public type TaskListInsert record {|
     int userId;
     string title;
+    time:Civil createdAt;
 |};
 
 public type TaskListUpdate record {|
     int userId?;
     string title?;
+    time:Civil createdAt?;
 |};
 
 public type Task record {|

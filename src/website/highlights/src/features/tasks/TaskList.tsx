@@ -26,8 +26,9 @@ let TaskExcerpt = ({ taskId }: { taskId: string }) => {
             key={task.id}
             className={classes.task}
             withBorder
+            wrap="nowrap"
         >
-            <Group>
+            <Group wrap="nowrap">
                 <Checkbox
                     radius={'lg'}
                     checked={task.status === 'completed'}
@@ -39,7 +40,7 @@ let TaskExcerpt = ({ taskId }: { taskId: string }) => {
             </Group>
             <Menu shadow="md">
                 <Menu.Target>
-                    <Button ml={'auto'} variant="transparent" color="dark"><IconDotsVertical size={18} /></Button>
+                    <Button style={{ flexShrink: 0 }} ml={'auto'} variant="transparent" color="dark"><IconDotsVertical size={18} /></Button>
                 </Menu.Target>
 
                 <Menu.Dropdown>
@@ -63,7 +64,7 @@ export default function TaskList({ taskListId }: { taskListId: string }) {
     }
 
     return (
-        <Stack gap={'xs'}>
+        <Stack py={'md'} gap={'xs'}>
             {orderedTaskIds?.map((taskId) => (
                 <TaskExcerpt key={taskId} taskId={taskId} />
             ))}

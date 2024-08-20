@@ -80,7 +80,7 @@ export default function Navbar() {
                 setActive(currentTaskList);
             }
         }
-    }, [router.pathname, router.asPath, taskListIds]);
+    }, [router.pathname, router.asPath, taskListIds, mstodoTaskListIds, googleTaskListIds]);
 
     const mainLinks = useMemo(() => links.map((link) => (
         <UnstyledButton

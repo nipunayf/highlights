@@ -15,15 +15,15 @@ export default function Tasks() {
     const taskList = useAppSelector(selectDefaultTaskList);
 
     return (
-        <Box p={'lg'} style={{ backgroundColor: backgroundColor }}>
+        <Box p={'xl'} style={{ backgroundColor: backgroundColor }}>
             <Flex className={classes.tasks} direction={"column"}>
-                <Title order={1}>Tasks</Title>
+                <Title mt={'sm'} mb={"sm"} px={"xl"} order={1}>Tasks</Title>
                 <ScrollArea my={'md'}>
-                    <Box mx={'auto'} maw={'70%'}>
+                    <Box mx={'auto'} maw={'80%'}>
                         <TaskList taskListId={taskList.id} />
                     </Box>
                 </ScrollArea>
-                <Box mt={'auto'} mb={0}>
+                <Box px={"xl"} mt={'auto'} mb={0}>
                     <TaskForm taskListId={taskList.id} />
                 </Box>
             </Flex>

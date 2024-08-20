@@ -9,7 +9,7 @@ import {
     Avatar,
     Box,
 } from '@mantine/core';
-import { IconBulb, IconUser, IconCheckbox, IconPlus, IconChartDots2, IconCalendarMonth, IconTie, IconAlarm, IconList, IconBellRinging, IconChevronRight } from '@tabler/icons-react';
+import { IconBulb, IconCheckbox, IconPlus, IconChartDots2, IconCalendarMonth, IconTie, IconAlarm, IconList, IconBellRinging, IconChevronRight } from '@tabler/icons-react';
 import classes from './Navbar.module.css';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
@@ -30,11 +30,8 @@ const links = [
     { icon: IconBellRinging, label: 'Projects', path: '/projects' },
 ];
 
-let taskListIds: string[] = [];
-
 let TaskListExcerpt = ({ taskListId, active, setActive }: { taskListId: string, active: string, setActive: (label: string) => void }) => {
-    const taskList = useAppSelector(state => selectTaskListById(state, taskListId))
-    taskListIds.push(taskList.id);
+    const taskList = useAppSelector(state => selectTaskListById(state, taskListId));
     return (
         <UnstyledButton
             component={Link}
@@ -42,7 +39,7 @@ let TaskListExcerpt = ({ taskListId, active, setActive }: { taskListId: string, 
             key={taskList.id}
             className={classes.collectionLink}
             data-active={taskList.id === active || undefined}
-            onClick={(e) => {
+            onClick={() => {
                 setActive(taskList.id);
             }}>
             <div className={classes.mainLinkInner}>
@@ -76,7 +73,9 @@ export default function Navbar() {
         if (currentSection) {
             setActive(currentSection.label);
         } else {
-            const currentTaskList = taskListIds.find(item => `/tasks/${item}` === router.asPath);
+            const currentTaskList = taskListIds.find(item => `/tasks/${item}` === router.asPath)
+                || mstodoTaskListIds.find(item => `/tasks/${item}` === router.asPath)
+                || googleTaskListIds.find(item => `/tasks/${item}` === router.asPath);
             if (currentTaskList) {
                 setActive(currentTaskList);
             }

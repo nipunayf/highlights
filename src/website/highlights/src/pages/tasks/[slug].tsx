@@ -32,15 +32,15 @@ export default function Page() {
     }
 
     return (
-        <Box p={'lg'} style={{ backgroundColor: backgroundColor }}>
+        <Box p={'xl'} style={{ backgroundColor: backgroundColor }}>
             <Flex className={classes.tasks} direction={"column"}>
-                <Title order={1}>{taskList.title}</Title>
+                <Title mt={'sm'} mb={"sm"} px={"xl"} order={1}>{taskList.title}</Title>
                 <ScrollArea my={'md'}>
                     <Box mx={'auto'} maw={'70%'}>
                         <TaskList taskListId={taskListId} />
                     </Box>
                 </ScrollArea>
-                <Box mt={'auto'} mb={0}>
+                <Box px={"xl"} mt={'auto'} mb={0}>
                     <TaskForm taskListId={taskListId} />
                 </Box>
             </Flex>

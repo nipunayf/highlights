@@ -7,7 +7,7 @@ import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, Ent
 import { TaskListSource } from './TaskListSource';
 
 const defaultState = [
-    { id: 'taskList1', title: 'Default', taskIds: [] }
+    { id: 'taskList1', title: 'Default', taskIds: ['task1', 'task2', 'task3', 'task4', 'task5', 'task6', 'task7', 'task8', 'task9', 'task10', 'task11', 'task12', 'task13', 'task14', 'task15', 'task16', 'task17', 'task18', 'task19', 'task20'] }
 ];
 
 interface TaskListsState extends EntityState<TaskList, string> {
@@ -29,7 +29,6 @@ export const fetchTaskLists = createAsyncThunk('taskLists/fetch', async (user: A
         taskLists.push({
             id: taskList.id,
             title: taskList.title,
-            taskIds: [],
             source: TaskListSource.Highlights
         });
     }
@@ -41,7 +40,6 @@ export const fetchMSToDoTaskLists = createAsyncThunk('taskLists/fetchFromMSToDo'
     return lists.map(list => ({
         id: list.id,
         title: list.title,
-        taskIds: [],
         source: TaskListSource.MicrosoftToDo
     }));
 });
@@ -57,9 +55,19 @@ export const taskListsSlice = createSlice({
             const { taskListId, taskId } = action.payload;
             const existingTaskList = state.entities[taskListId];
             if (existingTaskList) {
+                if (!existingTaskList.taskIds)
+                    existingTaskList.taskIds = [];
                 existingTaskList.taskIds.push(taskId);
             }
-        }
+        },
+        updateTaskListWithTasks: (state, action) => {
+            const { taskListId, taskIds } = action.payload;
+            const taskList = state.entities[taskListId];
+            if (taskList) {
+                taskList.taskIds = taskIds;
+                state.entities[taskListId] = taskList;
+            }
+        },
     },
     extraReducers: (builder) => {
         builder
@@ -88,7 +96,13 @@ export const taskListsSlice = createSlice({
     }
 });
 
-export const { taskListAdded, taskListRemoved, taskListUpdated, taskAddedToTaskList } = taskListsSlice.actions;
+export const {
+    taskListAdded,
+    taskListRemoved,
+    taskListUpdated,
+    taskAddedToTaskList,
+    updateTaskListWithTasks
+} = taskListsSlice.actions;
 
 export default taskListsSlice.reducer;
 

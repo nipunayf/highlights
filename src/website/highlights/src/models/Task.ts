@@ -2,8 +2,7 @@ import { SetStateAction } from "react";
 
 export interface Task {
 
-    estimatedTime: SetStateAction<number | null>;
-    completed: boolean;
+    estimatedTime?: SetStateAction<number | null>;
     dueDate?: string;
     Date?: string;
     title: string;
@@ -17,7 +16,7 @@ export interface Task {
     taskId?: string;
 
     id: string;
-    created?: string;
+    created: string;
 }
 
 export interface Review {

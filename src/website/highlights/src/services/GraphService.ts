@@ -108,11 +108,10 @@ export async function getTaskLists(): Promise<TaskList[]> {
     return taskLists;
 }
 
-export async function getTasks() {
+export async function getTasks(taskListId: string): Promise<any[]> {
     await ensureClient();
 
-    const tasks = await graphClient!.api('/me/todo/lists/tasks')
-        .select('id,title,dueDateTime,completedDateTime')
+    const tasks = await graphClient!.api('/me/todo/lists/' + taskListId + '/tasks')
         .get();
 
     return tasks.value;

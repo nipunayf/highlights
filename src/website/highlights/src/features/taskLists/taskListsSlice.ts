@@ -1,5 +1,5 @@
 import { AppUser } from '@/hooks/useAppUser';
-import { TaskList } from '@/models/TaskList';
+import { TaskList } from '@/features/taskLists/TaskList';
 import { getTaskLists } from '@/services/api';
 import { RootState } from '@/store';
 import { createAsyncThunk, createEntityAdapter, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';

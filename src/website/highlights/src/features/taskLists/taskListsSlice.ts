@@ -1,8 +1,10 @@
 import { AppUser } from '@/hooks/useAppUser';
 import { TaskList } from '@/features/taskLists/TaskList';
 import { getTaskLists } from '@/services/api';
+import { getTaskLists as getTaskListsGraph } from '@/services/GraphService';
 import { RootState } from '@/store';
-import { createAsyncThunk, createEntityAdapter, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
+import { TaskListSource } from './TaskListSource';
 
 const defaultState = [
     { id: 'taskList1', title: 'Default', taskIds: [] }
@@ -27,10 +29,21 @@ export const fetchTaskLists = createAsyncThunk('taskLists/fetch', async (user: A
         taskLists.push({
             id: taskList.id,
             title: taskList.title,
-            taskIds: []
+            taskIds: [],
+            source: TaskListSource.Highlights
         });
     }
     return taskLists;
+});
+
+export const fetchMSToDoTaskLists = createAsyncThunk('taskLists/fetchFromMSToDo', async () => {
+    const lists = await getTaskListsGraph();
+    return lists.map(list => ({
+        id: list.id,
+        title: list.title,
+        taskIds: [],
+        source: TaskListSource.MicrosoftToDo
+    }));
 });
 
 export const taskListsSlice = createSlice({
@@ -61,6 +74,17 @@ export const taskListsSlice = createSlice({
                 state.status = 'failed';
                 state.error = action.error.message;
             })
+            .addCase(fetchMSToDoTaskLists.pending, (state, action) => {
+                state.status = 'loading';
+            })
+            .addCase(fetchMSToDoTaskLists.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+                taskListsAdapter.upsertMany(state, action.payload);
+            })
+            .addCase(fetchMSToDoTaskLists.rejected, (state, action) => {
+                state.status = 'failed';
+                state.error = action.error.message;
+            });
     }
 });
 
@@ -93,3 +117,8 @@ export const selectUserTaskListIds = (state: RootState): string[] => {
     const taskLists = selectUserTaskLists(state);
     return taskLists.map(taskList => taskList.id);
 }
+
+export const selectTaskListIdsBySource = createSelector(
+    [selectAllTaskLists, (state: RootState, source: TaskListSource) => source],
+    (taskLists, source) => taskLists.filter(taskList => taskList.source === source).map(taskList => taskList.id)
+);

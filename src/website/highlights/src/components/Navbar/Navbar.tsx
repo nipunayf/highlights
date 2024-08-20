@@ -12,12 +12,13 @@ import {
 import { IconBulb, IconUser, IconCheckbox, IconPlus, IconChartDots2, IconCalendarMonth, IconTie, IconAlarm, IconList, IconBellRinging, IconChevronRight } from '@tabler/icons-react';
 import classes from './Navbar.module.css';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
-import { fetchTaskLists, selectTaskListById, selectUserTaskListIds } from '@/features/taskLists/taskListsSlice';
+import { fetchMSToDoTaskLists, fetchTaskLists, selectTaskListById, selectTaskListIdsBySource } from '@/features/taskLists/taskListsSlice';
 import { useAppDispatch, useAppSelector } from '@/hooks';
 import { useAppUser } from '@/hooks/useAppUser';
 import UserMenu from '../UserMenu/UserMenu';
+import { TaskListSource } from '@/features/taskLists/TaskListSource';
 
 const links = [
     { icon: IconBulb, label: 'Highlights', path: '/highlights' },
@@ -40,7 +41,7 @@ let TaskListExcerpt = ({ taskListId, active, setActive }: { taskListId: string, 
             component={Link}
             href={`/tasks/${taskList.id}`}
             key={taskList.id}
-            className={classes.mainLink}
+            className={classes.collectionLink}
             data-active={taskList.id === active || undefined}
             onClick={(e) => {
                 setActive(taskList.id);
@@ -59,11 +60,15 @@ export default function Navbar() {
 
     const dispatch = useAppDispatch();
 
-    const taskListIds = useAppSelector(selectUserTaskListIds);
+    const taskListIds = useAppSelector(state => selectTaskListIdsBySource(state, TaskListSource.Highlights));
+    const mstodoTaskListIds = useAppSelector(state => selectTaskListIdsBySource(state, TaskListSource.MicrosoftToDo));
+    const googleTaskListIds = useAppSelector(state => selectTaskListIdsBySource(state, TaskListSource.GoogleTasks));
     const { user } = useAppUser();
 
     useEffect(() => {
+        if (!user) return;
         dispatch(fetchTaskLists(user));
+        dispatch(fetchMSToDoTaskLists());
     }, [dispatch, user]);
 
     useEffect(() => {
@@ -79,7 +84,7 @@ export default function Navbar() {
         }
     }, [router.pathname, router.asPath, taskListIds]);
 
-    const mainLinks = links.map((link) => (
+    const mainLinks = useMemo(() => links.map((link) => (
         <UnstyledButton
             component={Link}
             href={link.path}
@@ -94,7 +99,7 @@ export default function Navbar() {
                 <span>{link.label}</span>
             </div>
         </UnstyledButton >
-    ));
+    )), [active]);
 
     return (
         <nav className={classes.navbar}>
@@ -137,6 +142,40 @@ export default function Navbar() {
                 </Group>
                 <div className={classes.collections}>
                     {taskListIds.map((taskListId: string) => (
+                        <TaskListExcerpt key={taskListId} taskListId={taskListId} active={active} setActive={setActive} />
+                    ))}
+                </div>
+            </div>
+            <div className={classes.section}>
+                <Group className={classes.collectionsHeader} justify="space-between">
+                    <Text size="sm" fw={500} c="dimmed">
+                        Microsoft To Do
+                    </Text>
+                    <Tooltip label="Create collection" withArrow position="right">
+                        <ActionIcon variant="default" size={18}>
+                            <IconPlus style={{ width: rem(12), height: rem(12) }} stroke={1.5} />
+                        </ActionIcon>
+                    </Tooltip>
+                </Group>
+                <div className={classes.collections}>
+                    {mstodoTaskListIds.map((taskListId: string) => (
+                        <TaskListExcerpt key={taskListId} taskListId={taskListId} active={active} setActive={setActive} />
+                    ))}
+                </div>
+            </div>
+            <div className={classes.section}>
+                <Group className={classes.collectionsHeader} justify="space-between">
+                    <Text size="sm" fw={500} c="dimmed">
+                        Google Tasks
+                    </Text>
+                    <Tooltip label="Create collection" withArrow position="right">
+                        <ActionIcon variant="default" size={18}>
+                            <IconPlus style={{ width: rem(12), height: rem(12) }} stroke={1.5} />
+                        </ActionIcon>
+                    </Tooltip>
+                </Group>
+                <div className={classes.collections}>
+                    {googleTaskListIds.map((taskListId: string) => (
                         <TaskListExcerpt key={taskListId} taskListId={taskListId} active={active} setActive={setActive} />
                     ))}
                 </div>

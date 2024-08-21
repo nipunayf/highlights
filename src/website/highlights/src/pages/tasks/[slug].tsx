@@ -1,12 +1,11 @@
 import PageLayout from '@/components/PageLayout/PageLayout';
-import TaskList from '@/features/tasks/TaskList';
 import { Box, Center, Flex, ScrollArea, Text, Title } from '@mantine/core';
 import { useRouter } from 'next/router'
 import { ReactNode } from 'react';
 import classes from './Tasks.module.css';
-import TaskForm from '@/features/tasks/TaskForm';
 import { useAppSelector } from '@/hooks';
 import { selectTaskListById } from '@/features/taskLists/taskListsSlice';
+import { TaskForm, TaskList } from '@/features/tasks/components';
 
 export default function Page() {
     const router = useRouter();

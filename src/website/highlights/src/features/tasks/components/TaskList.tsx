@@ -2,7 +2,7 @@ import { fetchTasks, selectTaskById, taskCompleted, taskRemoved, taskUncompleted
 import { useAppDispatch, useAppSelector } from "@/hooks";
 import type { TaskList } from "@/features/taskLists/TaskList";
 import { Button, Checkbox, Group, Menu, Paper, Stack, Text } from "@mantine/core";
-import { selectTaskListById } from "../taskLists/taskListsSlice";
+import { selectTaskListById } from "../../taskLists/taskListsSlice";
 import classes from './TaskList.module.css';
 import { IconDotsVertical, IconTrash } from "@tabler/icons-react";
 
@@ -53,7 +53,7 @@ let TaskExcerpt = ({ taskId }: { taskId: string }) => {
     );
 }
 
-export default function TaskList({ taskListId }: { taskListId: string }) {
+export function TaskList({ taskListId }: { taskListId: string }) {
     const dispatch = useAppDispatch();
 
     const taskList = useAppSelector((state) => selectTaskListById(state, taskListId));

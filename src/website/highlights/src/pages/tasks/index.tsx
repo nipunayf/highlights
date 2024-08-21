@@ -1,11 +1,10 @@
 import PageLayout from "@/components/PageLayout/PageLayout";
 import { Box, Flex, ScrollArea, Title, useMantineColorScheme, useMantineTheme } from "@mantine/core";
 import { ReactNode } from "react";
-import TaskForm from "@/features/tasks/TaskForm";
-import TaskList from "@/features/tasks/TaskList";
 import classes from './Tasks.module.css';
 import { useAppSelector } from "@/hooks";
 import { selectDefaultTaskList } from "@/features/taskLists/taskListsSlice";
+import { TaskForm, TaskList } from "@/features/tasks/components";
 
 export default function Tasks() {
     const theme = useMantineTheme();

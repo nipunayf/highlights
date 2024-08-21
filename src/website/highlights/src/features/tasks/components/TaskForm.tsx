@@ -5,10 +5,10 @@ import { DatePicker } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import { IconPlus } from '@tabler/icons-react';
 import classes from './TaskForm.module.css';
-import { taskAddedToTaskList } from '../taskLists/taskListsSlice';
+import { taskAddedToTaskList } from '../../taskLists/taskListsSlice';
 import { useFocusTrap } from '@mantine/hooks';
 
-export default function TaskForm({ taskListId }: { taskListId: string }) {
+export function TaskForm({ taskListId }: { taskListId: string }) {
 
     const dispatch = useAppDispatch();
 

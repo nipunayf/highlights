@@ -4,6 +4,12 @@ import webapp.backend.storage;
 import ballerina/http;
 import ballerina/log;
 
+type User record {|
+    int id;
+    string sub;
+    string[] linkedAccounts;
+|};
+
 service /users on http_listener:Listener {
     private final storage:Client sClient;
 
@@ -11,8 +17,22 @@ service /users on http_listener:Listener {
         self.sClient = check new ();
     }
 
-    resource function get [int id]() returns storage:User|error {
-        return self.sClient->/users/[id]();
+    resource function get [int id]() returns User|error {
+        storage:User user = check self.sClient->/users/[id]();
+
+        stream<storage:UserLinkedAccount, error?> userLinkedAccounts = self.sClient->/userlinkedaccounts();
+        stream<storage:LinkedAccount, error?> linkedAccounts = self.sClient->/linkedaccounts();
+
+        storage:LinkedAccount[] accounts = check from var ula in userLinkedAccounts
+            where ula.userId == id
+            join var la in linkedAccounts on ula.linkedaccountId equals la.id
+            select la;
+
+        return {
+            id: user.id,
+            sub: user.sub,
+            linkedAccounts: accounts.map((account) => account.name)
+        };
     }
 
     resource function post .(@http:Payload storage:UserInsert user) returns http:Created|http:Conflict|http:InternalServerError|error {

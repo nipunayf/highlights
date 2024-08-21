@@ -6,6 +6,10 @@ values(1, 'Shopping', '2023-10-05 14:48:00'),
 (1, 'Work', '2023-10-05 14:48:00'),
 (1, 'Travel', '2023-10-05 14:48:00');
 
+insert into LinkedAccount(name) values('Microsoft'), ('Google');
+
+insert into UserLinkedAccount(userId, linkedaccountId) values(1, 1), (1, 2);
+
 -- INSERT INTO `timer_details` (
 --   `timer_name`,
 --   `pomo_duration`,

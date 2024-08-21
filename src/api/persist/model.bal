@@ -8,6 +8,21 @@ type User record {|
     string sub;
     TaskList[] tasklist;
     Timer[] timer;
+    UserLinkedAccount[] userlinkedaccount;
+|};
+
+type LinkedAccount record {|
+    @sql:Generated
+    readonly int id;
+    string name;
+    UserLinkedAccount[] userlinkedaccount;
+|};
+
+type UserLinkedAccount record {|
+    @sql:Generated
+    readonly int id;
+    User user;
+    LinkedAccount linkedaccount;
 |};
 
 type TaskList record {|

@@ -8,6 +8,7 @@ DROP TABLE IF EXISTS `Pomodoro`;
 DROP TABLE IF EXISTS `Stopwatch`;
 DROP TABLE IF EXISTS `Highlight`;
 DROP TABLE IF EXISTS `Task`;
+DROP TABLE IF EXISTS `UserLinkedAccount`;
 DROP TABLE IF EXISTS `Timer`;
 DROP TABLE IF EXISTS `TaskList`;
 DROP TABLE IF EXISTS `PauseStopwatch`;
@@ -15,6 +16,13 @@ DROP TABLE IF EXISTS `Project`;
 DROP TABLE IF EXISTS `DailyTip`;
 DROP TABLE IF EXISTS `User`;
 DROP TABLE IF EXISTS `Review`;
+DROP TABLE IF EXISTS `LinkedAccount`;
+
+CREATE TABLE `LinkedAccount` (
+	`id` INT AUTO_INCREMENT,
+	`name` VARCHAR(191) NOT NULL,
+	PRIMARY KEY(`id`)
+);
 
 CREATE TABLE `Review` (
 	`id` INT AUTO_INCREMENT,
@@ -59,6 +67,15 @@ CREATE TABLE `Timer` (
 	`pomosPerLongBreak` INT NOT NULL,
 	`userId` INT NOT NULL,
 	FOREIGN KEY(`userId`) REFERENCES `User`(`id`),
+	PRIMARY KEY(`id`)
+);
+
+CREATE TABLE `UserLinkedAccount` (
+	`id` INT AUTO_INCREMENT,
+	`userId` INT NOT NULL,
+	FOREIGN KEY(`userId`) REFERENCES `User`(`id`),
+	`linkedaccountId` INT NOT NULL,
+	FOREIGN KEY(`linkedaccountId`) REFERENCES `LinkedAccount`(`id`),
 	PRIMARY KEY(`id`)
 );
 

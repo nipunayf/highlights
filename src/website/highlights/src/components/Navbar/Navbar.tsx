@@ -19,6 +19,7 @@ import { useAppDispatch, useAppSelector } from '@/hooks';
 import { useAppUser } from '@/hooks/useAppUser';
 import UserMenu from '../UserMenu/UserMenu';
 import { TaskListSource } from '@/features/taskLists/TaskListSource';
+import LinkServiceButton from './LinkServiceButton';
 
 const links = [
     { icon: IconBulb, label: 'Highlights', path: '/highlights' },
@@ -127,57 +128,49 @@ export default function Navbar() {
                 <div className={classes.mainLinks}>{mainLinks}</div>
             </div>
 
-            <div className={classes.section}>
-                <Group className={classes.collectionsHeader} justify="space-between">
-                    <Text size="sm" fw={500} c="dimmed">
-                        Collections
-                    </Text>
-                    <Tooltip label="Create collection" withArrow position="right">
-                        <ActionIcon variant="default" size={18}>
-                            <IconPlus style={{ width: rem(12), height: rem(12) }} stroke={1.5} />
-                        </ActionIcon>
-                    </Tooltip>
-                </Group>
-                <div className={classes.collections}>
-                    {taskListIds.map((taskListId: string) => (
-                        <TaskListExcerpt key={taskListId} taskListId={taskListId} active={active} setActive={setActive} />
-                    ))}
+            {user?.linkedAccounts?.includes('Microsoft') ? (
+                <Box className={classes.section}>
+                    <Group className={classes.collectionsHeader} justify="space-between">
+                        <Text size="sm" fw={500} c="dimmed">
+                            Microsoft To Do
+                        </Text>
+                        <Tooltip label="Create collection" withArrow position="right">
+                            <ActionIcon variant="default" size={18}>
+                                <IconPlus style={{ width: rem(12), height: rem(12) }} stroke={1.5} />
+                            </ActionIcon>
+                        </Tooltip>
+                    </Group>
+                    <div className={classes.collections}>
+                        {mstodoTaskListIds.map((taskListId: string) => (
+                            <TaskListExcerpt key={taskListId} taskListId={taskListId} active={active} setActive={setActive} />
+                        ))}
+                    </div>
+                </Box>
+            ) :
+                <LinkServiceButton service="Microsoft" />
+            }
+
+            {user?.linkedAccounts?.includes('Google') ? (
+                <div className={classes.section}>
+                    <Group className={classes.collectionsHeader} justify="space-between">
+                        <Text size="sm" fw={500} c="dimmed">
+                            Google Tasks
+                        </Text>
+                        <Tooltip label="Create collection" withArrow position="right">
+                            <ActionIcon variant="default" size={18}>
+                                <IconPlus style={{ width: rem(12), height: rem(12) }} stroke={1.5} />
+                            </ActionIcon>
+                        </Tooltip>
+                    </Group>
+                    <div className={classes.collections}>
+                        {googleTaskListIds.map((taskListId: string) => (
+                            <TaskListExcerpt key={taskListId} taskListId={taskListId} active={active} setActive={setActive} />
+                        ))}
+                    </div>
                 </div>
-            </div>
-            <div className={classes.section}>
-                <Group className={classes.collectionsHeader} justify="space-between">
-                    <Text size="sm" fw={500} c="dimmed">
-                        Microsoft To Do
-                    </Text>
-                    <Tooltip label="Create collection" withArrow position="right">
-                        <ActionIcon variant="default" size={18}>
-                            <IconPlus style={{ width: rem(12), height: rem(12) }} stroke={1.5} />
-                        </ActionIcon>
-                    </Tooltip>
-                </Group>
-                <div className={classes.collections}>
-                    {mstodoTaskListIds.map((taskListId: string) => (
-                        <TaskListExcerpt key={taskListId} taskListId={taskListId} active={active} setActive={setActive} />
-                    ))}
-                </div>
-            </div>
-            <div className={classes.section}>
-                <Group className={classes.collectionsHeader} justify="space-between">
-                    <Text size="sm" fw={500} c="dimmed">
-                        Google Tasks
-                    </Text>
-                    <Tooltip label="Create collection" withArrow position="right">
-                        <ActionIcon variant="default" size={18}>
-                            <IconPlus style={{ width: rem(12), height: rem(12) }} stroke={1.5} />
-                        </ActionIcon>
-                    </Tooltip>
-                </Group>
-                <div className={classes.collections}>
-                    {googleTaskListIds.map((taskListId: string) => (
-                        <TaskListExcerpt key={taskListId} taskListId={taskListId} active={active} setActive={setActive} />
-                    ))}
-                </div>
-            </div>
+            ) :
+                <LinkServiceButton service="Google" />
+            }
         </nav>
     );
 }

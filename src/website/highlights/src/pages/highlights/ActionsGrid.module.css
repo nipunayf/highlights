@@ -1,0 +1,233 @@
+.title {
+    font-family:
+      Greycliff CF,
+      var(--mantine-font-family);
+    font-weight: 900;
+    font-size: 36px;
+    margin-top: -40%;
+    margin-left: 40%;
+    color:#349CF3;
+   
+  }
+  .card {
+    cursor: pointer;
+    width: 100%;
+    height: 200px;
+    box-shadow: 0 4px 8px rgba(4, 108, 244, 0.1);
+    border: 1px solid transparent; 
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; 
+    border-radius: 10px; 
+    margin-right: 3%;
+    margin-left: 2%;
+    margin-top: 6%;
+  }
+  
+  .card:hover {
+    transform: scale(1.05); 
+    border-color: #aca9a9; 
+    box-shadow: 0 8px 16px rgba(175, 172, 172, 0.2);
+  }
+  
+  
+  .icon {
+    margin-left: 0%;
+    margin-top: 0%;
+    width: 150px;  
+    height: 150px; 
+  }
+
+
+  .separator {
+    margin-left: 2%;
+    width: 4px;
+    background-color: #349CF3; 
+    margin-top: 2%;
+  }
+
+  .highlight_card{
+    display: flex;
+  }
+
+  .task{
+    margin-left: 10%;
+    box-shadow: 0 4px 8px rgba(4, 108, 244, 0.1);
+    width: 600px;
+    border: 1px solid transparent; 
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for the hover effect */
+    border-radius: 10px; 
+  }
+.labelname{
+  margin-left: 10%;
+  font-size: 20px;
+ 
+}
+
+.button{
+ margin-top: 3%;
+ margin-left: 15%;
+}
+ 
+.taskname{
+  margin-left: -70%;
+  /* margin-right: 50px; */
+  
+}
+
+
+
+.sqare{
+  margin-left: -3%;
+  cursor: pointer;
+ 
+}
+ 
+ .taskContainer{
+  margin-top: 3%;
+  margin-left: 12.6%;
+  display: flex;
+  justify-content: space-between;
+  display: flex;
+ 
+  background-color: rgb(253, 253, 253);
+  gap: 10px;
+  
+  
+ } 
+ .taskstarttime{
+  margin-right: -25%;
+ }
+ .taskendtime{
+  margin-right: -28%;
+  cursor: pointer;
+  /* padding-right: 25%; */
+  /* background-color: aqua; */
+ 
+ }
+ .taskname{
+cursor: pointer;
+margin-left: -20%;
+ }
+
+/* .sqarex{
+  display: flex;
+  margin-right: 120%;
+} */
+
+  .overduetitle {
+    font-size: 24px; 
+    font-weight: bold; 
+    color: red; 
+    text-align: center; 
+    margin: 20px 0; 
+    text-transform: uppercase; 
+    letter-spacing: 1px; 
+  }
+  .overdue{
+    margin-left: 0%;
+    box-shadow: 0 4px 8px rgba(255, 0, 0, 0.1);
+    width: 600px;
+    border: 1px solid transparent; 
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for the hover effect */
+    border-radius: 10px; 
+  }
+
+.Pendingtitle{
+  font-size: 24px; 
+    font-weight: bold; 
+    color: #349CF3; 
+    text-align: center; 
+    margin: 20px 0; 
+    text-transform: uppercase; 
+    letter-spacing: 1px;
+}
+
+.completetitle{
+  font-size: 24px; 
+    font-weight: bold; 
+    color: #c4bb0f; 
+    text-align: center; 
+    margin: 20px 0; 
+    text-transform: uppercase; 
+    letter-spacing: 1px;
+}
+
+.completedtask{
+  margin-left: 10%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 600px;
+  border: 1px solid transparent; 
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for the hover effect */
+  border-radius: 10px; 
+
+}
+
+
+
+
+
+.completedMessage {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: rgb(0, 0, 0); /* Text color */
+  font-size: 24px; /* Adjust font size */
+  z-index: 9999;
+  animation: popUp 0.5s forwards ease-out; /* Animation duration */
+}
+
+@keyframes popUp {
+  0% {
+    opacity: 0;
+    transform: translateY(10px); /* Start animation from below */
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(0); /* Move to final position */
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-10px); /* End animation above */
+  }
+}
+
+
+/* Responsive styles */
+@media (max-width: 1265px) {
+  .title {
+    font-size: 1.5rem; /* Adjust font size for mobile */
+  }
+
+  .icon {
+    width: 50px; /* Adjust size for mobile */
+    height: 50px; /* Adjust size for mobile */
+    margin-top: 2%;
+    margin-left: 5%;
+  }
+
+  .task {
+    width: 100%; /* Full width for mobile */
+  }
+
+  .highlight_card {
+    /* background-color: #921212; */
+    /* height: 10%; */
+    width: 100%; 
+    padding: 10px; /* Add padding for better spacing */
+    flex-direction: column; /* Stack items vertically */
+  }
+  .card{
+    /* background-color: rgb(255, 255, 255); */
+    height: 20%;
+    width: 80%;
+  }
+
+  .separator {
+    display: none; /* Hide separator on mobile */
+  }
+
+  .task {
+    margin: 2% auto; /* Adjust margin for mobile */
+  }
+}
+

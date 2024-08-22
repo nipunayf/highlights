@@ -22,6 +22,9 @@ interface UserButtonProps {
   };
   onClick?: () => void;
 }
+interface TimerProps {
+  onEndButtonClick: () => void; // Prop to notify end button click
+}
 
 const UserButton = forwardRef<HTMLButtonElement, UserButtonProps>(
   ({ image, label, icon, styles: userStyles, onClick, ...others }: UserButtonProps, ref) => {
@@ -114,11 +117,11 @@ const TimerMenu = ({ timer_details }: { timer_details: mTimer[] }) => {
   );
 };
 
-const Timer = () => {
-  const WORK_TIME = 1;
-  const SHORT_BREAK = 2;
-  const LONG_BREAK = 3;
-  const CYCLES_BEFORE_LONG_BREAK = 2;
+const Timer: React.FC<TimerProps> = ({ onEndButtonClick }) => {
+  const WORK_TIME = 25;
+  const SHORT_BREAK = 5;
+  const LONG_BREAK = 15;
+  const CYCLES_BEFORE_LONG_BREAK = 4;
   const userId = 11;
 
   const [active, setActive] = useState('focus'); // 'focus' for work session, 'break' for break session
@@ -635,6 +638,7 @@ const Timer = () => {
 
     try {
       await sendTimerEndData(endPomoDetails);
+      onEndButtonClick();
       showNotification({
         title: 'Timer Ended',
         message: 'The timer has been reset to the beginning and details have been sent.',

@@ -19,7 +19,9 @@ interface UserButtonProps {
   icon?: React.ReactNode;
   [key: string]: any;
 }
-
+interface StopwatchProps {
+  onEndButtonClick: () => void; // Prop to notify end button click
+}
 const UserButton = forwardRef<HTMLButtonElement, UserButtonProps>(
   ({ image, label, icon, ...others }, ref) => (
     <UnstyledButton
@@ -111,8 +113,7 @@ const TimerMenu = ({ timer_details }: { timer_details: mTimer[] }) => {
     </Tabs.Panel>
   );
 };
-
-const Stopwatch: React.FC = () => {
+const Stopwatch: React.FC<StopwatchProps> = ({ onEndButtonClick }) => {
   const [time, setTime] = useState(0);
   const [isActive, setIsActive] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
@@ -361,6 +362,98 @@ const Stopwatch: React.FC = () => {
   
 
 
+  // const handleEnd = () => {
+  //   Swal({
+  //     title: "Is the task complete?",
+  //     text: "Please confirm if you have completed the task.",
+  //     icon: "warning",
+  //     buttons: ["Not Yet", "Yes, Complete!"],
+  //     dangerMode: true,
+  //   }).then(async (isComplete) => {
+  //     const endTime = new Date();
+  //     setEndTime(endTime);
+  
+  //     const currentTimerId = selectedTask !== null && timer_details
+  //       ? Number(timer_details[selectedTask]?.timer_id) // Convert to number
+  //       : -1; // Default value or handle as needed
+  
+  //     const userId = 11;
+
+  //     const status = isComplete ? "complete" : "uncomplete";
+  
+  //     const endDetails = {
+  //       stopwatch_id: stopwatchId ?? 1,
+  //       timer_id: currentTimerId,
+  //       highlight_id: highlightId ?? 1,
+  //       user_id: userId,
+  //       end_time: endTime.toISOString(),
+  //       status: status
+  //     };
+  
+  //     try {
+        
+  //       await sendEndStopwatchData(endDetails);
+
+  //       setShowFocusSummary(true);
+  
+  //       const notificationTitle = isComplete ? 'Task Completed' : 'Task Not Completed';
+  //       const notificationMessage = isComplete
+  //         ? 'The task has been marked as complete, and the end time has been sent.'
+  //         : 'The task has been marked as uncomplete, and the end time has been sent.';
+  //       const notificationColor = isComplete ? 'blue' : 'yellow';
+  
+  //       showNotification({
+  //         title: notificationTitle,
+  //         message: notificationMessage,
+  //         icon: <IconInfoCircle />,
+  //         color: notificationColor,
+  //         autoClose: 3000,
+  //         radius: 'md',
+  //         styles: (theme) => ({
+  //           root: {
+  //             backgroundColor: theme.colors[notificationColor][6],
+  //             borderColor: theme.colors[notificationColor][6],
+  //             '&::before': { backgroundColor: theme.white },
+  //           },
+  //           title: { color: theme.white },
+  //           description: { color: theme.white },
+  //           closeButton: {
+  //             color: theme.white,
+  //             '&:hover': { backgroundColor: theme.colors[notificationColor][7] },
+  //           },
+  //         }),
+  //       });
+  //       setShowFocusSummary(true);
+  //     } catch (error) {
+  //       showNotification({
+  //         title: 'Error',
+  //         message: 'Failed to send end time details.',
+  //         icon: <IconInfoCircle />,
+  //         color: 'red',
+  //         autoClose: 3000,
+  //         radius: 'md',
+  //         styles: (theme) => ({
+  //           root: {
+  //             backgroundColor: theme.colors.red[6],
+  //             borderColor: theme.colors.red[6],
+  //             '&::before': { backgroundColor: theme.white },
+  //           },
+  //           title: { color: theme.white },
+  //           description: { color: theme.white },
+  //           closeButton: {
+  //             color: theme.white,
+  //             '&:hover': { backgroundColor: theme.colors.red[7] },
+  //           },
+  //         }),
+  //       });
+  //     }
+  
+  //     // Reset stopwatch
+  //     setIsActive(false);
+  //     setIsPaused(false);
+  //     setTime(0);
+  //   });
+  // };
   const handleEnd = () => {
     Swal({
       title: "Is the task complete?",
@@ -371,15 +464,15 @@ const Stopwatch: React.FC = () => {
     }).then(async (isComplete) => {
       const endTime = new Date();
       setEndTime(endTime);
-  
+
       const currentTimerId = selectedTask !== null && timer_details
         ? Number(timer_details[selectedTask]?.timer_id) // Convert to number
         : -1; // Default value or handle as needed
-  
+
       const userId = 11;
 
       const status = isComplete ? "complete" : "uncomplete";
-  
+
       const endDetails = {
         stopwatch_id: stopwatchId ?? 1,
         timer_id: currentTimerId,
@@ -388,19 +481,19 @@ const Stopwatch: React.FC = () => {
         end_time: endTime.toISOString(),
         status: status
       };
-  
+
       try {
-        
         await sendEndStopwatchData(endDetails);
 
-        setShowFocusSummary(true);
-  
+        // Notify parent component to refresh FocusSummary
+        onEndButtonClick();
+
         const notificationTitle = isComplete ? 'Task Completed' : 'Task Not Completed';
         const notificationMessage = isComplete
           ? 'The task has been marked as complete, and the end time has been sent.'
           : 'The task has been marked as uncomplete, and the end time has been sent.';
         const notificationColor = isComplete ? 'blue' : 'yellow';
-  
+
         showNotification({
           title: notificationTitle,
           message: notificationMessage,
@@ -422,6 +515,7 @@ const Stopwatch: React.FC = () => {
             },
           }),
         });
+
         setShowFocusSummary(true);
       } catch (error) {
         showNotification({
@@ -446,14 +540,13 @@ const Stopwatch: React.FC = () => {
           }),
         });
       }
-  
+
       // Reset stopwatch
       setIsActive(false);
       setIsPaused(false);
       setTime(0);
     });
   };
-  
 
 
 
@@ -541,7 +634,6 @@ const Stopwatch: React.FC = () => {
           )}
         </div>
       </div>
-      {showFocusSummary && <FocusSummary activeTab={'Stopwatch'} />}
     </div>
   );
 };

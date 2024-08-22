@@ -9,7 +9,7 @@ const WebSocketComponent: React.FC = () => {
   const [socket, setSocket] = useState<WebSocket | null>(null);
 
   useEffect(() => {
-    // Create WebSocket connection
+          
     const ws = new WebSocket('ws://localhost:9091');
 
     // Function to send a message (if needed)
@@ -49,16 +49,16 @@ const WebSocketComponent: React.FC = () => {
     };
   }, []);
 
-  return (
-    <div>
-      <h1>WebSocket Messages</h1>
-      <ul>
-        {messages.map((message, index) => (
-          <li key={index}>{JSON.stringify(message)}</li>
-        ))}
-      </ul>
-    </div>
-  );
+  // return (
+  //   <div>
+  //     <h1>WebSocket Messages</h1>
+  //     <ul>
+  //       {messages.map((message, index) => (
+  //         <li key={index}>{JSON.stringify(message)}</li>
+  //       ))}
+  //     </ul>
+  //   </div>
+  // );
 };
 
 export default WebSocketComponent;

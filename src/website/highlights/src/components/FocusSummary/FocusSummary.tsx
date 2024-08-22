@@ -6,9 +6,10 @@ import { Title } from "@mantine/core";
 
 interface FocusSummaryProps {
   activeTab: 'Pomo' | 'Stopwatch';
+  refreshTrigger: boolean; // New prop to trigger refresh
 }
 
-const FocusSummary: React.FC<FocusSummaryProps> = ({ activeTab }) => {
+const FocusSummary: React.FC<FocusSummaryProps> = ({ activeTab, refreshTrigger }) => {
   const [focusRecords, setFocusRecords] = useState<mTimeRecord[]>([]);
   const [pauseDetails, setPauseDetails] = useState<mPauseContinueDetails[]>([]);
   const [stopwatchfocusRecords, setstopwatchFocusRecords] = useState<mStopwatchTimeRecord[]>([]);
@@ -40,8 +41,7 @@ const FocusSummary: React.FC<FocusSummaryProps> = ({ activeTab }) => {
     };
   
     fetchFocusData();
-  }, [userId, activeTab]);
-  
+  },  [userId, activeTab, refreshTrigger]); // Added refreshTrigger to dependency array
 
   const groupByDate = (records: mTimeRecord[]) => {
     return records.reduce((acc, record) => {

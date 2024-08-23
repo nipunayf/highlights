@@ -1,6 +1,7 @@
 import webapp.backend.database;
 import webapp.backend.http_listener;
 import webapp.backend.lists as _;
+import webapp.backend.users as _;
 
 import ballerina/http;
 import ballerina/io;
@@ -9,15 +10,6 @@ import ballerina/log;
 import ballerina/sql;
 import ballerina/time;
 import ballerinax/mysql.driver as _;
-
-type CreateUser record {|
-    string sub;
-|};
-
-type User record {|
-    int id;
-    string sub;
-|};
 
 type Task record {
     int id;
@@ -44,12 +36,16 @@ type CreateTask record {|
 
 |};
 
-type Highlight record {|
-    string id;
-    string created;
-    string title;
-    time:Utc? dueDate = null;
-|};
+// type CreateSubTask record {|
+//     string title;
+//     string description;
+//     string? dueDate;
+//     string? startTime;
+//     string? endTime;
+//     string? reminder;
+//     string priority;
+//     int parentTaskId;
+// |};
 
 type h_Highlight record {|
     int highlight_id;
@@ -154,6 +150,7 @@ type PausesDetailsTemp record {
     string pause_time;
     // string continue_time;
 };
+
 type h_stopwatch_PausesDetails record {
     int stopwatch_id;
     int highlight_id;
@@ -181,6 +178,7 @@ type ContinueDetailsTemp record {
     // string pause_time;
     string continue_time;
 };
+
 type h_stopwatch_ContinueDetails record {
     int stopwatch_id;
     int highlight_id;
@@ -220,6 +218,7 @@ type TimeRecord record {
     string end_time;
     string[][] pause_and_continue_times;
 };
+
 type h_StopwatchTimeRecord record {
     int stopwatch_id;
     int highlight_id;
@@ -228,10 +227,6 @@ type h_StopwatchTimeRecord record {
     string end_time;
     string[][] pause_and_continue_times;
 };
-
-Task[] tasks = [
-
-];
 
 type FocusRecord record {
     string highlight_id;
@@ -288,13 +283,6 @@ type h_ActiveStopwatchDetails record {|
     int highlight_id;
 |};
 
-type TaskList record {|
-    int id;
-    @sql:Column {name: "user_id"}
-    int userId;
-    string title;
-|};
-
 type DailyTip record {
     int id;
     string label;
@@ -308,6 +296,11 @@ type CreateDailyTip record {|
     // time:Date date;
 |};
 
+type review record {|
+    string id;
+    string description;
+|};
+
 // listener http:Listener securedEP = new (9090);
 
 // Define the configuration variables
@@ -319,6 +312,26 @@ type PauseAndContinueTime record {
 };
 
 @http:ServiceConfig {
+    // auth: [
+    //     {
+    //         jwtValidatorConfig: {
+    //             issuer: azureAdIssuer,
+    //             audience: azureAdAudience,
+    //             scopeKey: "scp"
+    //         },
+    //         scopes: ["User.Read"]
+    //     }
+    // ],
+    // auth: [
+    //     {
+    //         jwtValidatorConfig: {
+    //             issuer: azureAdIssuer,
+    //             audience: azureAdAudience,
+    //             scopeKey: "scp"
+    //         },
+    //         scopes: ["User.Read"]
+    //     }
+    // ],
     cors: {
         allowOrigins: ["http://localhost:3000"],
         allowCredentials: false,
@@ -328,33 +341,10 @@ type PauseAndContinueTime record {
     }
 }
 service / on http_listener:Listener {
-    resource function post users(CreateUser createUser) returns http:Created|http:Conflict|http:InternalServerError {
-
-        User|sql:Error result = database:Client->queryRow(`SELECT * FROM users WHERE sub = ${createUser.sub}`);
-
-        if result is sql:NoRowsError {
-            do {
-                _ = check database:Client->execute(`
-                        INSERT INTO users (sub)
-                        VALUES (${createUser.sub});`);
-            } on fail var e {
-                log:printError("Error occurred while inserting data: ", e);
-                return http:INTERNAL_SERVER_ERROR;
-            }
-
-            return http:CREATED;
-        }
-
-        if result is User {
-            return http:CONFLICT;
-        }
-
-        return http:INTERNAL_SERVER_ERROR;
-    }
 
     //  resource function get tasks() returns Task[]|error {
     //         sql:ParameterizedQuery query = `SELECT id,title, dueDate, startTime, endTime, label, reminder, priority, description , status FROM hi`;
-    //         stream<Task, sql:Error?> resultStream = database:Client->query(query);
+    //         stream<Task, sql:Error?> resultStream = self.db->query(query);
     //         Task[] tasksList = [];
     //         error? e = resultStream.forEach(function(Task task) {
     //             tasksList.push(task);
@@ -388,27 +378,7 @@ service / on http_listener:Listener {
         return tasksList;
     }
 
-    resource function get taskLists(string sub) returns TaskList[]|error {
-        User|sql:Error result = database:Client->queryRow(`SELECT * FROM users WHERE sub = ${sub}`);
-
-        if result is sql:NoRowsError {
-            return error("User not found");
-        }
-
-        stream<TaskList, sql:Error?> taskListStream = database:Client->query(
-            `SELECT * FROM task_lists WHERE user_id=(SELECT u.id FROM users AS u WHERE u.sub=${sub});`
-        );
-
-        return from TaskList taskList in taskListStream
-            select taskList;
-    }
-
-    // resource function get tasks() returns Task[] {
-    //     return tasks;
-    // }
-
     resource function get tasks() returns Task[]|error {
-        io:println("cbbbb");
         return self.fetchTasksForToday();
     }
 
@@ -449,7 +419,7 @@ service / on http_listener:Listener {
             return;
         }
 
-        io:println(tasks);
+        // io:println(tasks);
 
         check caller->respond(tasks);
 
@@ -459,13 +429,11 @@ service / on http_listener:Listener {
     }
 
     resource function put tasks/[int taskId](http:Caller caller, http:Request req) returns error? {
-        // io:println("ss");
-        // io:println(Task);
 
         json|http:ClientError payload = req.getJsonPayload();
         if payload is http:ClientError {
             log:printError("Error while parsing request payload", 'error = payload);
-            io:println("xdd");
+
             check caller->respond(http:STATUS_BAD_REQUEST);
             return;
         }
@@ -534,17 +502,6 @@ service / on http_listener:Listener {
         return;
     }
 
-    // Handle preflight OPTIONS request for CORS
-    // resource function options addTask(http:Caller caller, http:Request req) returns error? {
-    //     http:Response response = new;
-    //     response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
-    //     response.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-    //     response.setHeader("Access-Control-Allow-Headers", "Content-Type");
-    //     check caller->respond(response);
-
-    //     return;
-    // }
-
     resource function post addProjects(http:Caller caller, http:Request req) returns error? {
         io:print("this inside add project");
         json payload = check req.getJsonPayload();
@@ -578,17 +535,6 @@ service / on http_listener:Listener {
         return;
     }
 
-    // Handle preflight OPTIONS request for CORS
-    // resource function options addProjects(http:Caller caller, http:Request req) returns error? {
-    //     http:Response response = new;
-    //     response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
-    //     response.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-    //     response.setHeader("Access-Control-Allow-Headers", "Content-Type");
-    //     check caller->respond(response);
-
-    //     return;
-    // }
-
     /////////////////////////////////////////////////////////
     resource function get projects(http:Caller caller, http:Request req) returns error? {
 
@@ -610,17 +556,6 @@ service / on http_listener:Listener {
 
         return;
     }
-
-    // Handle preflight OPTIONS request for CORS
-    // resource function options projects(http:Caller caller, http:Request req) returns error? {
-    //     http:Response response = new;
-    //     response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
-    //     response.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-    //     response.setHeader("Access-Control-Allow-Headers", "Content-Type");
-    //     check caller->respond(response);
-
-    //     return;
-    // }
 
     // New resource function to update project details
     resource function put updateProject(http:Caller caller, http:Request req) returns error? {
@@ -659,17 +594,6 @@ service / on http_listener:Listener {
 
         return;
     }
-
-    // Handle preflight OPTIONS request for CORS
-    // resource function options updateProject(http:Caller caller, http:Request req) returns error? {
-    //     http:Response response = new;
-    //     response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
-    //     response.setHeader("Access-Control-Allow-Methods", "PUT, OPTIONS");
-    //     response.setHeader("Access-Control-Allow-Headers", "Content-Type");
-    //     check caller->respond(response);
-
-    //     return;
-    // }
 
     // New resource function to get details of a specific project based on project id
     resource function get project/[int projectId](http:Caller caller, http:Request req) returns error? {
@@ -715,17 +639,6 @@ service / on http_listener:Listener {
         return;
     }
 
-    // Handle preflight OPTIONS request for CORS
-    // resource function options project/[int projectId](http:Caller caller, http:Request req) returns error? {
-    //     http:Response response = new;
-    //     response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
-    //     response.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
-    //     response.setHeader("Access-Control-Allow-Headers", "Content-Type");
-    //     check caller->respond(response);
-
-    //     return;
-    // }
-
     resource function put updateTask(http:Caller caller, http:Request req) returns error? {
         json payload = check req.getJsonPayload();
 
@@ -757,17 +670,6 @@ service / on http_listener:Listener {
 
         return;
     }
-
-    // // Handle preflight OPTIONS request for CORS
-    // resource function options updateTask(http:Caller caller, http:Request req) returns error? {
-    //     http:Response response = new;
-    //     response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
-    //     response.setHeader("Access-Control-Allow-Methods", "PUT, OPTIONS");
-    //     response.setHeader("Access-Control-Allow-Headers", "Content-Type");
-    //     check caller->respond(response);
-
-    //     return;
-    // }
 
     resource function get tasks/[int projectId](http:Caller caller, http:Request req) returns error? {
 
@@ -896,8 +798,9 @@ service / on http_listener:Listener {
     }
 
     // Endpoint to update a daily tip
-    resource function put [int tipId](http:Caller caller, http:Request req) returns error? {
+    resource function PUT updatetips(int tipId, http:Caller caller, http:Request req) returns error? {
         json|http:ClientError payload = req.getJsonPayload();
+        io:print("*************");
 
         if (payload is http:ClientError) {
             log:printError("Error while parsing request payload", 'error = payload);
@@ -923,17 +826,17 @@ service / on http_listener:Listener {
 
     resource function get timer_details() returns h_TimerDetails[]|error {
 
-        sql:ParameterizedQuery sqlQuery = `SELECT timer_id, timer_name, pomo_duration, short_break_duration, long_break_duration, pomos_per_long_break, user_id FROM timer_details`;
+        sql:ParameterizedQuery sqlQuery = `SELECT * FROM Timer`;
 
         // Execute the query and retrieve the results
         stream<record {|
-            int timer_id;
-            string timer_name;
-            time:TimeOfDay? pomo_duration;
-            time:TimeOfDay? short_break_duration;
-            time:TimeOfDay? long_break_duration;
-            int pomos_per_long_break;
-            int user_id;
+            int id;
+            string name;
+            time:TimeOfDay? pomoDuration;
+            time:TimeOfDay? shortBreakDuration;
+            time:TimeOfDay? longBreakDuration;
+            int pomosPerLongBreak;
+            int userId;
         |}, sql:Error?> resultStream = database:Client->query(sqlQuery);
 
         h_TimerDetails[] h_timerDetailsList = [];
@@ -945,13 +848,13 @@ service / on http_listener:Listener {
             do {
                 log:printInfo("Retrieved TimerDetail: " + timerDetail.toString());
                 h_timerDetailsList.push({
-                    timer_id: timerDetail.timer_id,
-                    timer_name: timerDetail.timer_name,
-                    pomo_duration: timerDetail.pomo_duration,
-                    short_break_duration: timerDetail.short_break_duration,
-                    long_break_duration: timerDetail.long_break_duration,
-                    pomos_per_long_break: timerDetail.pomos_per_long_break,
-                    user_id: timerDetail.user_id
+                    timer_id: timerDetail.id,
+                    timer_name: timerDetail.name,
+                    pomo_duration: timerDetail.pomoDuration,
+                    short_break_duration: timerDetail.shortBreakDuration,
+                    long_break_duration: timerDetail.longBreakDuration,
+                    pomos_per_long_break: timerDetail.pomosPerLongBreak,
+                    user_id: timerDetail.userId
                 });
             };
 
@@ -1475,7 +1378,7 @@ service / on http_listener:Listener {
         check caller->respond(http:STATUS_OK);
     }
 
-        resource function post pause_stopwatch_details(http:Caller caller, http:Request req) returns error? {
+    resource function post pause_stopwatch_details(http:Caller caller, http:Request req) returns error? {
 
         json|http:ClientError payload = req.getJsonPayload();
 
@@ -1529,7 +1432,8 @@ service / on http_listener:Listener {
         // io:println("Data inserted successfully");
         check caller->respond(http:STATUS_OK);
     }
-        resource function post continue_stopwatch_details(http:Caller caller, http:Request req) returns error? {
+
+    resource function post continue_stopwatch_details(http:Caller caller, http:Request req) returns error? {
 
         json|http:ClientError payload = req.getJsonPayload();
 
@@ -1668,7 +1572,134 @@ service / on http_listener:Listener {
 
         return pauseContinueDetails;
     }
-    
+
+    resource function post predict(http:Caller caller, http:Request req) returns error? {
+
+        json payload = check req.getJsonPayload();
+        log:printInfo("Received payload: " + payload.toString());
+
+        // Call the Python API to get the estimated time
+        var response = callPythonPredictAPI(payload);
+        json responseJson;
+        if (response is json) {
+            responseJson = response;
+        } else {
+            responseJson = {"error": response.toString()};
+        }
+
+        // Send the response
+        check caller->respond(responseJson);
+    }
+
+    resource function post review/[int id](http:Caller caller, http:Request req) returns error? {
+        // Extract the description from the request payload
+        json payload = check req.getJsonPayload();
+
+        // Check if the description field exists and is of type string
+        string? description = (check payload.description).toString();
+
+        if (description is string) {
+            // Execute the SQL query using the SQL client
+            sql:ExecutionResult|sql:Error result = database:Client->execute(
+            `INSERT INTO review (id, description) VALUES (${id}, ${description})`
+            );
+
+            // Check the result and handle errors if necessary
+            if (result is sql:Error) {
+                log:printError("Error while inserting data into the review table", 'error = result);
+                // Respond with an error and status code
+                check caller->respond({
+                    "error": "Internal Server Error: Failed to insert review"
+                });
+                return;
+            }
+
+            // Return success if there are no errors
+            log:printInfo("Data inserted successfully for review ID: " + id.toString());
+            // Respond with a success message and status code
+            check caller->respond({
+                "message": "Review inserted successfully"
+            });
+        } else {
+            // Handle the case where the description is missing or not a string
+            log:printError("Invalid description field in the request payload");
+            // Respond with a bad request error and status code
+            check caller->respond({
+                "error": "Bad Request: Missing or invalid 'description' field"
+            });
+        }
+    }
+
+    resource function get time() returns Task[]|error {
+        sql:ParameterizedQuery query = `SELECT  dueDate, startTime, endTime FROM hi`;
+        stream<Task, sql:Error?> resultStream = database:Client->query(query);
+        Task[] tasksList = [];
+        error? e = resultStream.forEach(function(Task task) {
+            tasksList.push(task);
+        });
+        if (e is error) {
+            log:printError("Error occurred while fetching tasks: ", 'error = e);
+            return e;
+        }
+        // io:print(tasklist);
+        // io:println(tasksList);
+        return tasksList;
+    }
+
+    resource function patch completed/[int taskId]/status(@http:Payload Task status) returns error? {
+        io:println("Updating task status");
+
+        // Check if the status object and taskId are valid before executing SQL
+        if status.status is string && taskId is int {
+            // sql:ExecutionResult|sql:Error result = database:Client->execute(`
+
+            sql:ExecutionResult|sql:Error result = database:Client->execute(`
+            UPDATE hi SET status = ${status.status} WHERE id = ${taskId}
+        `);
+
+            if result is sql:Error {
+                log:printError("Error occurred while updating task status", result);
+                return error("Failed to update status for task: " + taskId.toString());
+            } else {
+                if result.affectedRowCount > 0 {
+                    return;
+                } else {
+                    return error("No task found with id: " + taskId.toString());
+                }
+            }
+        }
+    }
+
+}
+
+function callPythonPredictAPI(json payload) returns json|error {
+    io:print("tes1");
+    io:println(payload);
+    io:print("test2");
+
+    // Create an HTTP client instance
+    http:Client clientEP = check new ("http://localhost:8081");
+
+    // Create a new HTTP request
+    http:Request req = new;
+    req.setPayload(payload);
+    req.setHeader("Content-Type", "application/json");
+
+    // Send a POST request to the Python API
+    http:Response response = check clientEP->post("/predict", req);
+
+    // Process the response
+    if (response.statusCode == 200) {
+        var jsonResponse = response.getJsonPayload();
+        if (jsonResponse is json) {
+            return jsonResponse;
+        } else {
+            return {"error": "Invalid JSON response from Python API"};
+        }
+    } else {
+        // return { "error": "Error from Python API: " + response.statusCode().toString() };
+
+    }
 
 }
 

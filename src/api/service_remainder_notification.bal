@@ -40,7 +40,7 @@ service class ChatService {
         int count = 0;
         while true {
             json m = {"x": count};
-            io:println("sending");
+            // io:println("sending");
             error? myerror = check caller->writeMessage(m);
             if (myerror is error) {
                 io:println("Error sending message");

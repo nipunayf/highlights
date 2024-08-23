@@ -798,8 +798,9 @@ service / on http_listener:Listener {
     }
 
     // Endpoint to update a daily tip
-    resource function put [int tipId](http:Caller caller, http:Request req) returns error? {
+    resource function PUT updatetips(int tipId, http:Caller caller, http:Request req) returns error? {
         json|http:ClientError payload = req.getJsonPayload();
+        io:print("*************");
 
         if (payload is http:ClientError) {
             log:printError("Error while parsing request payload", 'error = payload);

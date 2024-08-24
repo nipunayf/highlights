@@ -1363,9 +1363,9 @@ service / on http_listener:Listener {
         string formattedEndTime = endTimeStr.substring(0, 10) + " " + endTimeStr.substring(11, 19);
 
         sql:ExecutionResult|sql:Error result = database:Client->execute(`
-            UPDATE HighlightStopwatchDetails 
-            SET end_time = ${formattedEndTime}, status = ${highlightStopwatchDetails.status}
-            WHERE stopwatch_id=${highlightStopwatchDetails.stopwatch_id} AND highlight_id = ${highlightStopwatchDetails.highlight_id}  ;
+            UPDATE PauseStopwatch 
+            SET endTime = ${formattedEndTime}, status = ${highlightStopwatchDetails.status}
+            WHERE id=${highlightStopwatchDetails.stopwatch_id} AND highlightId = ${highlightStopwatchDetails.highlight_id}  ;
         `);
 
         if result is sql:Error {

@@ -1487,7 +1487,7 @@ service / on http_listener:Listener {
 
         sql:ParameterizedQuery highlightQuery = `SELECT hpd.id,hpd.highlightId, hh.title, hpd.startTime, hpd.endTime 
                                              FROM Stopwatch hpd
-                                             JOIN TaskList hh ON hpd.highlightId = hh.highlightId
+                                             JOIN TaskList hh ON hpd.highlightId = hh.id
                                              WHERE hpd.userId = ${userId} AND hpd.endTime IS NOT NULL`;
         stream<record {|int id; int highlightId; string title; time:Utc startTime; time:Utc endTime;|}, sql:Error?> highlightStream = database:Client->query(highlightQuery);
 
@@ -1518,7 +1518,7 @@ service / on http_listener:Listener {
 
                 highlightTimeRecords.push(timeRecord);
             };
-        // io:println(highlightTimeRecords);
+        io:println(highlightTimeRecords);
         return highlightTimeRecords;
     }
         resource function get stopwatch_pause_details/[int userId]() returns h_Stopwatch_PauseContinueDetails[]|error {
@@ -1535,7 +1535,7 @@ service / on http_listener:Listener {
                                       ON 
                                         h.id = p.stopwatchId 
                                       WHERE 
-                                        h.user_id = ${userId}`;
+                                        h.userId = ${userId}`;
 
 
         stream<record {|

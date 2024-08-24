@@ -1520,25 +1520,25 @@ service / on http_listener:Listener {
         resource function get stopwatch_pause_details/[int userId]() returns h_Stopwatch_PauseContinueDetails[]|error {
             
         sql:ParameterizedQuery sqlQuery = `SELECT 
-                                        h.stopwatch_id,
-                                        h.highlight_id, 
-                                        p.pause_time, 
-                                        p.continue_time 
+                                        h.id,
+                                        h.highlightId, 
+                                        p.pauseTime, 
+                                        p.continueTime 
                                       FROM 
-                                        HighlightStopwatchDetails h 
+                                        Stopwatch h 
                                       JOIN 
-                                        PausesStopwatchDetails p 
+                                        PauseStopwatch p 
                                       ON 
-                                        h.stopwatch_id = p.stopwatch_id 
+                                        h.id = p.stopwatchId 
                                       WHERE 
                                         h.user_id = ${userId}`;
 
 
         stream<record {|
-            int stopwatch_id;
-            int highlight_id;
-            time:Utc pause_time;
-            time:Utc? continue_time;
+            int id;
+            int highlightId;
+            time:Utc pauseTime;
+            time:Utc? continueTime;
         |}, sql:Error?> resultStream = database:Client->query(sqlQuery);
 
         h_Stopwatch_PauseContinueDetails[] pauseContinueDetails = [];
@@ -1547,8 +1547,8 @@ service / on http_listener:Listener {
         check from var pauseDetail in resultStream
             do {
                 
-                time:Utc newPauseTime = time:utcAddSeconds(pauseDetail.pause_time, +(5 * 3600 + 30 * 60));
-                time:Utc? newContinueTime = pauseDetail.continue_time != () ? time:utcAddSeconds(<time:Utc>pauseDetail.continue_time, +(5 * 3600 + 30 * 60)) : ();
+                time:Utc newPauseTime = time:utcAddSeconds(pauseDetail.pauseTime, +(5 * 3600 + 30 * 60));
+                time:Utc? newContinueTime = pauseDetail.continueTime != () ? time:utcAddSeconds(<time:Utc>pauseDetail.continueTime, +(5 * 3600 + 30 * 60)) : ();
 
 
                 string pauseTimeStr = time:utcToString(newPauseTime);
@@ -1559,8 +1559,8 @@ service / on http_listener:Listener {
                 string? formattedContinueTime = continueTimeStr != () ? continueTimeStr.substring(0, 10) + " " + continueTimeStr.substring(11, 19) : ();
 
                 h_Stopwatch_PauseContinueDetails pauseContinueDetail = {
-                    stopwatch_id: pauseDetail.stopwatch_id,
-                    highlight_id: pauseDetail.highlight_id,
+                    stopwatch_id: pauseDetail.id,
+                    highlight_id: pauseDetail.highlightId,
                     pause_time: formattedPauseTime,
                     continue_time: formattedContinueTime
                 };

@@ -1419,7 +1419,7 @@ service / on http_listener:Listener {
 
         // Insert data into database
         sql:ExecutionResult|sql:Error result = database:Client->execute(`
-        INSERT INTO PausesStopwatchDetails (highlight_id, stopwatch_id,  pause_time) 
+        INSERT INTO PauseStopwatch (highlightId, stopwatchId,  pauseTime) 
         VALUES (${pausesDetails.highlight_id}, ${pausesDetails.stopwatch_id}, ${pausesDetails.pause_time});
     `);
 

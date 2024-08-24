@@ -1090,10 +1090,10 @@ service / on http_listener:Listener {
         };
 
         sql:ExecutionResult|sql:Error result = database:Client->execute(`
-        UPDATE PausesPomoDetails 
-        SET continue_time = ${continueDetails.continue_time} 
-        WHERE highlight_id = ${continueDetails.highlight_id} AND  pomo_id = ${continueDetails.pomo_id}
-        AND continue_time IS NULL;
+        UPDATE PausePomodoro 
+        SET continueTime = ${continueDetails.continue_time} 
+        WHERE highlightId = ${continueDetails.highlight_id} AND  pomodoroId = ${continueDetails.pomo_id}
+        AND continueTime IS NULL;
     `);
 
         if result is sql:Error {

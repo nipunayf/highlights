@@ -105,6 +105,10 @@ CREATE TABLE `PauseStopwatch` (
 	`continueTime` DATETIME NOT NULL,
 	`stopwatchId` INT UNIQUE NOT NULL,
 	FOREIGN KEY(`stopwatchId`) REFERENCES `Stopwatch`(`id`),
+	`userId` INT NOT NULL,
+	FOREIGN KEY(`userId`) REFERENCES `User`(`id`),
+	`highlightId` INT NOT NULL,
+	FOREIGN KEY(`highlightId`) REFERENCES `Highlight`(`id`),
 	PRIMARY KEY(`id`)
 );
 

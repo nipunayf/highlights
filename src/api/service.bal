@@ -1294,19 +1294,19 @@ service / on http_listener:Listener {
     resource function get active_stopwatch_highlight_details/[int userId]() returns h_ActiveStopwatchDetails[]|error {
         // SQL query to retrieve active (uncomplete) highlight timer details
         sql:ParameterizedQuery activeTimerQuery = `SELECT 
-                                                hpd.stopwatch_id,
-                                                hpd.highlight_id
+                                                hpd.id,
+                                                hpd.highlightId
                                               FROM 
-                                                HighlightStopwatchDetails hpd
+                                                Stopwatch hpd
                                               WHERE 
-                                                hpd.user_id = ${userId} 
-                                                AND hpd.end_time IS NULL
+                                                hpd.userId = ${userId} 
+                                                AND hpd.endTime IS NULL
                                                 AND hpd.status = 'uncomplete'`;
 
         // Execute the query and retrieve the results
         stream<record {|
-            int stopwatch_id;
-            int highlight_id;
+            int id;
+            int highlightId;
         |}, sql:Error?> resultStream = database:Client->query(activeTimerQuery);
 
         h_ActiveStopwatchDetails[] activeStopwatchDetails = [];
@@ -1315,8 +1315,8 @@ service / on http_listener:Listener {
         check from var detail in resultStream
             do {
                 h_ActiveStopwatchDetails highlightDetail = {
-                    stopwatch_id: detail.stopwatch_id,
-                    highlight_id: detail.highlight_id
+                    stopwatch_id: detail.id,
+                    highlight_id: detail.highlightId
                 };
 
                 activeStopwatchDetails.push(highlightDetail);

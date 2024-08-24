@@ -161,9 +161,9 @@ const Stopwatch: React.FC<StopwatchProps> = ({ onEndButtonClick }) => {
 
 
     const startDetails = {
-      timer_id: selectedTask !== null ? Number(selectedTask) : -1,
+      timer_id: 1,
       highlight_id: selectedTask !== null ? Number(selectedTask) : -1,
-      user_id: 11, // Replace with the actual user ID
+      user_id: 1, // Replace with the actual user ID
       start_time: startTime.toISOString(),
       status: "uncomplete"
     };
@@ -171,7 +171,7 @@ const Stopwatch: React.FC<StopwatchProps> = ({ onEndButtonClick }) => {
     try {
       await sendStartStopwatchData(startDetails);
 
-      const response = await getActiveStopwatchHighlightDetails(11); // Replace with the actual user ID
+      const response = await getActiveStopwatchHighlightDetails(startDetails.user_id); // Replace with the actual user ID
       const { stopwatch_id, highlight_id } = response[0];
       setStopwatchId(stopwatch_id);
       setHighlightId(highlight_id);
@@ -230,12 +230,12 @@ const Stopwatch: React.FC<StopwatchProps> = ({ onEndButtonClick }) => {
       ? Number(timer_details[selectedTask]?.timer_id) // Convert to number
       : -1; // Default value or handle as needed
   
-    const userId = 11;
+    const userId = 1;
   
     
     const pauseDetails = {
       stopwatch_id: stopwatchId ?? 1,
-      timer_id: currentTimerId,
+      timer_id: 1,
       highlight_id: highlightId ?? 1,
       user_id: userId,
       pause_time: pauseTime.toISOString(),
@@ -300,11 +300,11 @@ const Stopwatch: React.FC<StopwatchProps> = ({ onEndButtonClick }) => {
       ? Number(timer_details[selectedTask]?.timer_id) // Convert to number
       : -1; // Default value or handle as needed
   
-    const userId = 11;
+    const userId = 1;
   
     const continueDetails = {
       stopwatch_id: stopwatchId ?? 1,
-      timer_id: currentTimerId,
+      timer_id: 1,
       highlight_id: highlightId ?? 1,
       user_id: userId,
       continue_time: continueTime.toISOString(),
@@ -469,13 +469,13 @@ const Stopwatch: React.FC<StopwatchProps> = ({ onEndButtonClick }) => {
         ? Number(timer_details[selectedTask]?.timer_id) // Convert to number
         : -1; // Default value or handle as needed
 
-      const userId = 11;
+      const userId = 1;
 
       const status = isComplete ? "complete" : "uncomplete";
 
       const endDetails = {
         stopwatch_id: stopwatchId ?? 1,
-        timer_id: currentTimerId,
+        timer_id: 1,
         highlight_id: highlightId ?? 1,
         user_id: userId,
         end_time: endTime.toISOString(),

@@ -1107,8 +1107,6 @@ service / on http_listener:Listener {
     }
 
     resource function get focus_record/[int userId]() returns TimeRecord[]|error {
-        io:println("77777777777777777777777777777");
-        io:println(userId,"....................................");
 
         // Query to get all highlights and their names for the given user with non-null end_time
         sql:ParameterizedQuery highlightQuery = `SELECT hpd.id,hpd.highlightId, hh.title, hpd.startTime, hpd.endTime 
@@ -1143,12 +1141,10 @@ service / on http_listener:Listener {
                     end_time: formattedEndTime,
                     pause_and_continue_times: pauseAndContinueTimes
                 };
-        io:println("-timeRecord---",timeRecord,"``````````````````````````````````````.");
 
 
                 highlightTimeRecords.push(timeRecord);
             };
-        io:println("-----------------------------------------------------------------------",highlightTimeRecords,"....................................");
         return highlightTimeRecords;
     }
 
@@ -1342,6 +1338,10 @@ service / on http_listener:Listener {
         }
 
         h_HighlightStopwatchEndDetailsTemp tempDetails = check payload.cloneWithType(h_HighlightStopwatchEndDetailsTemp);
+        io:println("jjjjjjjjjjj");
+                io:println(tempDetails);
+
+
 
         time:Utc|error endTime = time:utcFromString(tempDetails.end_time);
 
@@ -1367,7 +1367,7 @@ service / on http_listener:Listener {
         string formattedEndTime = endTimeStr.substring(0, 10) + " " + endTimeStr.substring(11, 19);
 
         sql:ExecutionResult|sql:Error result = database:Client->execute(`
-            UPDATE PauseStopwatch 
+            UPDATE Stopwatch 
             SET endTime = ${formattedEndTime}, status = ${highlightStopwatchDetails.status}
             WHERE id=${highlightStopwatchDetails.stopwatch_id} AND highlightId = ${highlightStopwatchDetails.highlight_id}  ;
         `);
@@ -1378,7 +1378,7 @@ service / on http_listener:Listener {
             return;
         }
 
-        // io:println("Data inserted successfully");
+        io:println("End Data inserted successfully");
         check caller->respond(http:STATUS_OK);
     }
 

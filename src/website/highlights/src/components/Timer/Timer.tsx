@@ -383,7 +383,6 @@ const Timer: React.FC<TimerProps> = ({ onEndButtonClick }) => {
           start_time: startTime.toISOString(),
           status: "uncomplete"
         };
-console.log("startDetails",startDetails);
         try {
           await sendStartTimeData(startDetails);
           const response = await getActiveTimerHighlightDetails(startDetails.user_id); // Replace with the actual user ID

@@ -1481,11 +1481,11 @@ service / on http_listener:Listener {
     }
         resource function get stopwatch_focus_record/[int userId]() returns h_StopwatchTimeRecord[]|error {
 
-        sql:ParameterizedQuery highlightQuery = `SELECT hpd.stopwatch_id,hpd.highlight_id, hh.highlight_name, hpd.start_time, hpd.end_time 
-                                             FROM HighlightStopwatchDetails hpd
-                                             JOIN hilights_hasintha hh ON hpd.highlight_id = hh.highlight_id
-                                             WHERE hpd.user_id = ${userId} AND hpd.end_time IS NOT NULL`;
-        stream<record {|int stopwatch_id; int highlight_id; string highlight_name; time:Utc start_time; time:Utc end_time;|}, sql:Error?> highlightStream = database:Client->query(highlightQuery);
+        sql:ParameterizedQuery highlightQuery = `SELECT hpd.id,hpd.highlightId, hh.title, hpd.startTime, hpd.endTime 
+                                             FROM Stopwatch hpd
+                                             JOIN TaskList hh ON hpd.highlightId = hh.highlightId
+                                             WHERE hpd.userId = ${userId} AND hpd.endTime IS NOT NULL`;
+        stream<record {|int id; int highlightId; string title; time:Utc startTime; time:Utc endTime;|}, sql:Error?> highlightStream = database:Client->query(highlightQuery);
 
         h_StopwatchTimeRecord[] highlightTimeRecords = [];
 
@@ -1493,8 +1493,8 @@ service / on http_listener:Listener {
             do {
                 string[][] pauseAndContinueTimes = [];
 
-                time:Utc newStartTime = time:utcAddSeconds(highlight.start_time, +(5 * 3600 + 30 * 60));
-                time:Utc newEndTime = time:utcAddSeconds(highlight.end_time, +(5 * 3600 + 30 * 60));
+                time:Utc newStartTime = time:utcAddSeconds(highlight.startTime, +(5 * 3600 + 30 * 60));
+                time:Utc newEndTime = time:utcAddSeconds(highlight.endTime, +(5 * 3600 + 30 * 60));
 
                 string startTimeStr = time:utcToString(newStartTime);
                 string endTimeStr = time:utcToString(newEndTime);
@@ -1504,9 +1504,9 @@ service / on http_listener:Listener {
                 string formattedEndTime = endTimeStr.substring(0, 10) + " " + endTimeStr.substring(11, 19);
 
                 h_StopwatchTimeRecord timeRecord = {
-                    stopwatch_id: highlight.stopwatch_id,
-                    highlight_id: highlight.highlight_id,
-                    highlight_name: highlight.highlight_name,
+                    stopwatch_id: highlight.id,
+                    highlight_id: highlight.highlightId,
+                    highlight_name: highlight.title,
                     start_time: formattedStartTime,
                     end_time: formattedEndTime,
                     pause_and_continue_times: pauseAndContinueTimes

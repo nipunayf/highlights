@@ -94,6 +94,8 @@ CREATE TABLE `Stopwatch` (
 	FOREIGN KEY(`timerId`) REFERENCES `Timer`(`id`),
 	`highlightId` INT NOT NULL,
 	FOREIGN KEY(`highlightId`) REFERENCES `Highlight`(`id`),
+	`userId` INT NOT NULL,
+	FOREIGN KEY(`userId`) REFERENCES `User`(`id`),
 	PRIMARY KEY(`id`)
 );
 

@@ -10,6 +10,7 @@ type User record {|
     Timer[] timer;
 	Pomodoro[] pomodoro;
 	PausePomodoro[] pausepomodoro;
+	Stopwatch[] stopwatch;
 |};
 
 type TaskList record {|
@@ -80,6 +81,8 @@ type Stopwatch record {|
     time:Civil endTime;
     string status;
     PauseStopwatch? pausestopwatch;
+    User user;
+
 |};
 
 type PausePomodoro record {|

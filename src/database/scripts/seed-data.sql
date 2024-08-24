@@ -16,6 +16,28 @@ VALUES
 ('Weekend Marathon', '02:00:00', '00:20:00', '00:45:00', 6, 1);
 
 
+
+INSERT INTO `Task` 
+(`title`, `description`, `dueDate`, `startTime`, `endTime`, `reminder`, `priority`, `label`, `status`, `tasklistId`) 
+VALUES
+('Buy Groceries', 'Purchase items for the week', '2023-10-07 12:00:00', '2023-10-07 10:00:00', '2023-10-07 11:00:00', '2023-10-07 09:00:00', 'High', 'Personal', 'Pending', 2),
+('Complete Project Report', 'Finalize the annual report', '2023-10-10 17:00:00', '2023-10-10 09:00:00', '2023-10-10 16:00:00', '2023-10-10 08:00:00', 'Medium', 'Work', 'In Progress', 3),
+('Plan Vacation', 'Organize the upcoming trip', '2023-10-15 10:00:00', '2023-10-14 15:00:00', '2023-10-14 17:00:00', NULL, 'Low', 'Travel', 'Pending', 4),
+('Prepare Presentation', 'Slides for Monday meeting', '2023-10-08 09:00:00', '2023-10-07 20:00:00', '2023-10-07 22:00:00', '2023-10-07 19:00:00', 'High', 'Work', 'Completed', 3),
+('Book Doctor Appointment', 'Routine check-up', '2023-10-09 09:00:00', NULL, NULL, '2023-10-08 10:00:00', 'Medium', 'Personal', 'Pending', 2);
+
+
+
+INSERT INTO `Highlight` (`taskId`) 
+VALUES
+(1),
+(2),
+(3),
+(4),
+(5);
+
+
+
 -- INSERT INTO `timer_details` (
 --   `timer_name`,
 --   `pomo_duration`,

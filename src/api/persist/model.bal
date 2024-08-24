@@ -9,9 +9,7 @@ type User record {|
     TaskList[] tasklist;
     Timer[] timer;
 	Pomodoro[] pomodoro;
-	PausePomodoro[] pausepomodoro;
 	Stopwatch[] stopwatch;
-	PauseStopwatch[] pausestopwatch;
 |};
 
 type TaskList record {|
@@ -58,8 +56,10 @@ type Timer record {|
     time:TimeOfDay longBreakDuration;
     int pomosPerLongBreak;
     User user;
-    Pomodoro? pomodoro;
-    Stopwatch? stopwatch;
+	Pomodoro[] pomodoro;
+	Stopwatch[] stopwatch;
+    // Pomodoro? pomodoro;
+    // Stopwatch? stopwatch;
 |};
 
 type Pomodoro record {|
@@ -68,10 +68,10 @@ type Pomodoro record {|
     Timer timer;
     Highlight highlight;
     time:Civil startTime;
-    time:Civil endTime;
+    time:Civil? endTime;
     string status;
-    PausePomodoro? pausepomodoro;
     User user;
+	PausePomodoro[] pausepomodoro;
 |};
 
 type Stopwatch record {|
@@ -80,21 +80,20 @@ type Stopwatch record {|
     Timer timer;
     Highlight highlight;
     time:Civil startTime;
-    time:Civil endTime;
+    time:Civil? endTime;
     string status;
-    PauseStopwatch? pausestopwatch;
     User user;
+	PauseStopwatch[] pausestopwatch;
 
 |};
 
 type PausePomodoro record {|
     @sql:Generated
     readonly int id;
-    Pomodoro pomodoro;
     time:Civil pauseTime;
-    time:Civil continueTime;
-    User user;
+    time:Civil? continueTime;
     Highlight highlight;
+    Pomodoro pomodoro;
 
 |};
 
@@ -103,8 +102,7 @@ type PauseStopwatch record {|
     readonly int id;
     Stopwatch stopwatch;
     time:Civil pauseTime;
-    time:Civil continueTime;
-    User user;
+    time:Civil? continueTime;
     Highlight highlight;
 |};
 

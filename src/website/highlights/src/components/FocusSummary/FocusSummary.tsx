@@ -14,7 +14,7 @@ const FocusSummary: React.FC<FocusSummaryProps> = ({ activeTab, refreshTrigger }
   const [pauseDetails, setPauseDetails] = useState<mPauseContinueDetails[]>([]);
   const [stopwatchfocusRecords, setstopwatchFocusRecords] = useState<mStopwatchTimeRecord[]>([]);
   const [stopwatchpauseDetails, setstopwatchPauseDetails] = useState<mStopwatchPauseContinueDetails[]>([]);
-  const userId = 11; 
+  const userId = 1; 
 
   useEffect(() => {
     const fetchFocusData = async () => {

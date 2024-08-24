@@ -377,16 +377,16 @@ const Timer: React.FC<TimerProps> = ({ onEndButtonClick }) => {
         setStartTime(startTime); // Set start time
 
         const startDetails = {
-          timer_id: selectedTask !== null ? Number(selectedTask) : -1,
+          timer_id: 1,
           highlight_id: selectedTask !== null ? Number(selectedTask) : -1,
-          user_id: 11, // Replace with the actual user ID
+          user_id: 1, // Replace with the actual user ID
           start_time: startTime.toISOString(),
           status: "uncomplete"
         };
-
+console.log("startDetails",startDetails);
         try {
           await sendStartTimeData(startDetails);
-          const response = await getActiveTimerHighlightDetails(11); // Replace with the actual user ID
+          const response = await getActiveTimerHighlightDetails(startDetails.user_id); // Replace with the actual user ID
           const { pomo_id, highlight_id } = response[0];
           setPomoId(pomo_id);
           setHighlightId(highlight_id);
@@ -618,7 +618,7 @@ const Timer: React.FC<TimerProps> = ({ onEndButtonClick }) => {
 
     const end_time = new Date();
 
-    const userId = 11;
+    const userId = 1;
     let task_status: string;
 
     if (isTaskComplete) {
@@ -629,7 +629,7 @@ const Timer: React.FC<TimerProps> = ({ onEndButtonClick }) => {
 
     const endPomoDetails = {
       pomo_id: pomoId ?? 1,
-      timer_id: currentTimerId,
+      timer_id: 1,
       highlight_id: highlightId ?? 1,
       user_id: userId,
       end_time: end_time.toISOString(),

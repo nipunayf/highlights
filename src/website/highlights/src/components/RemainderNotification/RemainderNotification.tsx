@@ -34,7 +34,7 @@ const WebSocketComponent: React.FC = () => {
     };
 
     ws.onmessage = (event) => {
-      console.log('Received message:', event);
+      // console.log('Received message:', event);
       const message: Message = JSON.parse(event.data);
       setMessages((prevMessages) => [...prevMessages, message]);
     };

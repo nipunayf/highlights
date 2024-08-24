@@ -1107,13 +1107,15 @@ service / on http_listener:Listener {
     }
 
     resource function get focus_record/[int userId]() returns TimeRecord[]|error {
+        io:println("77777777777777777777777777777");
+        io:println(userId,"....................................");
+
         // Query to get all highlights and their names for the given user with non-null end_time
         sql:ParameterizedQuery highlightQuery = `SELECT hpd.id,hpd.highlightId, hh.title, hpd.startTime, hpd.endTime 
                                              FROM Pomodoro hpd
                                              JOIN TaskList hh ON hpd.highlightId = hh.id
                                              WHERE hpd.userId = ${userId} AND hpd.endTime IS NOT NULL`;
         stream<record {|int id; int highlightId; string title; time:Utc startTime; time:Utc endTime;|}, sql:Error?> highlightStream = database:Client->query(highlightQuery);
-
         TimeRecord[] highlightTimeRecords = [];
 
         // Iterate over the highlight results
@@ -1141,10 +1143,12 @@ service / on http_listener:Listener {
                     end_time: formattedEndTime,
                     pause_and_continue_times: pauseAndContinueTimes
                 };
+        io:println("-timeRecord---",timeRecord,"``````````````````````````````````````.");
+
 
                 highlightTimeRecords.push(timeRecord);
             };
-        // io:println(highlightTimeRecords);
+        io:println("-----------------------------------------------------------------------",highlightTimeRecords,"....................................");
         return highlightTimeRecords;
     }
 

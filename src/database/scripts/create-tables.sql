@@ -5,12 +5,12 @@
 
 DROP TABLE IF EXISTS `PausePomodoro`;
 DROP TABLE IF EXISTS `Pomodoro`;
+DROP TABLE IF EXISTS `PauseStopwatch`;
 DROP TABLE IF EXISTS `Stopwatch`;
 DROP TABLE IF EXISTS `Highlight`;
 DROP TABLE IF EXISTS `Task`;
 DROP TABLE IF EXISTS `Timer`;
 DROP TABLE IF EXISTS `TaskList`;
-DROP TABLE IF EXISTS `PauseStopwatch`;
 DROP TABLE IF EXISTS `Project`;
 DROP TABLE IF EXISTS `DailyTip`;
 DROP TABLE IF EXISTS `User`;
@@ -88,9 +88,9 @@ CREATE TABLE `Highlight` (
 CREATE TABLE `Stopwatch` (
 	`id` INT AUTO_INCREMENT,
 	`startTime` DATETIME NOT NULL,
-	`endTime` DATETIME NOT NULL,
+	`endTime` DATETIME,
 	`status` VARCHAR(191) NOT NULL,
-	`timerId` INT UNIQUE NOT NULL,
+	`timerId` INT NOT NULL,
 	FOREIGN KEY(`timerId`) REFERENCES `Timer`(`id`),
 	`highlightId` INT NOT NULL,
 	FOREIGN KEY(`highlightId`) REFERENCES `Highlight`(`id`),
@@ -102,11 +102,9 @@ CREATE TABLE `Stopwatch` (
 CREATE TABLE `PauseStopwatch` (
 	`id` INT AUTO_INCREMENT,
 	`pauseTime` DATETIME NOT NULL,
-	`continueTime` DATETIME NOT NULL,
-	`stopwatchId` INT UNIQUE NOT NULL,
+	`continueTime` DATETIME,
+	`stopwatchId` INT NOT NULL,
 	FOREIGN KEY(`stopwatchId`) REFERENCES `Stopwatch`(`id`),
-	`userId` INT NOT NULL,
-	FOREIGN KEY(`userId`) REFERENCES `User`(`id`),
 	`highlightId` INT NOT NULL,
 	FOREIGN KEY(`highlightId`) REFERENCES `Highlight`(`id`),
 	PRIMARY KEY(`id`)
@@ -115,9 +113,9 @@ CREATE TABLE `PauseStopwatch` (
 CREATE TABLE `Pomodoro` (
 	`id` INT AUTO_INCREMENT,
 	`startTime` DATETIME NOT NULL,
-	`endTime` DATETIME NOT NULL,
+	`endTime` DATETIME,
 	`status` VARCHAR(191) NOT NULL,
-	`timerId` INT UNIQUE NOT NULL,
+	`timerId` INT NOT NULL,
 	FOREIGN KEY(`timerId`) REFERENCES `Timer`(`id`),
 	`highlightId` INT NOT NULL,
 	FOREIGN KEY(`highlightId`) REFERENCES `Highlight`(`id`),
@@ -129,13 +127,12 @@ CREATE TABLE `Pomodoro` (
 CREATE TABLE `PausePomodoro` (
 	`id` INT AUTO_INCREMENT,
 	`pauseTime` DATETIME NOT NULL,
-	`continueTime` DATETIME NOT NULL,
-	`pomodoroId` INT UNIQUE NOT NULL,
-	FOREIGN KEY(`pomodoroId`) REFERENCES `Pomodoro`(`id`),
-	`userId` INT NOT NULL,
-	FOREIGN KEY(`userId`) REFERENCES `User`(`id`),
+	`continueTime` DATETIME,
 	`highlightId` INT NOT NULL,
 	FOREIGN KEY(`highlightId`) REFERENCES `Highlight`(`id`),
+	`pomodoroId` INT NOT NULL,
+	FOREIGN KEY(`pomodoroId`) REFERENCES `Pomodoro`(`id`),
 	PRIMARY KEY(`id`)
 );
+
 

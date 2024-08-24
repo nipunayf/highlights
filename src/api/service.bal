@@ -1108,11 +1108,11 @@ service / on http_listener:Listener {
 
     resource function get focus_record/[int userId]() returns TimeRecord[]|error {
         // Query to get all highlights and their names for the given user with non-null end_time
-        sql:ParameterizedQuery highlightQuery = `SELECT hpd.pomo_id,hpd.highlight_id, hh.highlight_name, hpd.start_time, hpd.end_time 
-                                             FROM HighlightPomoDetails hpd
-                                             JOIN hilights_hasintha hh ON hpd.highlight_id = hh.highlight_id
-                                             WHERE hpd.user_id = ${userId} AND hpd.end_time IS NOT NULL`;
-        stream<record {|int pomo_id; int highlight_id; string highlight_name; time:Utc start_time; time:Utc end_time;|}, sql:Error?> highlightStream = database:Client->query(highlightQuery);
+        sql:ParameterizedQuery highlightQuery = `SELECT hpd.id,hpd.highlightId, hh.title, hpd.startTime, hpd.endTime 
+                                             FROM Pomodoro hpd
+                                             JOIN TaskList hh ON hpd.highlightId = hh.id
+                                             WHERE hpd.userId = ${userId} AND hpd.endTime IS NOT NULL`;
+        stream<record {|int id; int highlightId; string title; time:Utc startTime; time:Utc endTime;|}, sql:Error?> highlightStream = database:Client->query(highlightQuery);
 
         TimeRecord[] highlightTimeRecords = [];
 
@@ -1122,8 +1122,8 @@ service / on http_listener:Listener {
                 string[][] pauseAndContinueTimes = [];
 
                 // Add the duration to start_time and end_time
-                time:Utc newStartTime = time:utcAddSeconds(highlight.start_time, +(5 * 3600 + 30 * 60));
-                time:Utc newEndTime = time:utcAddSeconds(highlight.end_time, +(5 * 3600 + 30 * 60));
+                time:Utc newStartTime = time:utcAddSeconds(highlight.startTime, +(5 * 3600 + 30 * 60));
+                time:Utc newEndTime = time:utcAddSeconds(highlight.endTime, +(5 * 3600 + 30 * 60));
 
                 // Convert time:Utc to RFC 3339 strings
                 string startTimeStr = time:utcToString(newStartTime);
@@ -1134,9 +1134,9 @@ service / on http_listener:Listener {
                 string formattedEndTime = endTimeStr.substring(0, 10) + " " + endTimeStr.substring(11, 19);
 
                 TimeRecord timeRecord = {
-                    pomo_id: highlight.pomo_id,
-                    highlight_id: highlight.highlight_id,
-                    highlight_name: highlight.highlight_name,
+                    pomo_id: highlight.id,
+                    highlight_id: highlight.highlightId,
+                    highlight_name: highlight.title,
                     start_time: formattedStartTime,
                     end_time: formattedEndTime,
                     pause_and_continue_times: pauseAndContinueTimes

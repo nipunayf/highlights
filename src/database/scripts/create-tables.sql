@@ -126,7 +126,10 @@ CREATE TABLE `PausePomodoro` (
 	`continueTime` DATETIME NOT NULL,
 	`pomodoroId` INT UNIQUE NOT NULL,
 	FOREIGN KEY(`pomodoroId`) REFERENCES `Pomodoro`(`id`),
+	`userId` INT NOT NULL,
+	FOREIGN KEY(`userId`) REFERENCES `User`(`id`),
+	`highlightId` INT NOT NULL,
+	FOREIGN KEY(`highlightId`) REFERENCES `Highlight`(`id`),
 	PRIMARY KEY(`id`)
 );
-
 

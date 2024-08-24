@@ -981,7 +981,7 @@ service / on http_listener:Listener {
 
         // Insert data into database
         sql:ExecutionResult|sql:Error result = database:Client->execute(`
-            INSERT INTO HighlightPomoDetails (timer_id, highlight_id, user_id, start_time,  status) 
+            INSERT INTO Pomodoro (timerId, highlightId, userId, startTime,  status) 
             VALUES (${highlightDetails.timer_id}, ${highlightDetails.highlight_id}, ${highlightDetails.user_id}, ${formattedStartTime}, ${highlightDetails.status});
         `);
 
@@ -1036,7 +1036,7 @@ service / on http_listener:Listener {
 
         // Insert data into database
         sql:ExecutionResult|sql:Error result = database:Client->execute(`
-        INSERT INTO PausesPomoDetails (highlight_id, pomo_id,  pause_time) 
+        INSERT INTO PausePomodoro (highlightId, pomodoroId,  pauseTime) 
         VALUES (${pausesDetails.highlight_id}, ${pausesDetails.pomo_id}, ${pausesDetails.pause_time});
     `);
 

@@ -9,6 +9,7 @@ type User record {|
     TaskList[] tasklist;
     Timer[] timer;
 	Pomodoro[] pomodoro;
+	PausePomodoro[] pausepomodoro;
 |};
 
 type TaskList record {|
@@ -42,6 +43,7 @@ type Highlight record {|
     Task task;
     Stopwatch[] stopwatch;
     Pomodoro[] pomodoro;
+	PausePomodoro[] pausepomodoro;
 |};
 
 type Timer record {|
@@ -86,6 +88,9 @@ type PausePomodoro record {|
     Pomodoro pomodoro;
     time:Civil pauseTime;
     time:Civil continueTime;
+    User user;
+    Highlight highlight;
+
 |};
 
 type PauseStopwatch record {|

@@ -866,13 +866,13 @@ service / on http_listener:Listener {
     // Function to get highlights from the database
     resource function get highlights() returns h_Highlight[]|error {
 
-        sql:ParameterizedQuery sqlQuery = `SELECT highlight_id, highlight_name, user_id FROM hilights_hasintha`;
+        sql:ParameterizedQuery sqlQuery = `SELECT id, title, userId FROM TaskList`;
 
         // Execute the query and retrieve the results
         stream<record {|
-            int highlight_id;
-            string highlight_name;
-            int user_id;
+            int id;
+            string title;
+            int userId;
         |}, sql:Error?> resultStream = database:Client->query(sqlQuery);
 
         h_Highlight[] highlightList = [];
@@ -882,9 +882,9 @@ service / on http_listener:Listener {
             do {
                 log:printInfo("Retrieved Highlight: " + highlight.toString());
                 highlightList.push({
-                    highlight_id: highlight.highlight_id,
-                    highlight_name: highlight.highlight_name,
-                    user_id: highlight.user_id
+                    highlight_id: highlight.id,
+                    highlight_name: highlight.title,
+                    user_id: highlight.userId
                 });
             };
 

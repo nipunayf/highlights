@@ -929,9 +929,9 @@ service / on http_listener:Listener {
         string formattedEndTime = endTimeStr.substring(0, 10) + " " + endTimeStr.substring(11, 19);
 
         sql:ExecutionResult|sql:Error result = database:Client->execute(`
-            UPDATE HighlightPomoDetails 
-            SET end_time = ${formattedEndTime}, status = ${highlightPomoDetails.status}
-            WHERE pomo_id=${highlightPomoDetails.pomo_id} AND highlight_id = ${highlightPomoDetails.highlight_id}  ;
+            UPDATE Pomodoro 
+            SET endTime = ${formattedEndTime}, status = ${highlightPomoDetails.status}
+            WHERE id=${highlightPomoDetails.pomo_id} AND highlightId = ${highlightPomoDetails.highlight_id}  ;
         `);
 
         if result is sql:Error {

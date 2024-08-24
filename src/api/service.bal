@@ -1187,25 +1187,25 @@ service / on http_listener:Listener {
     resource function get pause_details/[int userId]() returns h_PauseContinueDetails[]|error {
         // SQL query to retrieve pause and continue details by pomo_id and highlight_id
         sql:ParameterizedQuery sqlQuery = `SELECT 
-                                        h.pomo_id,
-                                        h.highlight_id, 
-                                        p.pause_time, 
-                                        p.continue_time 
+                                        h.id,
+                                        h.highlightId, 
+                                        p.pauseTime, 
+                                        p.continueTime 
                                       FROM 
-                                        HighlightPomoDetails h 
+                                        Pomodoro h 
                                       JOIN 
-                                        PausesPomoDetails p 
+                                        PausePomodoro p 
                                       ON 
-                                        h.pomo_id = p.pomo_id 
+                                        h.id = p.pomodoroId 
                                       WHERE 
-                                        h.user_id = ${userId}`;
+                                        h.userId = ${userId}`;
 
         // Execute the query and retrieve the results
         stream<record {|
-            int pomo_id;
-            int highlight_id;
-            time:Utc pause_time;
-            time:Utc? continue_time;
+            int id;
+            int highlightId;
+            time:Utc pauseTime;
+            time:Utc? continueTime;
         |}, sql:Error?> resultStream = database:Client->query(sqlQuery);
 
         h_PauseContinueDetails[] pauseContinueDetails = [];
@@ -1214,8 +1214,8 @@ service / on http_listener:Listener {
         check from var pauseDetail in resultStream
             do {
                 // Add the duration to pause_time and continue_time
-                time:Utc newPauseTime = time:utcAddSeconds(pauseDetail.pause_time, +(5 * 3600 + 30 * 60));
-                time:Utc? newContinueTime = pauseDetail.continue_time != () ? time:utcAddSeconds(<time:Utc>pauseDetail.continue_time, +(5 * 3600 + 30 * 60)) : ();
+                time:Utc newPauseTime = time:utcAddSeconds(pauseDetail.pauseTime, +(5 * 3600 + 30 * 60));
+                time:Utc? newContinueTime = pauseDetail.continueTime != () ? time:utcAddSeconds(<time:Utc>pauseDetail.continueTime, +(5 * 3600 + 30 * 60)) : ();
 
                 // Convert time:Utc to RFC 3339 strings
                 string pauseTimeStr = time:utcToString(newPauseTime);
@@ -1226,8 +1226,8 @@ service / on http_listener:Listener {
                 string? formattedContinueTime = continueTimeStr != () ? continueTimeStr.substring(0, 10) + " " + continueTimeStr.substring(11, 19) : ();
 
                 h_PauseContinueDetails pauseContinueDetail = {
-                    pomo_id: pauseDetail.pomo_id,
-                    highlight_id: pauseDetail.highlight_id,
+                    pomo_id: pauseDetail.id,
+                    highlight_id: pauseDetail.highlightId,
                     pause_time: formattedPauseTime,
                     continue_time: formattedContinueTime
                 };

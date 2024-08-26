@@ -10,6 +10,10 @@ type User record {|
     string[] linkedAccounts;
 |};
 
+type LinkedAccount record {|
+    string name;
+|};
+
 configurable string azureAdIssuer = ?;
 configurable string azureAdAudience = ?;
 
@@ -113,5 +117,31 @@ service /users on http_listener:Listener {
             log:printError("Error occurred: ", e);
             return http:INTERNAL_SERVER_ERROR;
         }
+    }
+
+    resource function post [int id]/linkedAccounts(@http:Payload LinkedAccount linkedAccount) returns http:Created|http:BadRequest|error {
+        storage:User user = check self.sClient->/users/[id]();
+
+        stream<storage:LinkedAccount, error?> linkedAccounts = self.sClient->/linkedaccounts();
+        storage:LinkedAccount[] accounts = check from var la in linkedAccounts
+            where la.name == linkedAccount.name
+            select la;
+
+        if (accounts.length() == 0) {
+            return http:BAD_REQUEST;
+        }
+
+        stream<storage:UserLinkedAccount, error?> userLinkedAccounts = self.sClient->/userlinkedaccounts();
+        storage:UserLinkedAccount[] existingUserLinkedAccounts = check from var ula in userLinkedAccounts
+            where ula.userId == id && ula.linkedaccountId == accounts[0].id
+            select ula;
+
+        if (existingUserLinkedAccounts.length() > 0) {
+            return http:BAD_REQUEST;
+        }
+
+        storage:UserLinkedAccountInsert userLinkedAccount = {userId: user.id, linkedaccountId: accounts[0].id};
+        int[] _ = check self.sClient->/userlinkedaccounts.post([userLinkedAccount]);
+        return http:CREATED;
     }
 }

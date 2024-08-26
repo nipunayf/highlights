@@ -362,7 +362,6 @@ const Stopwatch: React.FC<StopwatchProps> = ({ onEndButtonClick }) => {
   
 
 
-  // const handleEnd = () => {
   //   Swal({
   //     title: "Is the task complete?",
   //     text: "Please confirm if you have completed the task.",

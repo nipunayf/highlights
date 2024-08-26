@@ -1,4 +1,4 @@
-insert into User(sub) values('6e4096d8-b99e-4b2d-a495-446cce5fcd7c');
+insert into User(sub) values('BffwoA8xz4-gcK8FA9_rUOBvpMsMa5lCTnCBd5eAFe8');
 
 insert into TaskList(userId, title, createdAt) 
 values(1, 'Shopping', '2023-10-05 14:48:00'),

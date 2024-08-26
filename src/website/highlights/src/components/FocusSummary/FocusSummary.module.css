@@ -1,0 +1,120 @@
+.container {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  min-width: 55%;
+  margin-left: 2%;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.overview {
+  display: flex;
+  flex-wrap: wrap; /* Allow wrapping of cards */
+  justify-content: space-between;
+}
+
+.card {
+  background-color: #f7f7f7;
+  border-radius: 10px;
+  padding: 20px;
+  width: calc(50% - 10px); /* Adjust width for two cards per line */
+  margin-bottom: 20px; /* Add margin between rows */
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.label {
+  font-size: 14px;
+  color: #888;
+}
+
+.value {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+}
+
+.focusRecord {
+  margin-top: 20px;
+}
+
+.dateGroup {
+  margin-bottom: 20px;
+}
+
+.date {
+  font-weight: bold;
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+
+.record {
+  margin-left: 20px;
+  position: relative;
+}
+
+.timeRecord {
+  padding: 10px;
+  background-color: #e0f7fa;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.mainRecord {
+  font-weight: bold;
+}
+
+.pauseRecord {
+  margin-left: 20px;
+  padding: 5px 10px;
+  background-color: #b2ebf2;
+  border-radius: 5px;
+  margin-top: 5px;
+}
+
+.timeRecord span {
+  font-size: 14px;
+  color: #333;
+}
+
+.timeline {
+  position: relative;
+  margin-left: 20px;
+  padding-left: 10px;
+  border-left: 2px solid #00acc1;
+}
+
+.timeline:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -6px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #00acc1;
+}
+
+.timeline .timeRecord {
+  margin-left: 10px;
+  border-left: 2px solid #00acc1;
+  position: relative;
+}
+
+.timeline .timeRecord:before {
+  content: "";
+  position: absolute;
+  left: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #00acc1;
+}

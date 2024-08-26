@@ -10,6 +10,7 @@ type User record {|
     Timer[] timer;
 	Pomodoro[] pomodoro;
 	Stopwatch[] stopwatch;
+	Task[] task;
 |};
 
 type TaskList record {|
@@ -35,6 +36,9 @@ type Task record {|
     string label;
     string status;
     Highlight[] highlight;
+    User user;
+
+
 |};
 
 type Highlight record {|

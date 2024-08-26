@@ -38,6 +38,24 @@ VALUES
 
 
 
+
+-- -- Inserting sample data into the `Task` table
+-- INSERT INTO `Task` 
+-- (`title`, `description`, `dueDate`, `startTime`, `endTime`, `reminder`, `priority`, `label`, `status`, `tasklistId`, `userId`) 
+-- VALUES
+-- ('Buy Groceries', 'Purchase items for the week', '2023-10-07 12:00:00', '2023-10-07 10:00:00', '2023-10-07 11:00:00', '2023-10-07 09:00:00', 'High', 'Personal', 'Pending', 2, 1),
+-- ('Complete Project Report', 'Finalize the annual report', '2023-10-10 17:00:00', '2023-10-10 09:00:00', '2023-10-10 16:00:00', '2023-10-10 08:00:00', 'Medium', 'Work', 'In Progress', 3, 1),
+-- ('Plan Vacation', 'Organize the upcoming trip', '2023-10-15 10:00:00', '2023-10-14 15:00:00', '2023-10-14 17:00:00', NULL, 'Low', 'Travel', 'Pending', 4, 1),
+-- ('Prepare Presentation', 'Slides for Monday meeting', '2023-10-08 09:00:00', '2023-10-07 20:00:00', '2023-10-07 22:00:00', '2023-10-07 19:00:00', 'High', 'Work', 'Completed', 3, 1),
+-- ('Book Doctor Appointment', 'Routine check-up', '2023-10-09 09:00:00', NULL, NULL, '2023-10-08 10:00:00', 'Medium', 'Personal', 'Pending', 2, 1),
+-- ('Attend Workshop', 'AI and Machine Learning Workshop', '2023-10-12 10:00:00', '2023-10-12 09:00:00', '2023-10-12 15:00:00', '2023-10-11 12:00:00', 'High', 'Work', 'Upcoming', 3, 1),
+-- ('Family Dinner', 'Dinner with family at home', '2023-10-07 19:00:00', '2023-10-07 18:00:00', '2023-10-07 21:00:00', '2023-10-07 17:00:00', 'Low', 'Personal', 'Pending', 2, 1),
+-- ('Team Meeting', 'Monthly team status meeting', '2023-10-15 11:00:00', '2023-10-15 10:30:00', '2023-10-15 12:00:00', '2023-10-15 09:30:00', 'Medium', 'Work', 'Scheduled', 3, 1),
+-- ('Renew Passport', 'Complete the renewal process online', '2023-10-20 14:00:00', NULL, NULL, '2023-10-19 10:00:00', 'High', 'Personal', 'Pending', 2, 1),
+-- ('Visit the Dentist', 'Quarterly dental check-up', '2023-10-18 09:00:00', '2023-10-18 08:30:00', '2023-10-18 09:30:00', '2023-10-17 12:00:00', 'Medium', 'Personal', 'Upcoming', 2, 1);
+
+
+
 -- INSERT INTO `timer_details` (
 --   `timer_name`,
 --   `pomo_duration`,

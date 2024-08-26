@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import styles from './RemainderNotification.module.css';  
+import 'animate.css';
+import Swal from 'sweetalert2';
 
 interface Message {
-  [key: string]: any; // Adjust this interface based on the actual structure of your messages
+  id: number;
+  title: string;
+  message: string;
 }
 
 const WebSocketComponent: React.FC = () => {
@@ -9,56 +14,79 @@ const WebSocketComponent: React.FC = () => {
   const [socket, setSocket] = useState<WebSocket | null>(null);
 
   useEffect(() => {
-          
     const ws = new WebSocket('ws://localhost:9091');
-
-    // Function to send a message (if needed)
-    const sendMessage = (message: Message) => {
-      if (socket) {
-        console.log('Sending message:', message);
-        socket.send(JSON.stringify(message));
-      }
-    };
-
-    // Save the WebSocket instance
     setSocket(ws);
 
-    // Set up event listeners
     ws.onopen = () => {
       console.log('WebSocket connection established');
-      if (ws) {
-        console.log('Sending message:');
-        ws.send(JSON.stringify({}));
-      }
-      console.log('Message sent');
+      const userId = 1; // Replace with the actual userId you want to send
+      ws.send(JSON.stringify({ userId: userId }));
     };
 
     ws.onmessage = (event) => {
-      // console.log('Received message:', event);
       const message: Message = JSON.parse(event.data);
       setMessages((prevMessages) => [...prevMessages, message]);
+      showAlert(message);  // Trigger the SweetAlert when a message is received
     };
 
     ws.onclose = () => {
       console.log('WebSocket connection closed');
     };
 
-    // Clean up the WebSocket connection when the component unmounts
     return () => {
       ws.close();
     };
   }, []);
 
-  // return (
-  //   <div>
-  //     <h1>WebSocket Messages</h1>
-  //     <ul>
-  //       {messages.map((message, index) => (
-  //         <li key={index}>{JSON.stringify(message)}</li>
-  //       ))}
-  //     </ul>
-  //   </div>
-  // );
+  const showAlert = (message: Message) => {
+    Swal.fire({
+      title: ` Reminder: ${message.title}`,
+      text: message.message,
+      iconHtml: '⏰', // Replace the icon with the large-sized image
+      iconColor: '#ffcc00',
+      background: '#f2f2f2',
+      confirmButtonText: 'Got it',
+      confirmButtonColor: '#3085d6',
+      showCancelButton: true,
+      cancelButtonText: 'Snooze',
+      cancelButtonColor: '#d33',
+      // backdrop: `
+      //   rgba(0,0,123,0.4)
+      //   url("https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif")
+      //   left top
+      //   no-repeat
+      // `,
+      customClass: {
+        title: styles.swalTitle,
+        popup: styles.swalPopup,
+        confirmButton: styles.swalConfirmButton,
+        cancelButton: styles.swalCancelButton,
+      },
+      showClass: {
+        popup: 'animate__animated animate__fadeInDown'
+      },
+      hideClass: {
+        popup: 'animate__animated animate__fadeOutUp'
+      }
+    });
+  };
+
+  return (
+    <div>
+      {/* Uncomment the section below if you want to display the messages on the page */}
+      {/* 
+      <h1>Task Reminders</h1>
+      <ul>
+        {messages.map((message, index) => (
+          <li key={index}>
+            <h2>{message.title}</h2>
+            <p><strong>{message.message}</strong></p>
+          </li>
+        ))}
+      </ul>
+      */}
+    </div>
+  );
 };
 
 export default WebSocketComponent;

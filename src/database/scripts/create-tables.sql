@@ -75,6 +75,8 @@ CREATE TABLE `Task` (
 	`status` VARCHAR(191) NOT NULL,
 	`tasklistId` INT NOT NULL,
 	FOREIGN KEY(`tasklistId`) REFERENCES `TaskList`(`id`),
+	`userId` INT NOT NULL,
+	FOREIGN KEY(`userId`) REFERENCES `User`(`id`),
 	PRIMARY KEY(`id`)
 );
 

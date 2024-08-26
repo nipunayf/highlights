@@ -18,6 +18,8 @@ import { fetchTaskLists, selectTaskListById, selectUserTaskListIds } from '@/fea
 import { useAppDispatch, useAppSelector } from '@/hooks';
 import { useAppUser } from '@/hooks/useAppUser';
 import UserMenu from '../UserMenu/UserMenu';
+import WebSocketComponent from '@/components/RemainderNotification/RemainderNotification';
+
 
 const links = [
     { icon: IconBulb, label: 'Highlights', path: '/highlights' },
@@ -97,6 +99,9 @@ export default function Navbar() {
     ));
 
     return (
+        <>
+              <WebSocketComponent />
+
         <nav className={classes.navbar}>
             <Space mt={{ base: 'xs', sm: 'xl' }} h={'md'} />
             <Box visibleFrom='sm'>
@@ -142,5 +147,7 @@ export default function Navbar() {
                 </div>
             </div>
         </nav>
+        </>
+
     );
 }

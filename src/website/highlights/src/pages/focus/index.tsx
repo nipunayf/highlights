@@ -7,7 +7,6 @@ import styles from './index.module.css';
 import Timer from '../../components/Timer/Timer';
 import Stop_watch from '../../components/Stopwatch/Stopwatch';
 import FocusSummary from '../../components/FocusSummary/FocusSummary';
-import WebSocketComponent from '@/components/RemainderNotification/RemainderNotification';
 
 export default function Focus() {
   const [activeTab, setActiveTab] = useState<'Pomo' | 'Stopwatch'>('Pomo');
@@ -32,7 +31,6 @@ export default function Focus() {
 
   return (
     <>
-      <WebSocketComponent />
       <Container className={styles.app}>
         <ResizableBox
           className={styles.resizableBox}

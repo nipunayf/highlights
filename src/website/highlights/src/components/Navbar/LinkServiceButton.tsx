@@ -1,19 +1,24 @@
 import { Box, Group, UnstyledButton, Image, Text } from "@mantine/core";
 import classes from "./Navbar.module.css";
 import { useMSGraph } from "@/hooks/useMSGraph";
-import { useAppUser } from "@/hooks/useAppUser";
+import { AppUserLinkedAccount, useAppUser } from "@/hooks/useAppUser";
 import { useAppDispatch } from "@/hooks";
 import { setCredentials } from "@/features/auth/authSlice";
 import { InteractionRequiredAuthError } from "@azure/msal-browser";
+import { useAddLinkedAccountMutation } from "@/features/auth/apiUsersSlice";
 
 let MicrosoftToDoButton = () => {
     const dispatch = useAppDispatch();
     const { signIn } = useMSGraph();
     const { user } = useAppUser();
+    const [addLinkedAccount, { isLoading }] = useAddLinkedAccountMutation();
 
     const handleLinkMicrosoftToDo = async () => {
         try {
             await signIn();
+            if (user) {
+                await addLinkedAccount({ user, account: AppUserLinkedAccount.Microsoft }).unwrap();
+            }
             dispatch(setCredentials({
                 ...user,
                 linkedAccounts: user?.linkedAccounts ? [...user.linkedAccounts, 'Microsoft'] : ['Microsoft']

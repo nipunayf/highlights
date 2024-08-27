@@ -8,9 +8,9 @@ type User record {|
     string sub;
     TaskList[] tasklist;
     Timer[] timer;
-	Pomodoro[] pomodoro;
-	Stopwatch[] stopwatch;
-	Task[] task;
+    Pomodoro[] pomodoro;
+    Stopwatch[] stopwatch;
+    Task[] task;
 |};
 
 type TaskList record {|
@@ -47,8 +47,8 @@ type Highlight record {|
     Task task;
     Stopwatch[] stopwatch;
     Pomodoro[] pomodoro;
-	PausePomodoro[] pausepomodoro;
-	PauseStopwatch[] pausestopwatch;
+    PausePomodoro[] pausepomodoro;
+    PauseStopwatch[] pausestopwatch;
 |};
 
 type Timer record {|
@@ -60,10 +60,8 @@ type Timer record {|
     time:TimeOfDay longBreakDuration;
     int pomosPerLongBreak;
     User user;
-	Pomodoro[] pomodoro;
-	Stopwatch[] stopwatch;
-    // Pomodoro? pomodoro;
-    // Stopwatch? stopwatch;
+    Pomodoro[] pomodoro;
+    Stopwatch[] stopwatch;
 |};
 
 type Pomodoro record {|
@@ -75,7 +73,7 @@ type Pomodoro record {|
     time:Civil? endTime;
     string status;
     User user;
-	PausePomodoro[] pausepomodoro;
+    PausePomodoro[] pausepomodoro;
 |};
 
 type Stopwatch record {|
@@ -87,8 +85,7 @@ type Stopwatch record {|
     time:Civil? endTime;
     string status;
     User user;
-	PauseStopwatch[] pausestopwatch;
-
+    PauseStopwatch[] pausestopwatch;
 |};
 
 type PausePomodoro record {|
@@ -98,7 +95,6 @@ type PausePomodoro record {|
     time:Civil? continueTime;
     Highlight highlight;
     Pomodoro pomodoro;
-
 |};
 
 type PauseStopwatch record {|
@@ -127,5 +123,4 @@ type DailyTip record {|
     readonly int id;
     string label;
     string tip;
-    // time:Date date;
 |};

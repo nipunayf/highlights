@@ -37,8 +37,6 @@ type Task record {|
     string status;
     Highlight[] highlight;
     User user;
-
-
 |};
 
 type Highlight record {|

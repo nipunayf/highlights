@@ -100,54 +100,52 @@ export default function Navbar() {
 
     return (
         <>
-              <WebSocketComponent />
+            <WebSocketComponent />
+            <nav className={classes.navbar}>
+                <Space mt={{ base: 'xs', sm: 'xl' }} h={'md'} />
+                <Box visibleFrom='sm'>
+                    <UserMenu position={'right'}>
+                        <UnstyledButton className={classes.userMenu}>
+                            <Group>
+                                <Avatar
+                                    src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-8.png"
+                                    radius="xl"
+                                />
+                                <Box style={{ flex: 1 }}>
+                                    <Text size="sm" fw={500}>Nancy Eggshacker</Text>
 
-        <nav className={classes.navbar}>
-            <Space mt={{ base: 'xs', sm: 'xl' }} h={'md'} />
-            <Box visibleFrom='sm'>
-                <UserMenu position={'right'}>
-                    <UnstyledButton className={classes.userMenu}>
-                        <Group>
-                            <Avatar
-                                src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-8.png"
-                                radius="xl"
-                            />
-                            <Box style={{ flex: 1 }}>
-                                <Text size="sm" fw={500}>Nancy Eggshacker</Text>
-
-                                <Text c="dimmed" size="xs">
-                                    neggshaker@mantine.dev
-                                </Text>
-                            </Box>
-                            <IconChevronRight style={{ width: rem(14), height: rem(14), marginLeft: 'auto' }} stroke={1.5} />
-                        </Group>
-                    </UnstyledButton>
-                </UserMenu>
-            </Box>
-            <Space h={'sm'} />
-            <div className={classes.section}>
-                <div className={classes.mainLinks}>{mainLinks}</div>
-            </div>
-
-            <div className={classes.section}>
-                <Group className={classes.collectionsHeader} justify="space-between">
-                    <Text size="sm" fw={500} c="dimmed">
-                        Collections
-                    </Text>
-                    <Tooltip label="Create collection" withArrow position="right">
-                        <ActionIcon variant="default" size={18}>
-                            <IconPlus style={{ width: rem(12), height: rem(12) }} stroke={1.5} />
-                        </ActionIcon>
-                    </Tooltip>
-                </Group>
-                <div className={classes.collections}>
-                    {taskListIds.map((taskListId: string) => (
-                        <TaskListExcerpt key={taskListId} taskListId={taskListId} active={active} setActive={setActive} />
-                    ))}
+                                    <Text c="dimmed" size="xs">
+                                        neggshaker@mantine.dev
+                                    </Text>
+                                </Box>
+                                <IconChevronRight style={{ width: rem(14), height: rem(14), marginLeft: 'auto' }} stroke={1.5} />
+                            </Group>
+                        </UnstyledButton>
+                    </UserMenu>
+                </Box>
+                <Space h={'sm'} />
+                <div className={classes.section}>
+                    <div className={classes.mainLinks}>{mainLinks}</div>
                 </div>
-            </div>
-        </nav>
-        </>
 
+                <div className={classes.section}>
+                    <Group className={classes.collectionsHeader} justify="space-between">
+                        <Text size="sm" fw={500} c="dimmed">
+                            Collections
+                        </Text>
+                        <Tooltip label="Create collection" withArrow position="right">
+                            <ActionIcon variant="default" size={18}>
+                                <IconPlus style={{ width: rem(12), height: rem(12) }} stroke={1.5} />
+                            </ActionIcon>
+                        </Tooltip>
+                    </Group>
+                    <div className={classes.collections}>
+                        {taskListIds.map((taskListId: string) => (
+                            <TaskListExcerpt key={taskListId} taskListId={taskListId} active={active} setActive={setActive} />
+                        ))}
+                    </div>
+                </div>
+            </nav>
+        </>
     );
 }

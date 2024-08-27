@@ -134,7 +134,7 @@ export default function Navbar() {
                     <div className={classes.mainLinks}>{mainLinks}</div>
                 </div>
 
-                {user?.linkedAccounts?.includes('Microsoft') ? (
+                {user?.linkedAccounts?.includes(AppUserLinkedAccount.Microsoft) ? (
                     <Box className={classes.section}>
                         <Group className={classes.collectionsHeader} justify="space-between">
                             <Text size="sm" fw={500} c="dimmed">
@@ -166,7 +166,7 @@ export default function Navbar() {
                     <LinkServiceButton service="Microsoft" />
                 }
 
-                {user?.linkedAccounts?.includes('Google') ? (
+                {user?.linkedAccounts?.includes(AppUserLinkedAccount.Google) ? (
                     <div className={classes.section}>
                         <Group className={classes.collectionsHeader} justify="space-between">
                             <Text size="sm" fw={500} c="dimmed">

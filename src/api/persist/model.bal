@@ -6,9 +6,12 @@ type User record {|
     @sql:Generated
     readonly int id;
     string sub;
+    UserLinkedAccount[] userlinkedaccount;
     TaskList[] tasklist;
     Timer[] timer;
-    UserLinkedAccount[] userlinkedaccount;
+    Pomodoro[] pomodoro;
+    Stopwatch[] stopwatch;
+    Task[] task;
 |};
 
 type LinkedAccount record {|
@@ -48,6 +51,7 @@ type Task record {|
     string label;
     string status;
     Highlight[] highlight;
+    User user;
 |};
 
 type Highlight record {|
@@ -56,19 +60,21 @@ type Highlight record {|
     Task task;
     Stopwatch[] stopwatch;
     Pomodoro[] pomodoro;
+    PausePomodoro[] pausepomodoro;
+    PauseStopwatch[] pausestopwatch;
 |};
 
 type Timer record {|
     @sql:Generated
     readonly int id;
     string name;
-    time:Civil pomoDuration;
-    time:Civil shortBreakDuration;
-    time:Civil longBreakDuration;
+    time:TimeOfDay pomoDuration;
+    time:TimeOfDay shortBreakDuration;
+    time:TimeOfDay longBreakDuration;
     int pomosPerLongBreak;
     User user;
-    Pomodoro? pomodoro;
-    Stopwatch? stopwatch;
+    Pomodoro[] pomodoro;
+    Stopwatch[] stopwatch;
 |};
 
 type Pomodoro record {|
@@ -77,9 +83,10 @@ type Pomodoro record {|
     Timer timer;
     Highlight highlight;
     time:Civil startTime;
-    time:Civil endTime;
+    time:Civil? endTime;
     string status;
-    PausePomodoro? pausepomodoro;
+    User user;
+    PausePomodoro[] pausepomodoro;
 |};
 
 type Stopwatch record {|
@@ -88,17 +95,19 @@ type Stopwatch record {|
     Timer timer;
     Highlight highlight;
     time:Civil startTime;
-    time:Civil endTime;
+    time:Civil? endTime;
     string status;
-    PauseStopwatch? pausestopwatch;
+    User user;
+    PauseStopwatch[] pausestopwatch;
 |};
 
 type PausePomodoro record {|
     @sql:Generated
     readonly int id;
-    Pomodoro pomodoro;
     time:Civil pauseTime;
-    time:Civil continueTime;
+    time:Civil? continueTime;
+    Highlight highlight;
+    Pomodoro pomodoro;
 |};
 
 type PauseStopwatch record {|
@@ -106,7 +115,8 @@ type PauseStopwatch record {|
     readonly int id;
     Stopwatch stopwatch;
     time:Civil pauseTime;
-    time:Civil continueTime;
+    time:Civil? continueTime;
+    Highlight highlight;
 |};
 
 type Review record {|
@@ -126,5 +136,4 @@ type DailyTip record {|
     readonly int id;
     string label;
     string tip;
-    // time:Date date;
 |};

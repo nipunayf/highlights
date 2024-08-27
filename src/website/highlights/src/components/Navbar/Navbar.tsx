@@ -21,6 +21,7 @@ import { AppUserLinkedAccount, useAppUser } from '@/hooks/useAppUser';
 import UserMenu from '../UserMenu/UserMenu';
 import { TaskListSource } from '@/features/taskLists/TaskListSource';
 import LinkServiceButton from './LinkServiceButton';
+import WebSocketComponent from '@/components/RemainderNotification/RemainderNotification';
 
 const links = [
     { icon: IconBulb, label: 'Highlights', path: '/highlights' },
@@ -104,86 +105,89 @@ export default function Navbar() {
     )), [active]);
 
     return (
-        <nav className={classes.navbar}>
-            <Space mt={{ base: 'xs', sm: 'xl' }} h={'md'} />
-            <Box visibleFrom='sm'>
-                <UserMenu position={'right'}>
-                    <UnstyledButton className={classes.userMenu}>
-                        <Group>
-                            <Avatar
-                                src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-8.png"
-                                radius="xl"
-                            />
-                            <Box style={{ flex: 1 }}>
-                                <Text size="sm" fw={500}>Nancy Eggshacker</Text>
+        <>
+            <WebSocketComponent />
+            <nav className={classes.navbar}>
+                <Space mt={{ base: 'xs', sm: 'xl' }} h={'md'} />
+                <Box visibleFrom='sm'>
+                    <UserMenu position={'right'}>
+                        <UnstyledButton className={classes.userMenu}>
+                            <Group>
+                                <Avatar
+                                    src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-8.png"
+                                    radius="xl"
+                                />
+                                <Box style={{ flex: 1 }}>
+                                    <Text size="sm" fw={500}>Nancy Eggshacker</Text>
 
-                                <Text c="dimmed" size="xs">
-                                    neggshaker@mantine.dev
-                                </Text>
-                            </Box>
-                            <IconChevronRight style={{ width: rem(14), height: rem(14), marginLeft: 'auto' }} stroke={1.5} />
+                                    <Text c="dimmed" size="xs">
+                                        neggshaker@mantine.dev
+                                    </Text>
+                                </Box>
+                                <IconChevronRight style={{ width: rem(14), height: rem(14), marginLeft: 'auto' }} stroke={1.5} />
+                            </Group>
+                        </UnstyledButton>
+                    </UserMenu>
+                </Box>
+                <Space h={'sm'} />
+                <div className={classes.section}>
+                    <div className={classes.mainLinks}>{mainLinks}</div>
+                </div>
+
+                {user?.linkedAccounts?.includes('Microsoft') ? (
+                    <Box className={classes.section}>
+                        <Group className={classes.collectionsHeader} justify="space-between">
+                            <Text size="sm" fw={500} c="dimmed">
+                                Microsoft To Do
+                            </Text>
+                            <Tooltip label="Create collection" withArrow position="right">
+                                <ActionIcon variant="default" size={18}>
+                                    <IconPlus style={{ width: rem(12), height: rem(12) }} stroke={1.5} />
+                                </ActionIcon>
+                            </Tooltip>
                         </Group>
-                    </UnstyledButton>
-                </UserMenu>
-            </Box>
-            <Space h={'sm'} />
-            <div className={classes.section}>
-                <div className={classes.mainLinks}>{mainLinks}</div>
-            </div>
+                        {msToDoLoadingStatus === 'loading' ? (
+                            <Box ta="center" py="md">
+                                <Loader size="sm" />
+                            </Box>
+                        ) : msToDoLoadingStatus === 'failed' ? (
+                            <Text c="red" size="sm" ta="center" py="md">
+                                {msToDoError || 'Failed to load Microsoft To Do lists'}
+                            </Text>
+                        ) : (
+                            <div className={classes.collections}>
+                                {msToDoListIds.map((taskListId: string) => (
+                                    <TaskListExcerpt key={taskListId} taskListId={taskListId} active={active} setActive={setActive} />
+                                ))}
+                            </div>
+                        )}
+                    </Box>
+                ) :
+                    <LinkServiceButton service="Microsoft" />
+                }
 
-            {user?.linkedAccounts?.includes('Microsoft') ? (
-                <Box className={classes.section}>
-                    <Group className={classes.collectionsHeader} justify="space-between">
-                        <Text size="sm" fw={500} c="dimmed">
-                            Microsoft To Do
-                        </Text>
-                        <Tooltip label="Create collection" withArrow position="right">
-                            <ActionIcon variant="default" size={18}>
-                                <IconPlus style={{ width: rem(12), height: rem(12) }} stroke={1.5} />
-                            </ActionIcon>
-                        </Tooltip>
-                    </Group>
-                    {msToDoLoadingStatus === 'loading' ? (
-                        <Box ta="center" py="md">
-                            <Loader size="sm" />
-                        </Box>
-                    ) : msToDoLoadingStatus === 'failed' ? (
-                        <Text c="red" size="sm" ta="center" py="md">
-                            {msToDoError || 'Failed to load Microsoft To Do lists'}
-                        </Text>
-                    ) : (
+                {user?.linkedAccounts?.includes('Google') ? (
+                    <div className={classes.section}>
+                        <Group className={classes.collectionsHeader} justify="space-between">
+                            <Text size="sm" fw={500} c="dimmed">
+                                Google Tasks
+                            </Text>
+                            <Tooltip label="Create collection" withArrow position="right">
+                                <ActionIcon variant="default" size={18}>
+                                    <IconPlus style={{ width: rem(12), height: rem(12) }} stroke={1.5} />
+                                </ActionIcon>
+                            </Tooltip>
+                        </Group>
                         <div className={classes.collections}>
-                            {msToDoListIds.map((taskListId: string) => (
+                            {gTaskListIds.map((taskListId: string) => (
                                 <TaskListExcerpt key={taskListId} taskListId={taskListId} active={active} setActive={setActive} />
                             ))}
                         </div>
-                    )}
-                </Box>
-            ) :
-                <LinkServiceButton service="Microsoft" />
-            }
-
-            {user?.linkedAccounts?.includes('Google') ? (
-                <div className={classes.section}>
-                    <Group className={classes.collectionsHeader} justify="space-between">
-                        <Text size="sm" fw={500} c="dimmed">
-                            Google Tasks
-                        </Text>
-                        <Tooltip label="Create collection" withArrow position="right">
-                            <ActionIcon variant="default" size={18}>
-                                <IconPlus style={{ width: rem(12), height: rem(12) }} stroke={1.5} />
-                            </ActionIcon>
-                        </Tooltip>
-                    </Group>
-                    <div className={classes.collections}>
-                        {gTaskListIds.map((taskListId: string) => (
-                            <TaskListExcerpt key={taskListId} taskListId={taskListId} active={active} setActive={setActive} />
-                        ))}
                     </div>
-                </div>
-            ) :
-                <LinkServiceButton service="Google" />
-            }
-        </nav>
+                ) :
+                    <LinkServiceButton service="Google" />
+                }
+            </nav>
+        </>
     );
 }

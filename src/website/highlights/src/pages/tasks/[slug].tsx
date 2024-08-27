@@ -4,17 +4,17 @@ import { useRouter } from 'next/router'
 import { ReactNode } from 'react';
 import classes from './Tasks.module.css';
 import { useAppSelector } from '@/hooks';
-import { selectTaskListById } from '@/features/taskLists/taskListsSlice';
+import { selectListById } from '@/features/taskLists/taskListsSlice';
 import { TaskForm, TaskList } from '@/features/tasks/components';
 
 export default function Page() {
     const router = useRouter();
     const { slug } = router.query;
 
-    const taskListId = slug as string;
-    const taskList = useAppSelector((state) => selectTaskListById(state, taskListId));
+    const listId = slug as string;
+    const list = useAppSelector((state) => selectListById(state, listId));
 
-    if (!taskList) {
+    if (!list) {
         return (
             <Box p={'lg'}>
                 <Flex className={classes.tasks} direction={"column"}>
@@ -29,14 +29,14 @@ export default function Page() {
     return (
         <Box p={'xl'}>
             <Flex className={classes.tasks} direction={"column"}>
-                <Title mt={'sm'} mb={"sm"} px={"xl"} order={1}>{taskList.title}</Title>
+                <Title mt={'sm'} mb={"sm"} px={"xl"} order={1}>{list.title}</Title>
                 <ScrollArea my={'md'}>
                     <Box mx={'auto'} maw={'70%'}>
-                        <TaskList taskListId={taskListId} />
+                        <TaskList taskListId={listId} />
                     </Box>
                 </ScrollArea>
                 <Box px={"xl"} mt={'auto'} mb={0}>
-                    <TaskForm taskListId={taskListId} />
+                    <TaskForm taskListId={listId} />
                 </Box>
             </Flex>
         </Box>

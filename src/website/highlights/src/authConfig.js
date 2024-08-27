@@ -55,8 +55,18 @@ export const msalConfig = {
  * https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-permissions-and-consent#openid-connect-scopes
  */
 export const loginRequest = {
-    scopes: ["User.Read"]
+    scopes: ["api://77fadf8c-1776-403c-8496-1f993887f1c3/User.Read"]
 };
+
+export const msGraphLoginRequest = {
+    scopes: [
+        'User.Read',
+        'Calendars.ReadWrite',
+        'Calendars.ReadWrite.Shared',
+        'Tasks.ReadWrite',
+        'Tasks.ReadWrite.Shared',
+    ]
+}
 
 export const profileEditRequest = {
     scopes: []

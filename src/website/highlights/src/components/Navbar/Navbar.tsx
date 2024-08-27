@@ -8,15 +8,16 @@ import {
     Space,
     Avatar,
     Box,
+    Loader,
 } from '@mantine/core';
 import { IconBulb, IconCheckbox, IconPlus, IconChartDots2, IconCalendarMonth, IconTie, IconAlarm, IconList, IconBellRinging, IconChevronRight } from '@tabler/icons-react';
 import classes from './Navbar.module.css';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
-import { fetchMSToDoTaskLists, fetchTaskLists, selectTaskListById, selectTaskListIdsBySource } from '@/features/taskLists/taskListsSlice';
+import { fetchMSToDoLists, selectListById, selectListIdsBySource } from '@/features/taskLists/taskListsSlice';
 import { useAppDispatch, useAppSelector } from '@/hooks';
-import { useAppUser } from '@/hooks/useAppUser';
+import { AppUserLinkedAccount, useAppUser } from '@/hooks/useAppUser';
 import UserMenu from '../UserMenu/UserMenu';
 import { TaskListSource } from '@/features/taskLists/TaskListSource';
 import LinkServiceButton from './LinkServiceButton';
@@ -32,7 +33,7 @@ const links = [
 ];
 
 let TaskListExcerpt = ({ taskListId, active, setActive }: { taskListId: string, active: string, setActive: (label: string) => void }) => {
-    const taskList = useAppSelector(state => selectTaskListById(state, taskListId));
+    const taskList = useAppSelector(state => selectListById(state, taskListId));
     return (
         <UnstyledButton
             component={Link}
@@ -57,15 +58,18 @@ export default function Navbar() {
 
     const dispatch = useAppDispatch();
 
-    const taskListIds = useAppSelector(state => selectTaskListIdsBySource(state, TaskListSource.Highlights));
-    const mstodoTaskListIds = useAppSelector(state => selectTaskListIdsBySource(state, TaskListSource.MicrosoftToDo));
-    const googleTaskListIds = useAppSelector(state => selectTaskListIdsBySource(state, TaskListSource.GoogleTasks));
+    const msToDoListIds = useAppSelector(state => selectListIdsBySource(state, TaskListSource.MicrosoftToDo));
+    const msToDoLoadingStatus = useAppSelector(state => state.taskLists.status[TaskListSource.MicrosoftToDo]);
+    const msToDoError = useAppSelector(state => state.taskLists.error[TaskListSource.MicrosoftToDo]);
+
+    const gTaskListIds = useAppSelector(state => selectListIdsBySource(state, TaskListSource.GoogleTasks));
+
     const { user } = useAppUser();
 
     useEffect(() => {
         if (!user) return;
-        dispatch(fetchTaskLists(user));
-        dispatch(fetchMSToDoTaskLists());
+        if (user.linkedAccounts?.includes(AppUserLinkedAccount.Microsoft))
+            dispatch(fetchMSToDoLists());
     }, [dispatch, user]);
 
     useEffect(() => {
@@ -74,14 +78,13 @@ export default function Navbar() {
         if (currentSection) {
             setActive(currentSection.label);
         } else {
-            const currentTaskList = taskListIds.find(item => `/tasks/${item}` === router.asPath)
-                || mstodoTaskListIds.find(item => `/tasks/${item}` === router.asPath)
-                || googleTaskListIds.find(item => `/tasks/${item}` === router.asPath);
+            const currentTaskList = msToDoListIds.find(item => `/tasks/${item}` === router.asPath)
+                || gTaskListIds.find(item => `/tasks/${item}` === router.asPath);
             if (currentTaskList) {
                 setActive(currentTaskList);
             }
         }
-    }, [router.pathname, router.asPath, taskListIds, mstodoTaskListIds, googleTaskListIds]);
+    }, [router.pathname, router.asPath, msToDoListIds, gTaskListIds]);
 
     const mainLinks = useMemo(() => links.map((link) => (
         <UnstyledButton
@@ -140,11 +143,21 @@ export default function Navbar() {
                             </ActionIcon>
                         </Tooltip>
                     </Group>
-                    <div className={classes.collections}>
-                        {mstodoTaskListIds.map((taskListId: string) => (
-                            <TaskListExcerpt key={taskListId} taskListId={taskListId} active={active} setActive={setActive} />
-                        ))}
-                    </div>
+                    {msToDoLoadingStatus === 'loading' ? (
+                        <Box ta="center" py="md">
+                            <Loader size="sm" />
+                        </Box>
+                    ) : msToDoLoadingStatus === 'failed' ? (
+                        <Text c="red" size="sm" ta="center" py="md">
+                            {msToDoError || 'Failed to load Microsoft To Do lists'}
+                        </Text>
+                    ) : (
+                        <div className={classes.collections}>
+                            {msToDoListIds.map((taskListId: string) => (
+                                <TaskListExcerpt key={taskListId} taskListId={taskListId} active={active} setActive={setActive} />
+                            ))}
+                        </div>
+                    )}
                 </Box>
             ) :
                 <LinkServiceButton service="Microsoft" />
@@ -163,7 +176,7 @@ export default function Navbar() {
                         </Tooltip>
                     </Group>
                     <div className={classes.collections}>
-                        {googleTaskListIds.map((taskListId: string) => (
+                        {gTaskListIds.map((taskListId: string) => (
                             <TaskListExcerpt key={taskListId} taskListId={taskListId} active={active} setActive={setActive} />
                         ))}
                     </div>

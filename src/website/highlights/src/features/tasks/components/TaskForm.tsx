@@ -30,8 +30,8 @@ export function TaskForm({ taskListId }: { taskListId: string }) {
         values.id = Math.random().toString(36);
         values.created = new Date().toISOString();
         values.dueDate = values.dueDate?.toISOString();
-        dispatch(taskAdded(values));
-        dispatch(taskAddedToTaskList({ taskListId, taskId: values.id }));
+        // dispatch(taskAdded(values));
+        // dispatch(taskAddedToTaskList({ taskListId, taskId: values.id }));
         form.reset();
     };
 

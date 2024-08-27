@@ -6,11 +6,26 @@ type User record {|
     @sql:Generated
     readonly int id;
     string sub;
+    UserLinkedAccount[] userlinkedaccount;
     TaskList[] tasklist;
     Timer[] timer;
     Pomodoro[] pomodoro;
     Stopwatch[] stopwatch;
     Task[] task;
+|};
+
+type LinkedAccount record {|
+    @sql:Generated
+    readonly int id;
+    string name;
+    UserLinkedAccount[] userlinkedaccount;
+|};
+
+type UserLinkedAccount record {|
+    @sql:Generated
+    readonly int id;
+    User user;
+    LinkedAccount linkedaccount;
 |};
 
 type TaskList record {|

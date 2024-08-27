@@ -1,4 +1,4 @@
-insert into User(sub) values('6e4096d8-b99e-4b2d-a495-446cce5fcd7c');
+insert into User(sub) values('BffwoA8xz4-gcK8FA9_rUOBvpMsMa5lCTnCBd5eAFe8');
 
 insert into TaskList(userId, title, createdAt) 
 values(1, 'Shopping', '2023-10-05 14:48:00'),
@@ -6,6 +6,9 @@ values(1, 'Shopping', '2023-10-05 14:48:00'),
 (1, 'Work', '2023-10-05 14:48:00'),
 (1, 'Travel', '2023-10-05 14:48:00');
 
+insert into LinkedAccount(name) values('Microsoft'), ('Google');
+
+insert into UserLinkedAccount(userId, linkedaccountId) values(1, 1), (1, 2);
 
 INSERT INTO `Timer` (name, pomoDuration, shortBreakDuration, longBreakDuration, pomosPerLongBreak, userId) 
 VALUES 
@@ -14,8 +17,6 @@ VALUES
 ('Evening Study', '00:45:00', '00:10:00', '00:25:00', 5, 1),
 ('Night Work', '01:00:00', '00:15:00', '00:30:00', 2, 1),
 ('Weekend Marathon', '02:00:00', '00:20:00', '00:45:00', 6, 1);
-
-
 
 INSERT INTO `Task` (title, description, dueDate, startTime, endTime, reminder, priority, label, status, tasklistId, userId) 
 VALUES 
@@ -30,10 +31,6 @@ VALUES
 (2),
 (3),
 (4);
-
-
-
-
 
 -- -- Inserting sample data into the `Task` table
 -- INSERT INTO `Task` 

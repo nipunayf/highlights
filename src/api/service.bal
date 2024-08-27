@@ -333,7 +333,7 @@ type PauseAndContinueTime record {
     //     }
     // ],
     cors: {
-        allowOrigins: ["http://localhost:3000"],
+        allowOrigins: ["http://localhost:3000", "http://localhost:3002"],
         allowCredentials: false,
         allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         allowHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
@@ -725,7 +725,7 @@ service / on http_listener:Listener {
     private function tipps(CreateDailyTip dailyTip) returns error? {
         io:println("cc");
         sql:ExecutionResult|sql:Error result = database:Client->execute(`
-            INSERT INTO dailytips (label, tip) VALUES (${dailyTip.label}, ${dailyTip.tip});
+            INSERT INTO DailyTip (label, tip) VALUES (${dailyTip.label}, ${dailyTip.tip});
         `);
 
         if (result is sql:ApplicationError) {
@@ -737,7 +737,7 @@ service / on http_listener:Listener {
 
     // Fetch daily tips
     private function fetchDailyTips() returns DailyTip[]|error {
-        sql:ParameterizedQuery query = `SELECT id, label, tip FROM dailytips`;
+        sql:ParameterizedQuery query = `SELECT id, label, tip FROM DailyTip`;
         stream<DailyTip, sql:Error?> resultStream = database:Client->query(query);
         DailyTip[] dailyTipList = [];
         error? e = resultStream.forEach(function(DailyTip dailyTip) {
@@ -756,7 +756,7 @@ service / on http_listener:Listener {
     // Update a dailytip by ID
     private function updateDailyTip(int tipId, string label, string tip) returns error? {
         sql:ExecutionResult|sql:Error result = database:Client->execute(`
-            UPDATE dailytips SET label = ${label}, tip = ${tip} WHERE id = ${tipId};
+            UPDATE DailyTip SET label = ${label}, tip = ${tip} WHERE id = ${tipId};
         `);
 
         if (result is sql:Error) {
@@ -798,30 +798,52 @@ service / on http_listener:Listener {
     }
 
     // Endpoint to update a daily tip
-    resource function PUT updatetips(int tipId, http:Caller caller, http:Request req) returns error? {
+    resource function PUT updatetips/[int tipId](http:Caller caller, http:Request req) returns error? {
+         io:println("************");
+
         json|http:ClientError payload = req.getJsonPayload();
-        io:print("*************");
-
-        if (payload is http:ClientError) {
+        if payload is http:ClientError {
             log:printError("Error while parsing request payload", 'error = payload);
+
             check caller->respond(http:STATUS_BAD_REQUEST);
             return;
         }
 
-        CreateDailyTip|error dailyTip = payload.cloneWithType(CreateDailyTip);
-        if (dailyTip is error) {
-            log:printError("Error while converting JSON to CreateDailyTip", 'error = dailyTip);
+        DailyTip|error tip = payload.cloneWithType(DailyTip);
+        if tip is error {
+            log:printError("Error while converting JSON to Task", 'error = tip);
             check caller->respond(http:STATUS_BAD_REQUEST);
             return;
         }
 
-        error? result = self.updateDailyTip(tipId, dailyTip.tip, dailyTip.label);
-        if (result is error) {
+        sql:ExecutionResult|sql:Error result = database:Client->execute(`
+        UPDATE DailyTip SET label = ${tip.label}, 
+                      tip = ${tip.tip} 
+        WHERE id = ${tipId};
+    `);
+
+        if result is sql:Error {
+            log:printError("Error occurred while updating task", 'error = result);
             check caller->respond(http:STATUS_INTERNAL_SERVER_ERROR);
-            return;
+        } else {
+            check caller->respond(http:STATUS_OK);
         }
+    }
 
-        check caller->respond(http:STATUS_OK);
+
+    // Delete dailytip
+    resource function delete tips/[int tipId](http:Caller caller) returns error? {
+        // io:println("xdd");
+        sql:ExecutionResult|sql:Error result = database:Client->execute(`
+            DELETE FROM DailyTip WHERE id = ${tipId};
+        `);
+
+        if result is sql:Error {
+            log:printError("Error occurred while deleting task", result);
+            check caller->respond(http:STATUS_INTERNAL_SERVER_ERROR);
+        } else {
+            check caller->respond(http:STATUS_OK);
+        }
     }
 
     resource function get timer_details() returns h_TimerDetails[]|error {

@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
-import {Modal,TextInput,Button,Textarea, Select,ActionIcon,rem, Text,} from "@mantine/core";
+import { Modal, TextInput, Button, Textarea, Select, ActionIcon, rem, Text, } from "@mantine/core";
 import { getTasktime } from "@/services/api";
 import { DatePicker, TimeInput } from "@mantine/dates";
 import { IconClock, IconX } from "@tabler/icons-react";
-import { createTask as createApiTask ,getEstimatedTime} from "@/services/api";
+import { createTask as createApiTask, getEstimatedTime } from "@/services/api";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 
@@ -40,7 +40,7 @@ interface ApiTask {
 
 
 
-export default function AddtaskPopup({ open, onClose }: AddtaskPopupProps) {
+export default function AddTaskPopup({ open, onClose }: AddtaskPopupProps) {
 
   const priorityColors = {
     low: '#4CAF50',
@@ -68,9 +68,9 @@ export default function AddtaskPopup({ open, onClose }: AddtaskPopupProps) {
   // Refs for accessing the TimeInput components' methods
   const startRef = useRef<HTMLInputElement>(null);
   const endRef = useRef<HTMLInputElement>(null);
-  
-  
-  
+
+
+
   useEffect(() => {
     const fetchTaskTimes = async () => {
       try {
@@ -159,7 +159,7 @@ export default function AddtaskPopup({ open, onClose }: AddtaskPopupProps) {
       label: formState.label,
       reminder: formState.reminder,
       priority: formState.priority,
-     
+
     };
 
     // Constructing apiTask object with data adjusted for API consumption
@@ -298,9 +298,9 @@ export default function AddtaskPopup({ open, onClose }: AddtaskPopupProps) {
             marginBottom: rem(10),
           }}
         >
-       
 
-<TimeInput
+
+          <TimeInput
             label="Start Time"
             value={startTime}
             onChange={(e) => handleTimeChange(setStartTime, e.currentTarget.value)}

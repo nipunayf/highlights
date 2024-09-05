@@ -17,11 +17,12 @@ import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import { fetchMSToDoLists, selectListById, selectListIdsBySource } from '@/features/taskLists/taskListsSlice';
 import { useAppDispatch, useAppSelector } from '@/hooks';
-import { AppUserLinkedAccount, useAppUser } from '@/hooks/useAppUser';
+import { useAppUser } from '@/hooks/useAppUser';
 import UserMenu from '../UserMenu/UserMenu';
 import { TaskListSource } from '@/features/taskLists/TaskListSource';
 import LinkServiceButton from './LinkServiceButton';
 import WebSocketComponent from '@/components/RemainderNotification/RemainderNotification';
+import { LinkedAccount } from '@/features/auth';
 
 const links = [
     { icon: IconBulb, label: 'Highlights', path: '/highlights' },
@@ -69,7 +70,7 @@ export default function Navbar() {
 
     useEffect(() => {
         if (!user) return;
-        if (user.linkedAccounts?.includes(AppUserLinkedAccount.Microsoft))
+        if (user.linkedAccounts.find(account => account.name === LinkedAccount.Microsoft))
             dispatch(fetchMSToDoLists());
     }, [dispatch, user]);
 
@@ -134,7 +135,7 @@ export default function Navbar() {
                     <div className={classes.mainLinks}>{mainLinks}</div>
                 </div>
 
-                {user?.linkedAccounts?.includes(AppUserLinkedAccount.Microsoft) ? (
+                {user?.linkedAccounts.find(account => account.name === LinkedAccount.Microsoft) ? (
                     <Box className={classes.section}>
                         <Group className={classes.collectionsHeader} justify="space-between">
                             <Text size="sm" fw={500} c="dimmed">
@@ -163,10 +164,10 @@ export default function Navbar() {
                         )}
                     </Box>
                 ) :
-                    <LinkServiceButton service="Microsoft" />
+                    <LinkServiceButton service={LinkedAccount.Microsoft} />
                 }
 
-                {user?.linkedAccounts?.includes(AppUserLinkedAccount.Google) ? (
+                {user?.linkedAccounts.find(account => account.name === LinkedAccount.Google) ? (
                     <div className={classes.section}>
                         <Group className={classes.collectionsHeader} justify="space-between">
                             <Text size="sm" fw={500} c="dimmed">
@@ -185,7 +186,7 @@ export default function Navbar() {
                         </div>
                     </div>
                 ) :
-                    <LinkServiceButton service="Google" />
+                    <LinkServiceButton service={LinkedAccount.Google} />
                 }
             </nav>
         </>

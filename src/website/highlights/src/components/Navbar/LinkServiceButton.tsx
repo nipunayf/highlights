@@ -1,11 +1,10 @@
 import { Box, Group, UnstyledButton, Image, Text } from "@mantine/core";
 import classes from "./Navbar.module.css";
 import { useMSGraph } from "@/hooks/useMSGraph";
-import { AppUserLinkedAccount, useAppUser } from "@/hooks/useAppUser";
-import { useAppDispatch } from "@/hooks";
-import { setCredentials } from "@/features/auth/authSlice";
+import { useAppUser } from "@/hooks/useAppUser";
 import { InteractionRequiredAuthError } from "@azure/msal-browser";
 import { useAddLinkedAccountMutation } from "@/features/auth/apiUsersSlice";
+import { LinkedAccount } from "@/features/auth";
 
 let MicrosoftToDoButton = () => {
     const dispatch = useAppDispatch();
@@ -16,13 +15,7 @@ let MicrosoftToDoButton = () => {
     const handleLinkMicrosoftToDo = async () => {
         try {
             await signIn();
-            if (user) {
-                await addLinkedAccount({ user, account: AppUserLinkedAccount.Microsoft }).unwrap();
-            }
-            dispatch(setCredentials({
-                ...user,
-                linkedAccounts: user?.linkedAccounts ? [...user.linkedAccounts, 'Microsoft'] : ['Microsoft']
-            }));
+            await addLinkedAccount({ user: user!, account: { name: LinkedAccount.Microsoft } }).unwrap();
         } catch (error) {
             if (error instanceof InteractionRequiredAuthError) {
                 if (!(error.errorCode === "user_cancelled") && !(error.errorCode === "access_denied")) {
@@ -90,11 +83,11 @@ let GoogleTasksButton = () => {
 }
 
 export interface LinkServiceButtonProps {
-    service: 'Microsoft' | 'Google';
+    service: LinkedAccount;
 }
 
-export default function LinkServiceButton({ service }: LinkServiceButtonProps) {
-    if (service === 'Microsoft') {
+export default function LinkServiceButton(props: LinkServiceButtonProps) {
+    if (props.service === LinkedAccount.Microsoft) {
         return <MicrosoftToDoButton />;
     } else {
         return <GoogleTasksButton />;

@@ -1,6 +1,6 @@
-import { AppUser } from "@/hooks/useAppUser";
 import { RootState } from "@/store";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { AppUser } from ".";
 
 interface AuthState {
     user: AppUser | undefined;

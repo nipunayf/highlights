@@ -1,16 +1,19 @@
 import { fetchTasks, selectTaskById, taskCompleted, taskRemoved, taskUncompleted } from "@/features/tasks/tasksSlice";
 import { useAppDispatch, useAppSelector } from "@/hooks";
 import { Button, Checkbox, Group, Menu, Paper, Stack, Text } from "@mantine/core";
-import { selectListById } from "../../taskLists/taskListsSlice";
+import { selectListById, taskRemovedFromTaskList } from "../../taskLists/taskListsSlice";
 import classes from './TaskList.module.css';
 import { IconDotsVertical, IconTrash } from "@tabler/icons-react";
+import { deleteTask } from "@/services/GraphService";
 
-let TaskExcerpt = ({ taskId }: { taskId: string }) => {
+let TaskExcerpt = ({ taskId, taskListId }: { taskId: string, taskListId: string }) => {
     const dispatch = useAppDispatch();
     const task = useAppSelector(state => selectTaskById(state, taskId))
 
     const handleDelete = () => {
+        deleteTask(taskListId, taskId);
         dispatch(taskRemoved(task.id));
+        dispatch(taskRemovedFromTaskList({ taskListId, taskId }));
     };
 
     if (!task) return null;
@@ -65,7 +68,7 @@ export function TaskList({ taskListId }: { taskListId: string }) {
     return (
         <Stack py={'md'} gap={'xs'}>
             {orderedTaskIds?.map((taskId) => (
-                <TaskExcerpt key={taskId} taskId={taskId} />
+                <TaskExcerpt key={taskId} taskId={taskId} taskListId={taskListId} />
             ))}
         </Stack>
     )

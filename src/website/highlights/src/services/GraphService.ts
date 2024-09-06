@@ -1,4 +1,5 @@
-import { TaskList } from '@/features/taskLists/TaskList';
+import { TaskList } from '@/features/taskLists';
+import { CreateTask } from '@/features/tasks';
 import { InteractionType, PublicClientApplication } from '@azure/msal-browser';
 import { Client } from '@microsoft/microsoft-graph-client';
 import { AuthCodeMSALBrowserAuthenticationProvider } from '@microsoft/microsoft-graph-client/authProviders/authCodeMsalBrowser';
@@ -115,4 +116,21 @@ export async function getTasks(taskListId: string): Promise<any[]> {
         .get();
 
     return tasks.value;
+}
+
+export async function createTask(task: CreateTask): Promise<any> {
+    await ensureClient();
+
+    return await graphClient!.api('/me/todo/lists/' + task.taskListId + '/tasks')
+        .post({
+            title: task.title,
+            dueDateTime: task.dueDate,
+        });
+}
+
+export async function deleteTask(taskListId: string, taskId: string): Promise<void> {
+    await ensureClient();
+
+    return await graphClient!.api('/me/todo/lists/' + taskListId + '/tasks/' + taskId)
+        .delete();
 }

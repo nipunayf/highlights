@@ -80,9 +80,14 @@ export const taskListsSlice = createSlice({
             const { taskListId, taskId } = action.payload;
             const existingTaskList = state.entities[taskListId];
             if (existingTaskList) {
-                if (!existingTaskList.taskIds)
-                    existingTaskList.taskIds = [];
-                existingTaskList.taskIds.push(taskId);
+                existingTaskList.taskIds = [taskId, ...(existingTaskList.taskIds || [])];
+            }
+        },
+        taskRemovedFromTaskList(state, action: PayloadAction<{ taskListId: string, taskId: string }>) {
+            const { taskListId, taskId } = action.payload;
+            const existingTaskList = state.entities[taskListId];
+            if (existingTaskList) {
+                existingTaskList.taskIds = existingTaskList.taskIds?.filter(id => id !== taskId);
             }
         },
         updateTaskListWithTasks: (state, action) => {
@@ -137,6 +142,7 @@ export const {
     taskListRemoved,
     taskListUpdated,
     taskAddedToTaskList,
+    taskRemovedFromTaskList,
     updateTaskListWithTasks
 } = taskListsSlice.actions;
 

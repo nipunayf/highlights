@@ -46,7 +46,7 @@ export default function Page() {
                         </Box>
                     </ScrollArea>
                     <Box px={"xl"} mt={'auto'} mb={0}>
-                        <TaskForm taskList={list} />
+                        <TaskForm taskListId={listId} />
                     </Box>
                 </Flex>
             </Box>

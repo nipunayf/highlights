@@ -28,7 +28,7 @@ export default function Tasks() {
                         </Box>
                     </ScrollArea>
                     <Box px={"xl"} mt={'auto'} mb={0}>
-                        <TaskForm taskList={list} />
+                        <TaskForm taskListId={list.id} />
                     </Box>
                 </Flex>
             </Box>

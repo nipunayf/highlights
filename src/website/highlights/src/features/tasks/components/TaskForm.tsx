@@ -1,18 +1,19 @@
 import { taskAdded } from '@/features/tasks/tasksSlice';
-import { useAppDispatch } from '@/hooks';
+import { useAppDispatch, useAppSelector } from '@/hooks';
 import { Box, Button, Group, Menu, Paper, TextInput, rem } from '@mantine/core';
 import { DatePicker } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import { IconPlus } from '@tabler/icons-react';
 import classes from './TaskForm.module.css';
-import { taskAddedToTaskList } from '../../taskLists/taskListsSlice';
+import { selectListById, taskAddedToTaskList } from '../../taskLists/taskListsSlice';
 import { useFocusTrap } from '@mantine/hooks';
-import { TaskList, TaskListSource } from '@/features/taskLists';
+import { TaskListSource } from '@/features/taskLists';
+import { CreateTask } from '../models/CreateTask';
+import { createTask as createMSTask } from '@/services/GraphService';
 
 export function TaskForm({ taskListId }: { taskListId: string }) {
-
     const dispatch = useAppDispatch();
-
+    const taskList = useAppSelector((state) => selectListById(state, taskListId));
     const focusTrapRef = useFocusTrap();
 
     const form = useForm({
@@ -27,21 +28,41 @@ export function TaskForm({ taskListId }: { taskListId: string }) {
         },
     });
 
-    const handleAddTask = (values: any) => {
-        values.id = Math.random().toString(36);
-        values.created = new Date().toISOString();
-        values.dueDate = values.dueDate?.toISOString();
-        // dispatch(taskAdded(values));
-        // dispatch(taskAddedToTaskList({ taskListId, taskId: values.id }));
-        form.reset();
+    const handleAddTask = async (values: any) => {
+
+        let task: CreateTask = {
+            title: values.title,
+            created: new Date().toISOString(),
+            dueDate: values.dueDate?.toISOString(),
+            taskListId: taskListId,
+        };
+
+        let id = undefined;
+
+        if (taskList.source === TaskListSource.MicrosoftToDo) {
+            const res = await createMSTask(task);
+            id = res.id;
+        }
+
+        if (!id) {
+            throw new Error('Task creation failed');
+        }
+
+        dispatch(taskAdded({
+            id,
+            status: 'pending',
+            ...task,
+        }));
+        dispatch(taskAddedToTaskList({ taskListId, taskId: id }));
     };
 
     const handleKeyDown = (event: any) => {
         if (event.key === 'Enter') {
             event.preventDefault();
-            form.onSubmit(async (values) => {
+            form.onSubmit((values) => {
                 handleAddTask(values);
             })();
+            form.reset();
         }
     };
 

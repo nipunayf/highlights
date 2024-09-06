@@ -50,7 +50,6 @@ export const fetchTasks = createAsyncThunk(
         if (taskList.source === TaskListSource.MicrosoftToDo) {
             const taskListId = taskList.id;
             const response = await getMSToDoTasks(taskListId);
-            console.log(response);
             for (let t of response) {
                 tasks.push({
                     id: t.id,

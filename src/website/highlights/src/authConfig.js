@@ -66,8 +66,14 @@ export const msGraphLoginRequest = {
         'Tasks.ReadWrite',
         'Tasks.ReadWrite.Shared',
     ]
-}
+};
 
-export const profileEditRequest = {
-    scopes: []
+export const googleAPIConfig = {
+    clientId: "643174977567-amqrvrrcn4ab6pkdvni0qj7rad6l58co.apps.googleusercontent.com",
+    discoveryDocs: [
+        "https://www.googleapis.com/discovery/v1/apis/people/v1/rest",
+        "https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest",
+        "https://www.googleapis.com/discovery/v1/apis/tasks/v1/rest",
+    ],
+    scopes: "profile https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/tasks"
 };

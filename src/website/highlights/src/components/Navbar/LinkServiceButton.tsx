@@ -5,9 +5,12 @@ import { useAppUser } from "@/hooks/useAppUser";
 import { InteractionRequiredAuthError } from "@azure/msal-browser";
 import { useAddLinkedAccountMutation } from "@/features/auth/apiUsersSlice";
 import { LinkedAccount } from "@/features/auth";
+import { useEffect } from "react";
+import { getUserEmail, initTokenClient, requestAccessToken } from "@/services/GAPIService";
+import { useAppDispatch, useAppSelector } from "@/hooks";
+import { selectGoogleAccessToken, setGoogleAccessToken } from "@/features/auth/authSlice";
 
 let MicrosoftToDoButton = () => {
-    const dispatch = useAppDispatch();
     const { signIn } = useMSGraph();
     const { user } = useAppUser();
     const [addLinkedAccount, { isLoading }] = useAddLinkedAccountMutation();
@@ -57,6 +60,34 @@ let MicrosoftToDoButton = () => {
 }
 
 let GoogleTasksButton = () => {
+    const dispatch = useAppDispatch();
+    const { user } = useAppUser();
+    const [addLinkedAccount, { isLoading }] = useAddLinkedAccountMutation();
+    const gApiToken = useAppSelector(selectGoogleAccessToken);
+
+    const handleAuthSuccess = async (token: string) => {
+        const email = await getUserEmail(token);
+        console.log(email);
+        console.log(user);
+        await addLinkedAccount({ user: user!, account: { name: LinkedAccount.Google, email } }).unwrap();
+    }
+
+    useEffect(() => {
+        if (gApiToken) {
+            handleAuthSuccess(gApiToken);
+        }
+    }, [gApiToken]);
+
+    const handleTokenResponse = async (response: any) => {
+        dispatch(setGoogleAccessToken(response.access_token));
+        console.log('Google Tasks token response:', response);
+    };
+
+    const handleLinkGoogleTasks = async () => {
+        initTokenClient(handleTokenResponse);
+        requestAccessToken();
+    };
+
     return (
         <Box className={classes.section}>
             <Group className={classes.collectionsHeader} justify="space-between">
@@ -65,7 +96,7 @@ let GoogleTasksButton = () => {
                 </Text>
             </Group>
             <Box className={classes.collections}>
-                <UnstyledButton w={'100%'} className={classes.collectionLink}>
+                <UnstyledButton onClick={handleLinkGoogleTasks} w={'100%'} className={classes.collectionLink}>
                     <Box className={classes.mainLinkInner}>
                         <Image
                             className={classes.mainLinkIcon}

@@ -32,11 +32,6 @@ let MicrosoftToDoButton = () => {
 
     return (
         <Box className={classes.section}>
-            <Group className={classes.collectionsHeader} justify="space-between">
-                <Text size="sm" fw={500} c="dimmed">
-                    Microsoft To Do
-                </Text>
-            </Group>
             <Box className={classes.collections}>
                 <UnstyledButton
                     onClick={handleLinkMicrosoftToDo}
@@ -87,11 +82,6 @@ let GoogleTasksButton = () => {
 
     return (
         <Box className={classes.section}>
-            <Group className={classes.collectionsHeader} justify="space-between">
-                <Text size="sm" fw={500} c="dimmed">
-                    Google Tasks
-                </Text>
-            </Group>
             <Box className={classes.collections}>
                 <UnstyledButton onClick={handleLinkGoogleTasks} w={'100%'} className={classes.collectionLink}>
                     <Box className={classes.mainLinkInner}>

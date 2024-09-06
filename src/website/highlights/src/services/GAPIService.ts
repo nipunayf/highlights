@@ -28,6 +28,15 @@ export const requestAccessToken = () => {
     }
 };
 
+export async function getUserEmail(token: string): Promise<string> {
+    const res = await axios.get('https://people.googleapis.com/v1/people/me?personFields=names,emailAddresses', {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    });
+    return res.data.emailAddresses[0].value;
+}
+
 export async function getTaskLists(token: string) {
     const res = await axios.get('https://tasks.googleapis.com/tasks/v1/users/@me/lists', {
         headers: {
@@ -37,11 +46,11 @@ export async function getTaskLists(token: string) {
     return res.data.items;
 }
 
-export async function getUserEmail(token: string): Promise<string> {
-    const res = await axios.get('https://people.googleapis.com/v1/people/me?personFields=names,emailAddresses', {
+export async function getTasks(token: string, taskListId: string) {
+    const res = await axios.get(`https://tasks.googleapis.com/tasks/v1/lists/${taskListId}/tasks`, {
         headers: {
             'Authorization': `Bearer ${token}`
         }
     });
-    return res.data.emailAddresses[0].value;
-};
+    return res.data.items;
+}

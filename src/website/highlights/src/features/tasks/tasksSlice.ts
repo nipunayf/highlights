@@ -5,6 +5,7 @@ import { TaskListSource } from '../taskLists/TaskListSource';
 import { getTasks as getMSToDoTasks } from '@/services/GraphService';
 import { updateTaskListWithTasks } from '../taskLists/taskListsSlice';
 import { Task } from './models';
+import { getTasks as getGTasks } from '@/services/GAPIService';
 
 const defaultState: Task[] = [
     { id: 'task1', title: 'Finish project proposal', dueDate: new Date('2024-07-25').toISOString(), created: new Date().toISOString(), status: 'pending', taskListId: '1' },
@@ -45,7 +46,7 @@ const initialState: TasksState = tasksAdapter.getInitialState({
 
 export const fetchTasks = createAsyncThunk(
     'tasks/fetch',
-    async (taskList: TaskList, { dispatch }) => {
+    async (taskList: TaskList, { dispatch, getState }) => {
         let tasks: Task[] = [];
         if (taskList.source === TaskListSource.MicrosoftToDo) {
             const taskListId = taskList.id;
@@ -56,6 +57,25 @@ export const fetchTasks = createAsyncThunk(
                     title: t.title,
                     created: t.createdDateTime,
                     status: t.status,
+                    taskListId
+                });
+            }
+            dispatch(updateTaskListWithTasks({ taskListId, taskIds: tasks.map(task => task.id) }));
+        }
+        if (taskList.source === TaskListSource.GoogleTasks) {
+            const state = getState() as RootState;
+            const token = state.auth.googleAccessToken;
+
+            if (!token) {
+                throw new Error('No Google authentication token found');
+            }
+            const taskListId = taskList.id;
+            const response = await getGTasks(token, taskListId);
+            for (let t of response) {
+                tasks.push({
+                    id: t.id,
+                    title: t.title,
+                    created: t.updated,
                     taskListId
                 });
             }

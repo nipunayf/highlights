@@ -1,6 +1,5 @@
 import { fetchTasks, selectTaskById, taskCompleted, taskRemoved, taskUncompleted } from "@/features/tasks/tasksSlice";
 import { useAppDispatch, useAppSelector } from "@/hooks";
-import type { TaskList } from "@/features/taskLists/TaskList";
 import { Button, Checkbox, Group, Menu, Paper, Stack, Text } from "@mantine/core";
 import { selectListById } from "../../taskLists/taskListsSlice";
 import classes from './TaskList.module.css';

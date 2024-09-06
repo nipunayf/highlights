@@ -19,7 +19,7 @@ import { fetchGoogleTaskLists, fetchMSToDoLists, selectListById, selectListIdsBy
 import { useAppDispatch, useAppSelector } from '@/hooks';
 import { useAppUser } from '@/hooks/useAppUser';
 import UserMenu from '../UserMenu/UserMenu';
-import { TaskListSource } from '@/features/taskLists/TaskListSource';
+import { TaskListSource } from '@/features/taskLists';
 import LinkServiceButton from './LinkServiceButton';
 import WebSocketComponent from '@/components/RemainderNotification/RemainderNotification';
 import { LinkedAccount } from '@/features/auth';

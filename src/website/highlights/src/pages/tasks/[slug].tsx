@@ -5,8 +5,8 @@ import { ReactNode } from 'react';
 import classes from './Tasks.module.css';
 import { useAppSelector } from '@/hooks';
 import { selectListById } from '@/features/taskLists/taskListsSlice';
-import { TaskForm, TaskList } from '@/features/tasks/components';
 import Head from 'next/head';
+import { TaskForm, TaskList } from '@/features/tasks';
 
 export default function Page() {
     const router = useRouter();
@@ -46,7 +46,7 @@ export default function Page() {
                         </Box>
                     </ScrollArea>
                     <Box px={"xl"} mt={'auto'} mb={0}>
-                        <TaskForm taskListId={listId} />
+                        <TaskForm taskList={list} />
                     </Box>
                 </Flex>
             </Box>

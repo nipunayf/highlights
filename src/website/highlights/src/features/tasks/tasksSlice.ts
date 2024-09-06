@@ -1,11 +1,10 @@
 import { RootState } from '@/store';
 import { createAsyncThunk, createEntityAdapter, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
-import { TaskList } from '../taskLists/TaskList';
-import { TaskListSource } from '../taskLists/TaskListSource';
 import { getTasks as getMSToDoTasks } from '@/services/GraphService';
 import { updateTaskListWithTasks } from '../taskLists/taskListsSlice';
-import { Task } from './models';
 import { getTasks as getGTasks } from '@/services/GAPIService';
+import { Task } from '.';
+import { TaskList, TaskListSource } from '../taskLists';
 
 const defaultState: Task[] = [
     { id: 'task1', title: 'Finish project proposal', dueDate: new Date('2024-07-25').toISOString(), created: new Date().toISOString(), status: 'pending', taskListId: '1' },

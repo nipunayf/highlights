@@ -7,6 +7,7 @@ import { IconPlus } from '@tabler/icons-react';
 import classes from './TaskForm.module.css';
 import { taskAddedToTaskList } from '../../taskLists/taskListsSlice';
 import { useFocusTrap } from '@mantine/hooks';
+import { TaskList, TaskListSource } from '@/features/taskLists';
 
 export function TaskForm({ taskListId }: { taskListId: string }) {
 

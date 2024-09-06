@@ -1,23 +1,10 @@
 import { loginRequest } from "@/authConfig";
-import { selectAppUser, setCredentials } from "@/features/auth/authSlice";
+import { selectAppUser, setCredentials, setGoogleAccessToken } from "@/features/auth/authSlice";
 import { useGetUserQuery } from "@/features/auth/apiUsersSlice";
 import { useAppDispatch, useAppSelector } from "@/hooks";
 import { useMsal } from "@azure/msal-react";
 import { useState, useEffect } from "react";
-
-export interface AppUser {
-    id?: string;
-    displayName?: string;
-    sub?: string;
-    linkedAccounts?: string[];
-}
-
-export const AppUserLinkedAccount = {
-    Microsoft: "Microsoft",
-    Google: "Google",
-} as const;
-export type AppUserLinkedAccount =
-    (typeof AppUserLinkedAccount)[keyof typeof AppUserLinkedAccount];
+import { initTokenClient, requestAccessToken } from "@/services/GAPIService";
 
 export function useAppUser() {
     const dispatch = useAppDispatch();
@@ -70,8 +57,12 @@ export function useAppUser() {
     useEffect(() => {
         if (isSuccess && userData) {
             dispatch(setCredentials(userData));
+            initTokenClient((response: any) => {
+                dispatch(setGoogleAccessToken(response.access_token));
+            }, userData.linkedAccounts.find((account) => account.name === 'Google')?.email);
+            requestAccessToken();
         }
     }, [isSuccess, userData, dispatch]);
 
-    return { user: user.user, isLoading: isLoading || isFetching };
+    return { user, isLoading: isLoading || isFetching };
 }

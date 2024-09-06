@@ -15,13 +15,15 @@ import classes from './Navbar.module.css';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
-import { fetchMSToDoLists, selectListById, selectListIdsBySource } from '@/features/taskLists/taskListsSlice';
+import { fetchGoogleTaskLists, fetchMSToDoLists, selectListById, selectListIdsBySource } from '@/features/taskLists/taskListsSlice';
 import { useAppDispatch, useAppSelector } from '@/hooks';
-import { AppUserLinkedAccount, useAppUser } from '@/hooks/useAppUser';
+import { useAppUser } from '@/hooks/useAppUser';
 import UserMenu from '../UserMenu/UserMenu';
-import { TaskListSource } from '@/features/taskLists/TaskListSource';
+import { TaskListSource } from '@/features/taskLists';
 import LinkServiceButton from './LinkServiceButton';
 import WebSocketComponent from '@/components/RemainderNotification/RemainderNotification';
+import { LinkedAccount } from '@/features/auth';
+import { selectGoogleAccessToken } from '@/features/auth/authSlice';
 
 const links = [
     { icon: IconBulb, label: 'Highlights', path: '/highlights' },
@@ -64,14 +66,19 @@ export default function Navbar() {
     const msToDoError = useAppSelector(state => state.taskLists.error[TaskListSource.MicrosoftToDo]);
 
     const gTaskListIds = useAppSelector(state => selectListIdsBySource(state, TaskListSource.GoogleTasks));
+    const gTaskLoadingStatus = useAppSelector(state => state.taskLists.status[TaskListSource.GoogleTasks]);
+    const gTaskError = useAppSelector(state => state.taskLists.error[TaskListSource.GoogleTasks]);
 
     const { user } = useAppUser();
+    const gApiToken = useAppSelector(selectGoogleAccessToken);
 
     useEffect(() => {
         if (!user) return;
-        if (user.linkedAccounts?.includes(AppUserLinkedAccount.Microsoft))
+        if (user.linkedAccounts.find(account => account.name === LinkedAccount.Microsoft))
             dispatch(fetchMSToDoLists());
-    }, [dispatch, user]);
+        if (user.linkedAccounts.find(account => account.name === LinkedAccount.Google) && gApiToken)
+            dispatch(fetchGoogleTaskLists(gApiToken));
+    }, [dispatch, user, gApiToken]);
 
     useEffect(() => {
         const currentPath = router.pathname;
@@ -134,7 +141,7 @@ export default function Navbar() {
                     <div className={classes.mainLinks}>{mainLinks}</div>
                 </div>
 
-                {user?.linkedAccounts?.includes(AppUserLinkedAccount.Microsoft) ? (
+                {user?.linkedAccounts.find(account => account.name === LinkedAccount.Microsoft) ? (
                     <Box className={classes.section}>
                         <Group className={classes.collectionsHeader} justify="space-between">
                             <Text size="sm" fw={500} c="dimmed">
@@ -163,10 +170,10 @@ export default function Navbar() {
                         )}
                     </Box>
                 ) :
-                    <LinkServiceButton service="Microsoft" />
+                    <LinkServiceButton service={LinkedAccount.Microsoft} />
                 }
 
-                {user?.linkedAccounts?.includes(AppUserLinkedAccount.Google) ? (
+                {user?.linkedAccounts.find(account => account.name === LinkedAccount.Google) ? (
                     <div className={classes.section}>
                         <Group className={classes.collectionsHeader} justify="space-between">
                             <Text size="sm" fw={500} c="dimmed">
@@ -178,14 +185,24 @@ export default function Navbar() {
                                 </ActionIcon>
                             </Tooltip>
                         </Group>
-                        <div className={classes.collections}>
-                            {gTaskListIds.map((taskListId: string) => (
-                                <TaskListExcerpt key={taskListId} taskListId={taskListId} active={active} setActive={setActive} />
-                            ))}
-                        </div>
+                        {gTaskLoadingStatus === 'loading' ? (
+                            <Box ta="center" py="md">
+                                <Loader size="sm" />
+                            </Box>
+                        ) : gTaskLoadingStatus === 'failed' ? (
+                            <Text c="red" size="sm" ta="center" py="md">
+                                {gTaskError || 'Failed to load Microsoft To Do lists'}
+                            </Text>
+                        ) : (
+                            <div className={classes.collections}>
+                                {gTaskListIds.map((taskListId: string) => (
+                                    <TaskListExcerpt key={taskListId} taskListId={taskListId} active={active} setActive={setActive} />
+                                ))}
+                            </div>
+                        )}
                     </div>
                 ) :
-                    <LinkServiceButton service="Google" />
+                    <LinkServiceButton service={LinkedAccount.Google} />
                 }
             </nav>
         </>

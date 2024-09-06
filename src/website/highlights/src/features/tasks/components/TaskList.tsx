@@ -1,17 +1,32 @@
 import { fetchTasks, selectTaskById, taskCompleted, taskRemoved, taskUncompleted } from "@/features/tasks/tasksSlice";
 import { useAppDispatch, useAppSelector } from "@/hooks";
-import type { TaskList } from "@/features/taskLists/TaskList";
 import { Button, Checkbox, Group, Menu, Paper, Stack, Text } from "@mantine/core";
-import { selectListById } from "../../taskLists/taskListsSlice";
+import { selectListById, taskRemovedFromTaskList } from "../../taskLists/taskListsSlice";
 import classes from './TaskList.module.css';
 import { IconDotsVertical, IconTrash } from "@tabler/icons-react";
+import { deleteTask as deleteMSTask } from "@/services/GraphService";
+import { TaskListSource } from "@/features/taskLists";
+import { deleteTask as deleteGTask } from "@/services/GAPIService";
+import { selectGoogleAccessToken } from "@/features/auth/authSlice";
 
-let TaskExcerpt = ({ taskId }: { taskId: string }) => {
+let TaskExcerpt = ({ taskId, taskListId }: { taskId: string, taskListId: string }) => {
     const dispatch = useAppDispatch();
-    const task = useAppSelector(state => selectTaskById(state, taskId))
+    const task = useAppSelector(state => selectTaskById(state, taskId));
+    const list = useAppSelector(state => selectListById(state, taskListId));
+
+    const gApiToken = useAppSelector(selectGoogleAccessToken);
 
     const handleDelete = () => {
+        if (list.source === TaskListSource.MicrosoftToDo) {
+            deleteMSTask(taskListId, taskId);
+        } else if (list.source === TaskListSource.GoogleTasks) {
+            if (!gApiToken) {
+                throw new Error('No Google authentication token found');
+            }
+            deleteGTask(gApiToken, taskListId, taskId);
+        }
         dispatch(taskRemoved(task.id));
+        dispatch(taskRemovedFromTaskList({ taskListId, taskId }));
     };
 
     if (!task) return null;
@@ -66,7 +81,7 @@ export function TaskList({ taskListId }: { taskListId: string }) {
     return (
         <Stack py={'md'} gap={'xs'}>
             {orderedTaskIds?.map((taskId) => (
-                <TaskExcerpt key={taskId} taskId={taskId} />
+                <TaskExcerpt key={taskId} taskId={taskId} taskListId={taskListId} />
             ))}
         </Stack>
     )

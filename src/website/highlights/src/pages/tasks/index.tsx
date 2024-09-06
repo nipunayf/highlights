@@ -4,29 +4,35 @@ import { ReactNode } from "react";
 import classes from './Tasks.module.css';
 import { useAppSelector } from "@/hooks";
 import { selectDefaultTaskList } from "@/features/taskLists/taskListsSlice";
-import { TaskForm, TaskList } from "@/features/tasks/components";
+import Head from "next/head";
+import { TaskForm, TaskList, } from "@/features/tasks";
 
 export default function Tasks() {
     const theme = useMantineTheme();
     const { colorScheme } = useMantineColorScheme();
     const backgroundColor = colorScheme === 'dark' ? theme.colors.dark[9] : theme.colors.indigo[2];
 
-    const taskList = useAppSelector(selectDefaultTaskList);
+    const list = useAppSelector(selectDefaultTaskList);
 
     return (
-        <Box p={'xl'} style={{ backgroundColor: backgroundColor }}>
-            <Flex className={classes.tasks} direction={"column"}>
-                <Title mt={'sm'} mb={"sm"} px={"xl"} order={1}>Tasks</Title>
-                <ScrollArea my={'md'}>
-                    <Box mx={'auto'} maw={'80%'}>
-                        <TaskList taskListId={taskList.id} />
+        <>
+            <Head>
+                <title>Tasks</title>
+            </Head>
+            <Box p={'xl'} style={{ backgroundColor: backgroundColor }}>
+                <Flex className={classes.tasks} direction={"column"}>
+                    <Title mt={'sm'} mb={"sm"} px={"xl"} order={1}>Tasks</Title>
+                    <ScrollArea my={'md'}>
+                        <Box mx={'auto'} maw={'80%'}>
+                            <TaskList taskListId={list.id} />
+                        </Box>
+                    </ScrollArea>
+                    <Box px={"xl"} mt={'auto'} mb={0}>
+                        <TaskForm taskListId={list.id} />
                     </Box>
-                </ScrollArea>
-                <Box px={"xl"} mt={'auto'} mb={0}>
-                    <TaskForm taskListId={taskList.id} />
-                </Box>
-            </Flex>
-        </Box>
+                </Flex>
+            </Box>
+        </>
     )
 }
 

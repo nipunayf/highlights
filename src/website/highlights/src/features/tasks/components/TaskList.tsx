@@ -4,14 +4,27 @@ import { Button, Checkbox, Group, Menu, Paper, Stack, Text } from "@mantine/core
 import { selectListById, taskRemovedFromTaskList } from "../../taskLists/taskListsSlice";
 import classes from './TaskList.module.css';
 import { IconDotsVertical, IconTrash } from "@tabler/icons-react";
-import { deleteTask } from "@/services/GraphService";
+import { deleteTask as deleteMSTask } from "@/services/GraphService";
+import { TaskListSource } from "@/features/taskLists";
+import { deleteTask as deleteGTask } from "@/services/GAPIService";
+import { selectGoogleAccessToken } from "@/features/auth/authSlice";
 
 let TaskExcerpt = ({ taskId, taskListId }: { taskId: string, taskListId: string }) => {
     const dispatch = useAppDispatch();
-    const task = useAppSelector(state => selectTaskById(state, taskId))
+    const task = useAppSelector(state => selectTaskById(state, taskId));
+    const list = useAppSelector(state => selectListById(state, taskListId));
+
+    const gApiToken = useAppSelector(selectGoogleAccessToken);
 
     const handleDelete = () => {
-        deleteTask(taskListId, taskId);
+        if (list.source === TaskListSource.MicrosoftToDo) {
+            deleteMSTask(taskListId, taskId);
+        } else if (list.source === TaskListSource.GoogleTasks) {
+            if (!gApiToken) {
+                throw new Error('No Google authentication token found');
+            }
+            deleteGTask(gApiToken, taskListId, taskId);
+        }
         dispatch(taskRemoved(task.id));
         dispatch(taskRemovedFromTaskList({ taskListId, taskId }));
     };

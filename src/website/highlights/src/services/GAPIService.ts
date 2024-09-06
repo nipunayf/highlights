@@ -1,4 +1,5 @@
 import { googleAPIConfig } from "@/authConfig";
+import { CreateTask } from "@/features/tasks";
 import axios from "axios";
 
 declare global {
@@ -53,4 +54,28 @@ export async function getTasks(token: string, taskListId: string) {
         }
     });
     return res.data.items;
+}
+
+export async function createTask(token: string, task: CreateTask) {
+    const res = await axios.post(
+        `https://tasks.googleapis.com/tasks/v1/lists/${task.taskListId}/tasks`,
+        {
+            title: task.title,
+            updated: task.created,
+            due: task.dueDate
+        },
+        {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+    return res.data;
+}
+
+export async function deleteTask(token: string, taskListId: string, taskId: string) {
+    return await axios.delete(`https://tasks.googleapis.com/tasks/v1/lists/${taskListId}/tasks/${taskId}`, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    });
 }

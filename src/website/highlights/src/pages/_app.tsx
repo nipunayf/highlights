@@ -11,6 +11,7 @@ import { NextPage } from 'next';
 import { ReactElement, ReactNode, StrictMode } from 'react';
 import { Provider } from 'react-redux';
 import { store } from '../store';
+import classes from './_app.module.css';
 
 export const msalInstance = new PublicClientApplication(msalConfig);
 
@@ -35,7 +36,7 @@ msalInstance.addEventCallback((event) => {
 });
 
 const theme = createTheme({
-    /** Put your mantine theme override here */
+    activeClassName: classes.active
 });
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {

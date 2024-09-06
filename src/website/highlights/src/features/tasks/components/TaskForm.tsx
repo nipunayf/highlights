@@ -19,7 +19,7 @@ export function TaskForm({ taskListId }: { taskListId: string }) {
     const dispatch = useAppDispatch();
     const taskList = useAppSelector((state) => selectListById(state, taskListId));
 
-    const gApiToken = useAppSelector(selectGoogleAccessToken);
+    const gAPIToken = useAppSelector(selectGoogleAccessToken);
 
     const focusTrapRef = useFocusTrap();
 
@@ -49,10 +49,10 @@ export function TaskForm({ taskListId }: { taskListId: string }) {
         if (taskList.source === TaskListSource.MicrosoftToDo) {
             createdTask = await createMSTask(task);
         } else if (taskList.source === TaskListSource.GoogleTasks) {
-            if (!gApiToken) {
+            if (!gAPIToken) {
                 throw new Error('No Google authentication token found');
             }
-            createdTask = await createGTask(gApiToken, task);
+            createdTask = await createGTask(gAPIToken, task);
         }
 
         if (!createdTask) {

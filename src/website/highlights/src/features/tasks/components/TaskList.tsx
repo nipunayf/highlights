@@ -14,16 +14,16 @@ let TaskExcerpt = ({ taskId, taskListId }: { taskId: string, taskListId: string 
     const task = useAppSelector(state => selectTaskById(state, taskId));
     const list = useAppSelector(state => selectListById(state, taskListId));
 
-    const gApiToken = useAppSelector(selectGoogleAccessToken);
+    const gAPIToken = useAppSelector(selectGoogleAccessToken);
 
     const handleDelete = () => {
         if (list.source === TaskListSource.MicrosoftToDo) {
             deleteMSTask(taskListId, taskId);
         } else if (list.source === TaskListSource.GoogleTasks) {
-            if (!gApiToken) {
+            if (!gAPIToken) {
                 throw new Error('No Google authentication token found');
             }
-            deleteGTask(gApiToken, taskListId, taskId);
+            deleteGTask(gAPIToken, taskListId, taskId);
         }
         dispatch(taskRemoved(task.id));
         dispatch(taskRemovedFromTaskList({ taskListId, taskId }));

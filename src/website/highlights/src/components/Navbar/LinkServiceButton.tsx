@@ -63,24 +63,21 @@ let GoogleTasksButton = () => {
     const dispatch = useAppDispatch();
     const { user } = useAppUser();
     const [addLinkedAccount, { isLoading }] = useAddLinkedAccountMutation();
-    const gApiToken = useAppSelector(selectGoogleAccessToken);
+    const gAPIToken = useAppSelector(selectGoogleAccessToken);
 
     const handleAuthSuccess = async (token: string) => {
         const email = await getUserEmail(token);
-        console.log(email);
-        console.log(user);
         await addLinkedAccount({ user: user!, account: { name: LinkedAccount.Google, email } }).unwrap();
     }
 
     useEffect(() => {
-        if (gApiToken) {
-            handleAuthSuccess(gApiToken);
+        if (gAPIToken) {
+            handleAuthSuccess(gAPIToken);
         }
-    }, [gApiToken]);
+    }, [gAPIToken]);
 
     const handleTokenResponse = async (response: any) => {
         dispatch(setGoogleAccessToken(response.access_token));
-        console.log('Google Tasks token response:', response);
     };
 
     const handleLinkGoogleTasks = async () => {

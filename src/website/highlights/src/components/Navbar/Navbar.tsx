@@ -70,15 +70,15 @@ export default function Navbar() {
     const gTaskError = useAppSelector(state => state.taskLists.error[TaskListSource.GoogleTasks]);
 
     const { user } = useAppUser();
-    const gApiToken = useAppSelector(selectGoogleAccessToken);
+    const gAPIToken = useAppSelector(selectGoogleAccessToken);
 
     useEffect(() => {
         if (!user) return;
         if (user.linkedAccounts.find(account => account.name === LinkedAccount.Microsoft))
             dispatch(fetchMSToDoLists());
-        if (user.linkedAccounts.find(account => account.name === LinkedAccount.Google) && gApiToken)
-            dispatch(fetchGoogleTaskLists(gApiToken));
-    }, [dispatch, user, gApiToken]);
+        if (user.linkedAccounts.find(account => account.name === LinkedAccount.Google) && gAPIToken)
+            dispatch(fetchGoogleTaskLists(gAPIToken));
+    }, [dispatch, user, gAPIToken]);
 
     useEffect(() => {
         const currentPath = router.pathname;

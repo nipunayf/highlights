@@ -5,6 +5,7 @@ import { useAppDispatch, useAppSelector } from "@/hooks";
 import { useMsal } from "@azure/msal-react";
 import { useState, useEffect } from "react";
 import { initTokenClient, requestAccessToken } from "@/services/GAPIService";
+import { LinkedAccount } from "@/features/auth";
 
 export function useAppUser() {
     const dispatch = useAppDispatch();
@@ -57,10 +58,12 @@ export function useAppUser() {
     useEffect(() => {
         if (isSuccess && userData) {
             dispatch(setCredentials(userData));
-            initTokenClient((response: any) => {
-                dispatch(setGoogleAccessToken(response.access_token));
-            }, userData.linkedAccounts.find((account) => account.name === 'Google')?.email);
-            requestAccessToken();
+            if (userData.linkedAccounts.some((a) => a.name === LinkedAccount.Google)) {
+                initTokenClient((response: any) => {
+                    dispatch(setGoogleAccessToken(response.access_token));
+                }, userData.linkedAccounts.find((account) => account.name === LinkedAccount.Google)?.email);
+                requestAccessToken();
+            }
         }
     }, [isSuccess, userData, dispatch]);
 

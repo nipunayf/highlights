@@ -1,6 +1,6 @@
 export interface CreateTask {
     title: string;
-    created: string;
-    dueDate?: string;
+    created: Date;
+    dueDate?: Date;
     taskListId: string;
 }

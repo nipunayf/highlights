@@ -1,5 +1,5 @@
 import { googleAPIConfig } from "@/authConfig";
-import { CreateTask } from "@/features/tasks";
+import { CreateTask, Task } from "@/features/tasks";
 import axios from "axios";
 
 declare global {
@@ -56,20 +56,26 @@ export async function getTasks(token: string, taskListId: string) {
     return res.data.items;
 }
 
-export async function createTask(token: string, task: CreateTask) {
+export async function createTask(token: string, task: CreateTask): Promise<Task> {
     const res = await axios.post(
         `https://tasks.googleapis.com/tasks/v1/lists/${task.taskListId}/tasks`,
         {
             title: task.title,
-            updated: task.created,
-            due: task.dueDate
+            updated: task.created.toISOString(),
+            due: task.dueDate ? (new Date(`${task.dueDate.toDateString()} UTC`)).toISOString() : undefined
         },
         {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
         });
-    return res.data;
+    return {
+        id: res.data.id,
+        title: res.data.title,
+        created: res.data.updated,
+        dueDate: res.data.due,
+        taskListId: task.taskListId
+    };
 }
 
 export async function deleteTask(token: string, taskListId: string, taskId: string) {

@@ -8,10 +8,12 @@ import classes from './TaskForm.module.css';
 import { selectListById, taskAddedToTaskList } from '../../taskLists/taskListsSlice';
 import { useFocusTrap } from '@mantine/hooks';
 import { TaskListSource } from '@/features/taskLists';
-import { CreateTask } from '../models/CreateTask';
 import { createTask as createMSTask } from '@/services/GraphService';
 import { createTask as createGTask } from '@/services/GAPIService';
 import { selectGoogleAccessToken } from '@/features/auth/authSlice';
+import { CreateTask } from '../models/CreateTask';
+import { Task } from '../models/Task';
+import { TaskStatus } from '../models/TaskStatus';
 
 export function TaskForm({ taskListId }: { taskListId: string }) {
     const dispatch = useAppDispatch();
@@ -25,7 +27,7 @@ export function TaskForm({ taskListId }: { taskListId: string }) {
         mode: 'uncontrolled',
         initialValues: {
             title: '',
-            dueDate: null,
+            dueDate: undefined,
         },
 
         validate: {
@@ -33,38 +35,35 @@ export function TaskForm({ taskListId }: { taskListId: string }) {
         },
     });
 
-    const handleAddTask = async (values: any) => {
+    const handleAddTask = async (values: typeof form.values) => {
 
         let task: CreateTask = {
             title: values.title,
-            created: new Date().toISOString(),
-            dueDate: values.dueDate ? (new Date(`${values.dueDate.toDateString()} UTC`)).toISOString() : undefined,
+            created: new Date(),
+            dueDate: values.dueDate,
             taskListId: taskListId,
         };
 
-        let id = undefined;
+        let createdTask: Task | undefined = undefined;
 
         if (taskList.source === TaskListSource.MicrosoftToDo) {
-            const res = await createMSTask(task);
-            id = res.id;
+            createdTask = await createMSTask(task);
         } else if (taskList.source === TaskListSource.GoogleTasks) {
             if (!gApiToken) {
                 throw new Error('No Google authentication token found');
             }
-            const res = await createGTask(gApiToken, task);
-            id = res.id;
+            createdTask = await createGTask(gApiToken, task);
         }
 
-        if (!id) {
+        if (!createdTask) {
             throw new Error('Task creation failed');
         }
 
         dispatch(taskAdded({
-            id,
-            status: 'pending',
-            ...task,
+            ...createdTask!,
+            status: TaskStatus.Pending,
         }));
-        dispatch(taskAddedToTaskList({ taskListId, taskId: id }));
+        dispatch(taskAddedToTaskList({ taskListId, taskId: createdTask.id }));
     };
 
     const handleKeyDown = (event: any) => {

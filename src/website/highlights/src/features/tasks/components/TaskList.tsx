@@ -32,15 +32,10 @@ let TaskExcerpt = ({ taskId, taskListId }: { taskId: string, taskListId: string 
     if (!task) return null;
 
     return (
-        <Paper
-            component={Group}
-            w={'100%'}
-            shadow={'xs'}
-            radius={'md'}
+        <Group
             px={'md'}
             key={task.id}
             className={classes.task}
-            withBorder
             wrap="nowrap"
         >
             <Group wrap="nowrap">
@@ -64,7 +59,7 @@ let TaskExcerpt = ({ taskId, taskListId }: { taskId: string, taskListId: string 
                     </Menu.Item>
                 </Menu.Dropdown>
             </Menu>
-        </Paper>
+        </Group>
     );
 }
 
@@ -78,11 +73,15 @@ export function TaskList({ taskListId }: { taskListId: string }) {
         dispatch(fetchTasks(taskList));
     }
 
+    if (orderedTaskIds?.length === 0) return;
+
     return (
-        <Stack py={'md'} gap={'xs'}>
-            {orderedTaskIds?.map((taskId) => (
-                <TaskExcerpt key={taskId} taskId={taskId} taskListId={taskListId} />
-            ))}
-        </Stack>
+        <Paper radius={'md'} shadow={'md'} px={'md'}>
+            <Stack py={'md'} gap={'xs'}>
+                {orderedTaskIds?.map((taskId) => (
+                    <TaskExcerpt key={taskId} taskId={taskId} taskListId={taskListId} />
+                ))}
+            </Stack>
+        </Paper>
     )
 }

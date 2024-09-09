@@ -1,5 +1,5 @@
 import PageLayout from "@/components/PageLayout/PageLayout";
-import { Box, Flex, ScrollArea, Title, useMantineColorScheme, useMantineTheme } from "@mantine/core";
+import { Box, Flex, ScrollArea, Title, useMantineTheme } from "@mantine/core";
 import { ReactNode } from "react";
 import classes from './Tasks.module.css';
 import { useAppSelector } from "@/hooks";
@@ -9,8 +9,7 @@ import { TaskForm, TaskList, } from "@/features/tasks";
 
 export default function Tasks() {
     const theme = useMantineTheme();
-    const { colorScheme } = useMantineColorScheme();
-    const backgroundColor = colorScheme === 'dark' ? theme.colors.dark[9] : theme.colors.indigo[2];
+    const backgroundColor = theme.colors.indigo[0];
 
     const list = useAppSelector(selectDefaultTaskList);
 
@@ -20,14 +19,16 @@ export default function Tasks() {
                 <title>Tasks</title>
             </Head>
             <Box p={'xl'} style={{ backgroundColor: backgroundColor }}>
-                <Flex className={classes.tasks} direction={"column"}>
-                    <Title mt={'sm'} mb={"sm"} px={"xl"} order={1}>Tasks</Title>
+                <Flex className={classes.tasks}
+                    direction={"column"}
+                    mx={"auto"}
+                    maw={{ base: '100%', lg: '70%', xl: '60%' }}
+                >
+                    <Title mt={'sm'} mb={"sm"} order={1}>Tasks</Title>
                     <ScrollArea my={'md'}>
-                        <Box mx={'auto'} maw={'80%'}>
-                            <TaskList taskListId={list.id} />
-                        </Box>
+                        <TaskList taskListId={list.id} />
                     </ScrollArea>
-                    <Box px={"xl"} mt={'auto'} mb={0}>
+                    <Box mt={'auto'} mb={0}>
                         <TaskForm taskListId={list.id} />
                     </Box>
                 </Flex>

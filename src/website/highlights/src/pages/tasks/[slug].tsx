@@ -1,5 +1,5 @@
 import PageLayout from '@/components/PageLayout/PageLayout';
-import { Box, Center, Flex, ScrollArea, Text, Title } from '@mantine/core';
+import { Box, Center, Flex, ScrollArea, Text, Title, useMantineTheme } from '@mantine/core';
 import { useRouter } from 'next/router'
 import { ReactNode } from 'react';
 import classes from './Tasks.module.css';
@@ -11,6 +11,9 @@ import { TaskForm, TaskList } from '@/features/tasks';
 export default function Page() {
     const router = useRouter();
     const { slug } = router.query;
+
+    const theme = useMantineTheme();
+    const backgroundColor = theme.colors.indigo[0];
 
     const listId = slug as string;
     const list = useAppSelector((state) => selectListById(state, listId));
@@ -37,15 +40,17 @@ export default function Page() {
             <Head>
                 <title>{list.title}</title>
             </Head>
-            <Box p={'xl'}>
-                <Flex className={classes.tasks} direction={"column"}>
-                    <Title mt={'sm'} mb={"sm"} px={"xl"} order={1}>{list.title}</Title>
+            <Box p={'xl'} style={{ backgroundColor: backgroundColor }}>
+                <Flex className={classes.tasks}
+                    direction={"column"}
+                    mx={"auto"}
+                    maw={{ base: '100%', lg: '70%', xl: '60%' }}
+                >
+                    <Title mt={'sm'} mb={"sm"} order={1}>Tasks</Title>
                     <ScrollArea my={'md'}>
-                        <Box mx={'auto'} maw={'70%'}>
-                            <TaskList taskListId={listId} />
-                        </Box>
+                        <TaskList taskListId={list.id} />
                     </ScrollArea>
-                    <Box px={"xl"} mt={'auto'} mb={0}>
+                    <Box mt={'auto'} mb={0}>
                         <TaskForm taskListId={listId} />
                     </Box>
                 </Flex>

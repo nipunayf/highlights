@@ -77,7 +77,7 @@ export function TaskForm({ taskListId }: { taskListId: string }) {
     };
 
     return (
-        <Paper p={'xs'} radius={'md'} withBorder className={classes.container}>
+        <Paper p={'xs'} radius={'md'} shadow='sm' withBorder className={classes.container}>
             <form>
                 <TextInput
                     ref={focusTrapRef}
